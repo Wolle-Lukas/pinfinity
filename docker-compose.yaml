@@ -1,7 +1,11 @@
 services:
   pinfinity:
     container_name: pinfinity
-    image: pinfinity
+    # Build the image locally from the repository Dockerfile. Without this
+    # Compose will try to pull an image named "pinfinity" from a registry
+    # which results in "pull access denied" if it doesn't exist or is private.
+    build: .
+    image: pinfinity:latest
     environment:
       PINFINITY_NAME: "XXX"
       PINFINITY_EMAIL: "XXX"
