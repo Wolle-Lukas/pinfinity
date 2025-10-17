@@ -32,7 +32,7 @@ As the Joola app communicates via https with the Joola servers, we need to modif
 - Copy the patched `*.apks` back to your Android device, uninstall the current Joola app and install the patched app again using [SAI](https://github.com/Aefyr/SAI).
 
 - Next create the certificates as described in the step [Generate TLS certs — MANDATORY (before the first run, and after expiry)](#generate-tls-certs--mandatory-before-the-first-run-and-after-expiry) on the host where you will run pinfinity.
-- After the certificate is created, copy the `ca.pem` to your Android device and add it as a trusted CA. (Could be different on your device)
+- After the certificate is created, copy the `ca.pem` from the `./certs` folder to your Android device and add it as a trusted CA. (Could be different on your device)
   - Open your device's Settings app.
   - Tap Security & privacy and then More security settings and then Encryption & credentials.
   - Tap Install a certificate and then CA certificate.
