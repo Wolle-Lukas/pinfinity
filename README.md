@@ -9,12 +9,14 @@ What can you expect after the successful installation:
 
 What will not work:
 - Any "Social" feature, like tutorials etc.
-- More then one robot connected to the app.
+- More then one robot connected to the Joola app.
 - Fine tuning of the robot settigs.
 
 What should be considered:
-- The app will show some random error messages, but they can be ignored.
-- If something is not implemented, the app can show "Saved" but the change is not really saved.
+- The Joola app will show some random error messages, but they can be ignored.
+- The startup of the Joola app is sometimes a bit bumpy. If this is the case, just switch to your home screen without closing the app and open it again. Or lock your screen and unlock it again.
+- Please don't switch to other tabs then `Play`and `More`, as it can crash the Joola app.
+- If something is not implemented, the Joola app can show "Saved" but the change is not really saved.
 
 ## Requirements
 
