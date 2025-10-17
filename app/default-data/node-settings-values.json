@@ -1,0 +1,20 @@
+{
+  "code": 200,
+  "msg": "SUCCESS",
+  "data": {
+    "minM1": 0,
+    "maxM1": 8100,
+    "minM2": 0,
+    "maxM2": 8100,
+    "minX": -20,
+    "maxX": 20,
+    "minY": -30,
+    "maxY": 50,
+    "minZ": -45,
+    "maxZ": 45,
+    "isCalibrationAvailable": false,
+    "motorSpeedThreshold": 15000,
+    "isPickleballCourtHidden": false,
+    "isPaddleRefreshProgram": 1
+  }
+}

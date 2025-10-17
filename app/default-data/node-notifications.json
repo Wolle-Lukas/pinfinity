@@ -1,0 +1,31 @@
+{
+  "code": 200,
+  "msg": "SUCCESS",
+  "data": [
+    {
+      "id": 1337,
+      "content": "You are using a self-hosted server",
+      "data": {
+        "icon": "learn",
+        "tutorialId": null,
+        "tutorialType": null,
+        "trainerId": null,
+        "page": "recommendedTutorials",
+        "roleId": null,
+        "youtubeId": null,
+        "subscriptionPlan": null,
+        "subscriptionStatus": null,
+        "url": "https://infinity.joola.com/home"
+      },
+      "status": "unread",
+      "date": "2025-08-07T07:00:00.000Z",
+      "heading": null,
+      "appId": "dafc0da3-6f76-4fbc-ba1b-fa79fc2318b6"
+    }
+  ],
+  "size": 1,
+  "unreadNotificationCount": 0,
+  "current": 1,
+  "totalCount": 1,
+  "pages": 1
+}

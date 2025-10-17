@@ -1,0 +1,1471 @@
+{
+  "code": 200,
+  "msg": "SUCCESS",
+  "data": [
+    {
+      "region": "AF",
+      "language": "en",
+      "phone": "93",
+      "title": "Afghanistan"
+    },
+    {
+      "region": "AX",
+      "language": "en",
+      "phone": "358 18",
+      "title": "Aland Islands"
+    },
+    {
+      "region": "AL",
+      "language": "en",
+      "phone": "355",
+      "title": "Albania"
+    },
+    {
+      "region": "DZ",
+      "language": "en",
+      "phone": "213",
+      "title": "Algeria"
+    },
+    {
+      "region": "AS",
+      "language": "en",
+      "phone": "1684",
+      "title": "American Samoa"
+    },
+    {
+      "region": "AD",
+      "language": "en",
+      "phone": "376",
+      "title": "Andorra"
+    },
+    {
+      "region": "AO",
+      "language": "en",
+      "phone": "244",
+      "title": "Angola"
+    },
+    {
+      "region": "AI",
+      "language": "en",
+      "phone": "1264",
+      "title": "Anguilla"
+    },
+    {
+      "region": "AQ",
+      "language": "en",
+      "phone": "6721",
+      "title": "Antarctica"
+    },
+    {
+      "region": "AG",
+      "language": "en",
+      "phone": "1268",
+      "title": "Antigua and Barbuda"
+    },
+    {
+      "region": "AR",
+      "language": "en",
+      "phone": "54",
+      "title": "Argentina"
+    },
+    {
+      "region": "AM",
+      "language": "en",
+      "phone": "374",
+      "title": "Armenia"
+    },
+    {
+      "region": "AW",
+      "language": "en",
+      "phone": "297",
+      "title": "Aruba"
+    },
+    {
+      "region": "AU",
+      "language": "en",
+      "phone": "61",
+      "title": "Australia"
+    },
+    {
+      "region": "AT",
+      "language": "en",
+      "phone": "43",
+      "title": "Austria"
+    },
+    {
+      "region": "AZ",
+      "language": "en",
+      "phone": "994",
+      "title": "Azerbaijan"
+    },
+    {
+      "region": "BS",
+      "language": "en",
+      "phone": "1242",
+      "title": "Bahamas"
+    },
+    {
+      "region": "BH",
+      "language": "en",
+      "phone": "973",
+      "title": "Bahrain"
+    },
+    {
+      "region": "BD",
+      "language": "en",
+      "phone": "880",
+      "title": "Bangladesh"
+    },
+    {
+      "region": "BB",
+      "language": "en",
+      "phone": "1246",
+      "title": "Barbados"
+    },
+    {
+      "region": "BY",
+      "language": "en",
+      "phone": "375",
+      "title": "Belarus"
+    },
+    {
+      "region": "BE",
+      "language": "en",
+      "phone": "32",
+      "title": "Belgium"
+    },
+    {
+      "region": "BZ",
+      "language": "en",
+      "phone": "501",
+      "title": "Belize"
+    },
+    {
+      "region": "BJ",
+      "language": "en",
+      "phone": "229",
+      "title": "Benin"
+    },
+    {
+      "region": "BM",
+      "language": "en",
+      "phone": "1441",
+      "title": "Bermuda"
+    },
+    {
+      "region": "BT",
+      "language": "en",
+      "phone": "975",
+      "title": "Bhutan"
+    },
+    {
+      "region": "BO",
+      "language": "en",
+      "phone": "591",
+      "title": "Bolivia"
+    },
+    {
+      "region": "BA",
+      "language": "en",
+      "phone": "387",
+      "title": "Bosnia and Herzegovina"
+    },
+    {
+      "region": "BW",
+      "language": "en",
+      "phone": "267",
+      "title": "Botswana"
+    },
+    {
+      "region": "BV",
+      "language": "en",
+      "phone": "47",
+      "title": "Bouvet Island"
+    },
+    {
+      "region": "BR",
+      "language": "en",
+      "phone": "55",
+      "title": "Brazil"
+    },
+    {
+      "region": "IO",
+      "language": "en",
+      "phone": "246",
+      "title": "British Indian Ocean Territory"
+    },
+    {
+      "region": "BN",
+      "language": "en",
+      "phone": "673",
+      "title": "Brunei Darussalam"
+    },
+    {
+      "region": "BG",
+      "language": "en",
+      "phone": "359",
+      "title": "Bulgaria"
+    },
+    {
+      "region": "BF",
+      "language": "en",
+      "phone": "226",
+      "title": "Burkina Faso"
+    },
+    {
+      "region": "BI",
+      "language": "en",
+      "phone": "257",
+      "title": "Burundi"
+    },
+    {
+      "region": "KH",
+      "language": "en",
+      "phone": "855",
+      "title": "Cambodia"
+    },
+    {
+      "region": "CM",
+      "language": "en",
+      "phone": "237",
+      "title": "Cameroon"
+    },
+    {
+      "region": "CA",
+      "language": "en",
+      "phone": "1",
+      "title": "Canada"
+    },
+    {
+      "region": "CV",
+      "language": "en",
+      "phone": "238",
+      "title": "Cape Verde"
+    },
+    {
+      "region": "KY",
+      "language": "en",
+      "phone": "1345",
+      "title": "Cayman Islands"
+    },
+    {
+      "region": "CF",
+      "language": "en",
+      "phone": "236",
+      "title": "Central African Republic"
+    },
+    {
+      "region": "TD",
+      "language": "en",
+      "phone": "235",
+      "title": "Chad"
+    },
+    {
+      "region": "CL",
+      "language": "en",
+      "phone": "56",
+      "title": "Chile"
+    },
+    {
+      "region": "CN",
+      "language": "en",
+      "phone": "86",
+      "title": "China"
+    },
+    {
+      "region": "CX",
+      "language": "en",
+      "phone": "61",
+      "title": "Christmas Island"
+    },
+    {
+      "region": "CC",
+      "language": "en",
+      "phone": "61",
+      "title": "Cocos (Keeling) Islands"
+    },
+    {
+      "region": "CO",
+      "language": "en",
+      "phone": "57",
+      "title": "Colombia"
+    },
+    {
+      "region": "KM",
+      "language": "en",
+      "phone": "269",
+      "title": "Comoros"
+    },
+    {
+      "region": "CG",
+      "language": "en",
+      "phone": "243",
+      "title": "Congo"
+    },
+    {
+      "region": "CD",
+      "language": "en",
+      "phone": "242",
+      "title": "Congo"
+    },
+    {
+      "region": "CK",
+      "language": "en",
+      "phone": "682",
+      "title": "Cook Islands"
+    },
+    {
+      "region": "CR",
+      "language": "en",
+      "phone": "506",
+      "title": "Costa Rica"
+    },
+    {
+      "region": "CI",
+      "language": "en",
+      "phone": "00225",
+      "title": "Côte d'Ivoire"
+    },
+    {
+      "region": "HR",
+      "language": "en",
+      "phone": "385",
+      "title": "Croatia"
+    },
+    {
+      "region": "CU",
+      "language": "en",
+      "phone": "53",
+      "title": "Cuba"
+    },
+    {
+      "region": "CY",
+      "language": "en",
+      "phone": "357",
+      "title": "Cyprus"
+    },
+    {
+      "region": "CZ",
+      "language": "en",
+      "phone": "420",
+      "title": "Czech Republic"
+    },
+    {
+      "region": "DK",
+      "language": "en",
+      "phone": "45",
+      "title": "Denmark"
+    },
+    {
+      "region": "DJ",
+      "language": "en",
+      "phone": "253",
+      "title": "Djibouti"
+    },
+    {
+      "region": "DM",
+      "language": "en",
+      "phone": "1 767",
+      "title": "Dominica"
+    },
+    {
+      "region": "DO",
+      "language": "en",
+      "phone": "1 809/829/849",
+      "title": "Dominican Republic"
+    },
+    {
+      "region": "EC",
+      "language": "en",
+      "phone": "593",
+      "title": "Ecuador"
+    },
+    {
+      "region": "EG",
+      "language": "en",
+      "phone": "20",
+      "title": "Egypt"
+    },
+    {
+      "region": "SV",
+      "language": "en",
+      "phone": "503",
+      "title": "El Salvador"
+    },
+    {
+      "region": "GQ",
+      "language": "en",
+      "phone": "240",
+      "title": "Equatorial Guinea"
+    },
+    {
+      "region": "ER",
+      "language": "en",
+      "phone": "291",
+      "title": "Eritrea"
+    },
+    {
+      "region": "EE",
+      "language": "en",
+      "phone": "372",
+      "title": "Estonia"
+    },
+    {
+      "region": "ET",
+      "language": "en",
+      "phone": "251",
+      "title": "Ethiopia"
+    },
+    {
+      "region": "FK",
+      "language": "en",
+      "phone": "500",
+      "title": "Falkland Islands"
+    },
+    {
+      "region": "FO",
+      "language": "en",
+      "phone": "298",
+      "title": "Faroe Islands"
+    },
+    {
+      "region": "FJ",
+      "language": "en",
+      "phone": "679",
+      "title": "Fiji"
+    },
+    {
+      "region": "FI",
+      "language": "en",
+      "phone": "358",
+      "title": "Finland"
+    },
+    {
+      "region": "FR",
+      "language": "en",
+      "phone": "33",
+      "title": "France"
+    },
+    {
+      "region": "GF",
+      "language": "en",
+      "phone": "594",
+      "title": "French Guiana"
+    },
+    {
+      "region": "PF",
+      "language": "en",
+      "phone": "689",
+      "title": "French Polynesia"
+    },
+    {
+      "region": "TF",
+      "language": "en",
+      "phone": "262",
+      "title": "French Southern Territories"
+    },
+    {
+      "region": "GA",
+      "language": "en",
+      "phone": "241",
+      "title": "Gabon"
+    },
+    {
+      "region": "GM",
+      "language": "en",
+      "phone": "220",
+      "title": "Gambia"
+    },
+    {
+      "region": "GE",
+      "language": "en",
+      "phone": "995",
+      "title": "Georgia"
+    },
+    {
+      "region": "DE",
+      "language": "en",
+      "phone": "49",
+      "title": "Germany"
+    },
+    {
+      "region": "GH",
+      "language": "en",
+      "phone": "233",
+      "title": "Ghana"
+    },
+    {
+      "region": "GI",
+      "language": "en",
+      "phone": "350",
+      "title": "Gibraltar"
+    },
+    {
+      "region": "GR",
+      "language": "en",
+      "phone": "30",
+      "title": "Greece"
+    },
+    {
+      "region": "GL",
+      "language": "en",
+      "phone": "299",
+      "title": "Greenland"
+    },
+    {
+      "region": "GD",
+      "language": "en",
+      "phone": "1473",
+      "title": "Grenada"
+    },
+    {
+      "region": "GP",
+      "language": "en",
+      "phone": "590",
+      "title": "Guadeloupe"
+    },
+    {
+      "region": "GU",
+      "language": "en",
+      "phone": "1671",
+      "title": "Guam"
+    },
+    {
+      "region": "GT",
+      "language": "en",
+      "phone": "502",
+      "title": "Guatemala"
+    },
+    {
+      "region": "GG",
+      "language": "en",
+      "phone": "44",
+      "title": "Guernsey"
+    },
+    {
+      "region": "GN",
+      "language": "en",
+      "phone": "224",
+      "title": "Guinea"
+    },
+    {
+      "region": "GW",
+      "language": "en",
+      "phone": "245",
+      "title": "Guinea-Bissau"
+    },
+    {
+      "region": "GY",
+      "language": "en",
+      "phone": "592",
+      "title": "Guyana"
+    },
+    {
+      "region": "HT",
+      "language": "en",
+      "phone": "509",
+      "title": "Haiti"
+    },
+    {
+      "region": "HM",
+      "language": "en",
+      "phone": "1672",
+      "title": "Heard Island and McDonald Islands"
+    },
+    {
+      "region": "VA",
+      "language": "en",
+      "phone": "379",
+      "title": "Holy See"
+    },
+    {
+      "region": "HN",
+      "language": "en",
+      "phone": "504",
+      "title": "Honduras"
+    },
+    {
+      "region": "HK",
+      "language": "en",
+      "phone": "852",
+      "title": "Hong Kong"
+    },
+    {
+      "region": "HU",
+      "language": "en",
+      "phone": "36",
+      "title": "Hungary"
+    },
+    {
+      "region": "IS",
+      "language": "en",
+      "phone": "354",
+      "title": "Iceland"
+    },
+    {
+      "region": "IN",
+      "language": "en",
+      "phone": "91",
+      "title": "India"
+    },
+    {
+      "region": "ID",
+      "language": "en",
+      "phone": "62",
+      "title": "Indonesia"
+    },
+    {
+      "region": "IR",
+      "language": "en",
+      "phone": "98",
+      "title": "Iran"
+    },
+    {
+      "region": "IQ",
+      "language": "en",
+      "phone": "964",
+      "title": "Iraq"
+    },
+    {
+      "region": "IE",
+      "language": "en",
+      "phone": "353",
+      "title": "Ireland"
+    },
+    {
+      "region": "IM",
+      "language": "en",
+      "phone": "44",
+      "title": "Isle of Man"
+    },
+    {
+      "region": "IL",
+      "language": "en",
+      "phone": "972",
+      "title": "Israel"
+    },
+    {
+      "region": "IT",
+      "language": "en",
+      "phone": "39",
+      "title": "Italy"
+    },
+    {
+      "region": "JM",
+      "language": "en",
+      "phone": "1876",
+      "title": "Jamaica"
+    },
+    {
+      "region": "JP",
+      "language": "en",
+      "phone": "81",
+      "title": "Japan"
+    },
+    {
+      "region": "JE",
+      "language": "en",
+      "phone": "44",
+      "title": "Jersey"
+    },
+    {
+      "region": "JO",
+      "language": "en",
+      "phone": "962",
+      "title": "Jordan"
+    },
+    {
+      "region": "KZ",
+      "language": "en",
+      "phone": "7",
+      "title": "Kazakhstan"
+    },
+    {
+      "region": "KE",
+      "language": "en",
+      "phone": "254",
+      "title": "Kenya"
+    },
+    {
+      "region": "KI",
+      "language": "en",
+      "phone": "686",
+      "title": "Kiribati"
+    },
+    {
+      "region": "KP",
+      "language": "en",
+      "phone": "850",
+      "title": "Korea"
+    },
+    {
+      "region": "KR",
+      "language": "en",
+      "phone": "82",
+      "title": "Korea"
+    },
+    {
+      "region": "KW",
+      "language": "en",
+      "phone": "965",
+      "title": "Kuwait"
+    },
+    {
+      "region": "KG",
+      "language": "en",
+      "phone": "996",
+      "title": "Kyrgyzstan"
+    },
+    {
+      "region": "LA",
+      "language": "en",
+      "phone": "856",
+      "title": "Lao People's Democratic Republic"
+    },
+    {
+      "region": "LV",
+      "language": "en",
+      "phone": "371",
+      "title": "Latvia"
+    },
+    {
+      "region": "LB",
+      "language": "en",
+      "phone": "961",
+      "title": "Lebanon"
+    },
+    {
+      "region": "LS",
+      "language": "en",
+      "phone": "266",
+      "title": "Lesotho"
+    },
+    {
+      "region": "LR",
+      "language": "en",
+      "phone": "231",
+      "title": "Liberia"
+    },
+    {
+      "region": "LY",
+      "language": "en",
+      "phone": "218",
+      "title": "Libyan Arab Jamahiriya"
+    },
+    {
+      "region": "LI",
+      "language": "en",
+      "phone": "423",
+      "title": "Liechtenstein"
+    },
+    {
+      "region": "LT",
+      "language": "en",
+      "phone": "370",
+      "title": "Lithuania"
+    },
+    {
+      "region": "LU",
+      "language": "en",
+      "phone": "352",
+      "title": "Luxembourg"
+    },
+    {
+      "region": "MO",
+      "language": "en",
+      "phone": "853",
+      "title": "Macao"
+    },
+    {
+      "region": "MK",
+      "language": "en",
+      "phone": "389",
+      "title": "Macedonia"
+    },
+    {
+      "region": "MG",
+      "language": "en",
+      "phone": "261",
+      "title": "Madagascar"
+    },
+    {
+      "region": "MW",
+      "language": "en",
+      "phone": "265",
+      "title": "Malawi"
+    },
+    {
+      "region": "MY",
+      "language": "en",
+      "phone": "60",
+      "title": "Malaysia"
+    },
+    {
+      "region": "MV",
+      "language": "en",
+      "phone": "960",
+      "title": "Maldives"
+    },
+    {
+      "region": "ML",
+      "language": "en",
+      "phone": "223",
+      "title": "Mali"
+    },
+    {
+      "region": "MT",
+      "language": "en",
+      "phone": "356",
+      "title": "Malta"
+    },
+    {
+      "region": "MH",
+      "language": "en",
+      "phone": "692",
+      "title": "Marshall Islands"
+    },
+    {
+      "region": "MQ",
+      "language": "en",
+      "phone": "596",
+      "title": "Martinique"
+    },
+    {
+      "region": "MR",
+      "language": "en",
+      "phone": "222",
+      "title": "Mauritania"
+    },
+    {
+      "region": "MU",
+      "language": "en",
+      "phone": "230",
+      "title": "Mauritius"
+    },
+    {
+      "region": "YT",
+      "language": "en",
+      "phone": "262",
+      "title": "Mayotte"
+    },
+    {
+      "region": "MX",
+      "language": "en",
+      "phone": "52",
+      "title": "Mexico"
+    },
+    {
+      "region": "FM",
+      "language": "en",
+      "phone": "691",
+      "title": "Micronesia"
+    },
+    {
+      "region": "MD",
+      "language": "en",
+      "phone": "373",
+      "title": "Moldova"
+    },
+    {
+      "region": "MC",
+      "language": "en",
+      "phone": "377",
+      "title": "Monaco"
+    },
+    {
+      "region": "MN",
+      "language": "en",
+      "phone": "976",
+      "title": "Mongolia"
+    },
+    {
+      "region": "ME",
+      "language": "en",
+      "phone": "382",
+      "title": "Montenegro"
+    },
+    {
+      "region": "MS",
+      "language": "en",
+      "phone": "1664",
+      "title": "Montserrat"
+    },
+    {
+      "region": "MA",
+      "language": "en",
+      "phone": "212",
+      "title": "Morocco"
+    },
+    {
+      "region": "MZ",
+      "language": "en",
+      "phone": "258",
+      "title": "Mozambique"
+    },
+    {
+      "region": "MM",
+      "language": "en",
+      "phone": "95",
+      "title": "Myanmar"
+    },
+    {
+      "region": "NA",
+      "language": "en",
+      "phone": "264",
+      "title": "Namibia"
+    },
+    {
+      "region": "NR",
+      "language": "en",
+      "phone": "674",
+      "title": "Nauru"
+    },
+    {
+      "region": "NP",
+      "language": "en",
+      "phone": "977",
+      "title": "Nepal"
+    },
+    {
+      "region": "NL",
+      "language": "en",
+      "phone": "31",
+      "title": "Netherlands"
+    },
+    {
+      "region": "AN",
+      "language": "en",
+      "phone": "599",
+      "title": "Netherlands Antilles"
+    },
+    {
+      "region": "NC",
+      "language": "en",
+      "phone": "687",
+      "title": "New Caledonia"
+    },
+    {
+      "region": "NZ",
+      "language": "en",
+      "phone": "64",
+      "title": "New Zealand"
+    },
+    {
+      "region": "NI",
+      "language": "en",
+      "phone": "505",
+      "title": "Nicaragua"
+    },
+    {
+      "region": "NE",
+      "language": "en",
+      "phone": "227",
+      "title": "Niger"
+    },
+    {
+      "region": "NG",
+      "language": "en",
+      "phone": "234",
+      "title": "Nigeria"
+    },
+    {
+      "region": "NU",
+      "language": "en",
+      "phone": "683",
+      "title": "Niue"
+    },
+    {
+      "region": "NF",
+      "language": "en",
+      "phone": "6723",
+      "title": "Norfolk Island"
+    },
+    {
+      "region": "MP",
+      "language": "en",
+      "phone": "1670",
+      "title": "Northern Mariana Islands"
+    },
+    {
+      "region": "NO",
+      "language": "en",
+      "phone": "47",
+      "title": "Norway"
+    },
+    {
+      "region": "OM",
+      "language": "en",
+      "phone": "968",
+      "title": "Oman"
+    },
+    {
+      "region": "PK",
+      "language": "en",
+      "phone": "92",
+      "title": "Pakistan"
+    },
+    {
+      "region": "PW",
+      "language": "en",
+      "phone": "680",
+      "title": "Palau"
+    },
+    {
+      "region": "PS",
+      "language": "en",
+      "phone": "970",
+      "title": "Palestinian Territory"
+    },
+    {
+      "region": "PA",
+      "language": "en",
+      "phone": "507",
+      "title": "Panama"
+    },
+    {
+      "region": "PG",
+      "language": "en",
+      "phone": "675",
+      "title": "Papua New Guinea"
+    },
+    {
+      "region": "PY",
+      "language": "en",
+      "phone": "595",
+      "title": "Paraguay"
+    },
+    {
+      "region": "PE",
+      "language": "en",
+      "phone": "51",
+      "title": "Peru"
+    },
+    {
+      "region": "PH",
+      "language": "en",
+      "phone": "63",
+      "title": "Philippines"
+    },
+    {
+      "region": "PN",
+      "language": "en",
+      "phone": "64",
+      "title": "Pitcairn"
+    },
+    {
+      "region": "PL",
+      "language": "en",
+      "phone": "48",
+      "title": "Poland"
+    },
+    {
+      "region": "PT",
+      "language": "en",
+      "phone": "351",
+      "title": "Portugal"
+    },
+    {
+      "region": "PR",
+      "language": "en",
+      "phone": "1 787/939",
+      "title": "Puerto Rico"
+    },
+    {
+      "region": "QA",
+      "language": "en",
+      "phone": "974",
+      "title": "Qatar"
+    },
+    {
+      "region": "RE",
+      "language": "en",
+      "phone": "262",
+      "title": "Réunion"
+    },
+    {
+      "region": "RO",
+      "language": "en",
+      "phone": "40",
+      "title": "Romania"
+    },
+    {
+      "region": "RU",
+      "language": "en",
+      "phone": "7",
+      "title": "Russian Federation"
+    },
+    {
+      "region": "RW",
+      "language": "en",
+      "phone": "250",
+      "title": "Rwanda"
+    },
+    {
+      "region": "SH",
+      "language": "en",
+      "phone": "290",
+      "title": "Saint Helena"
+    },
+    {
+      "region": "KN",
+      "language": "en",
+      "phone": "1 869",
+      "title": "Saint Kitts and Nevis"
+    },
+    {
+      "region": "LC",
+      "language": "en",
+      "phone": "1 758",
+      "title": "Saint Lucia"
+    },
+    {
+      "region": "PM",
+      "language": "en",
+      "phone": "508",
+      "title": "Saint Pierre and Miquelon"
+    },
+    {
+      "region": "VC",
+      "language": "en",
+      "phone": "1 784",
+      "title": "Saint Vincent and the Grenadines"
+    },
+    {
+      "region": "WS",
+      "language": "en",
+      "phone": "685",
+      "title": "Samoa"
+    },
+    {
+      "region": "SM",
+      "language": "en",
+      "phone": "378",
+      "title": "San Marino"
+    },
+    {
+      "region": "ST",
+      "language": "en",
+      "phone": "239",
+      "title": "Sao Tome and Principe"
+    },
+    {
+      "region": "SA",
+      "language": "en",
+      "phone": "966",
+      "title": "Saudi Arabia"
+    },
+    {
+      "region": "SN",
+      "language": "en",
+      "phone": "221",
+      "title": "Senegal"
+    },
+    {
+      "region": "RS",
+      "language": "en",
+      "phone": "381",
+      "title": "Serbia"
+    },
+    {
+      "region": "SC",
+      "language": "en",
+      "phone": "248",
+      "title": "Seychelles"
+    },
+    {
+      "region": "SL",
+      "language": "en",
+      "phone": "232",
+      "title": "Sierra Leone"
+    },
+    {
+      "region": "SG",
+      "language": "en",
+      "phone": "65",
+      "title": "Singapore"
+    },
+    {
+      "region": "SK",
+      "language": "en",
+      "phone": "421",
+      "title": "Slovakia"
+    },
+    {
+      "region": "SI",
+      "language": "en",
+      "phone": "386",
+      "title": "Slovenia"
+    },
+    {
+      "region": "SB",
+      "language": "en",
+      "phone": "677",
+      "title": "Solomon Islands"
+    },
+    {
+      "region": "SO",
+      "language": "en",
+      "phone": "252",
+      "title": "Somalia"
+    },
+    {
+      "region": "ZA",
+      "language": "en",
+      "phone": "27",
+      "title": "South Africa"
+    },
+    {
+      "region": "GS",
+      "language": "en",
+      "phone": "500",
+      "title": "South Georgia and the South Sandwich Islands"
+    },
+    {
+      "region": "ES",
+      "language": "en",
+      "phone": "34",
+      "title": "Spain"
+    },
+    {
+      "region": "LK",
+      "language": "en",
+      "phone": "94",
+      "title": "Sri Lanka"
+    },
+    {
+      "region": "SD",
+      "language": "en",
+      "phone": "249",
+      "title": "Sudan"
+    },
+    {
+      "region": "SR",
+      "language": "en",
+      "phone": "597",
+      "title": "Suriname"
+    },
+    {
+      "region": "SJ",
+      "language": "en",
+      "phone": "47",
+      "title": "Svalbard and Jan Mayen"
+    },
+    {
+      "region": "SZ",
+      "language": "en",
+      "phone": "268",
+      "title": "Swaziland"
+    },
+    {
+      "region": "SE",
+      "language": "en",
+      "phone": "46",
+      "title": "Sweden"
+    },
+    {
+      "region": "CH",
+      "language": "en",
+      "phone": "41",
+      "title": "Switzerland"
+    },
+    {
+      "region": "SY",
+      "language": "en",
+      "phone": "963",
+      "title": "Syrian Arab Republic"
+    },
+    {
+      "region": "TW",
+      "language": "en",
+      "phone": "886",
+      "title": "Taiwan,Province of China"
+    },
+    {
+      "region": "TJ",
+      "language": "en",
+      "phone": "992",
+      "title": "Tajikistan"
+    },
+    {
+      "region": "TZ",
+      "language": "en",
+      "phone": "255",
+      "title": "Tanzania,United Republic of"
+    },
+    {
+      "region": "TH",
+      "language": "en",
+      "phone": "66",
+      "title": "Thailand"
+    },
+    {
+      "region": "TL",
+      "language": "en",
+      "phone": "670",
+      "title": "Timor-Leste"
+    },
+    {
+      "region": "TG",
+      "language": "en",
+      "phone": "228",
+      "title": "Togo"
+    },
+    {
+      "region": "TK",
+      "language": "en",
+      "phone": "690",
+      "title": "Tokelau"
+    },
+    {
+      "region": "TO",
+      "language": "en",
+      "phone": "676",
+      "title": "Tonga"
+    },
+    {
+      "region": "TT",
+      "language": "en",
+      "phone": "1 868",
+      "title": "Trinidad and Tobago"
+    },
+    {
+      "region": "TN",
+      "language": "en",
+      "phone": "216",
+      "title": "Tunisia"
+    },
+    {
+      "region": "TR",
+      "language": "en",
+      "phone": "90",
+      "title": "Turkey"
+    },
+    {
+      "region": "TM",
+      "language": "en",
+      "phone": "993",
+      "title": "Turkmenistan"
+    },
+    {
+      "region": "TC",
+      "language": "en",
+      "phone": "1 649",
+      "title": "Turks and Caicos Islands"
+    },
+    {
+      "region": "TV",
+      "language": "en",
+      "phone": "688",
+      "title": "Tuvalu"
+    },
+    {
+      "region": "UG",
+      "language": "en",
+      "phone": "256",
+      "title": "Uganda"
+    },
+    {
+      "region": "UA",
+      "language": "en",
+      "phone": "380",
+      "title": "Ukraine"
+    },
+    {
+      "region": "AE",
+      "language": "en",
+      "phone": "971",
+      "title": "United Arab Emirates"
+    },
+    {
+      "region": "GB",
+      "language": "en",
+      "phone": "44",
+      "title": "United Kingdom"
+    },
+    {
+      "region": "US",
+      "language": "en",
+      "phone": "1",
+      "title": "United States"
+    },
+    {
+      "region": "UM",
+      "language": "en",
+      "phone": "1 808",
+      "title": "United States Minor Outlying Islands"
+    },
+    {
+      "region": "UY",
+      "language": "en",
+      "phone": "598",
+      "title": "Uruguay"
+    },
+    {
+      "region": "UZ",
+      "language": "en",
+      "phone": "998",
+      "title": "Uzbekistan"
+    },
+    {
+      "region": "VU",
+      "language": "en",
+      "phone": "678",
+      "title": "Vanuatu"
+    },
+    {
+      "region": "VE",
+      "language": "en",
+      "phone": "58",
+      "title": "Venezuela"
+    },
+    {
+      "region": "VN",
+      "language": "en",
+      "phone": "84",
+      "title": "Viet Nam"
+    },
+    {
+      "region": "VG",
+      "language": "en",
+      "phone": "1 284",
+      "title": "Virgin Islands (British)"
+    },
+    {
+      "region": "VI",
+      "language": "en",
+      "phone": "1 340",
+      "title": "Virgin Islands (U.S.)"
+    },
+    {
+      "region": "WF",
+      "language": "en",
+      "phone": "681",
+      "title": "Wallis and Futuna"
+    },
+    {
+      "region": "EH",
+      "language": "en",
+      "phone": "212 28",
+      "title": "Western Sahara"
+    },
+    {
+      "region": "YE",
+      "language": "en",
+      "phone": "967",
+      "title": "Yemen"
+    },
+    {
+      "region": "ZM",
+      "language": "en",
+      "phone": "260",
+      "title": "Zambia"
+    },
+    {
+      "region": "ZW",
+      "language": "en",
+      "phone": "263",
+      "title": "Zimbabwe"
+    }
+  ],
+  "version": "1"
+}

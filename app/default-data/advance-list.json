@@ -1,0 +1,2703 @@
+[
+  {
+    "id": 123,
+    "uid": 0,
+    "createDate": "2021-08-25 03:31:43",
+    "updateDate": "2021-08-25 03:32:30",
+    "name": "B8. Beginner BH Push, BH Loop",
+    "repeatNum": 10,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 7,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 12,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 122,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:29:46",
+    "updateDate": "2021-08-25 03:32:16",
+    "name": "B7. Beginner FH Push, FH Loop",
+    "repeatNum": 10,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 9,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 121,
+    "uid": 0,
+    "createDate": "2021-08-25 03:25:46",
+    "updateDate": "2021-08-25 03:26:07",
+    "name": "B6. Beginner BH Flick, BH Drive",
+    "repeatNum": 14,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 2,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 4,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 120,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:24:13",
+    "updateDate": "2021-08-25 03:25:59",
+    "name": "B5. Beginner FH Flick, FH Drive",
+    "repeatNum": 10,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 2,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 4,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 119,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:20:31",
+    "updateDate": "2021-08-25 03:20:31",
+    "name": "B4. Beginner BH Loop, FH Drive",
+    "repeatNum": 14,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 12,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 118,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:15:49",
+    "updateDate": "2021-08-25 03:15:49",
+    "name": "B3. Beginner FH Loop, BH Drive",
+    "repeatNum": 10,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 117,
+    "uid": 0,
+    "createDate": "2021-08-25 03:13:45",
+    "updateDate": "2021-08-25 03:13:45",
+    "name": "B2. Beginner BH Loop, BH Drive",
+    "repeatNum": 10,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 12,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 12,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 116,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:11:19",
+    "updateDate": "2021-08-25 03:11:19",
+    "name": "B1. Beginner FH Loop, FH Drive",
+    "repeatNum": 10,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 2
+          }
+        ],
+        "ballTime": 14,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 1,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-06-07 20:10:24",
+    "updateDate": "2021-06-07 20:10:24",
+    "name": "Default Pattern",
+    "repeatNum": 2,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 2,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 8,
+            "y": 3
+          }
+        ],
+        "ballTime": 9,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 3
+          }
+        ],
+        "ballTime": 9,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 9,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 1,
+      "skillLevel": "Beginner"
+    }
+  },
+  {
+    "id": 139,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-26 21:53:39",
+    "updateDate": "2021-08-26 21:53:39",
+    "name": "I16. Intermediate FH Flick, Random FH 2/3",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 5,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 1
+          },
+          {
+            "x": 14,
+            "y": 1
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 1
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 138,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-26 21:50:32",
+    "updateDate": "2021-08-26 21:50:32",
+    "name": "I15. Intermediate BH Flick, BH Drive",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 137,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-26 03:33:13",
+    "updateDate": "2021-08-26 03:33:13",
+    "name": "I14. Intermediate BH Triangle Drill",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 3,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 136,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-26 03:30:42",
+    "updateDate": "2021-08-26 03:30:42",
+    "name": "I13. Intermediate FH Triangle Drill",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 3,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 135,
+    "uid": 0,
+    "createDate": "2021-08-26 01:56:57",
+    "updateDate": "2021-08-26 01:56:57",
+    "name": "I12. Intermediate Half Long 2/3 FH Loop",
+    "repeatNum": 15,
+    "repeatDelay": 0,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 6,
+            "y": 1
+          },
+          {
+            "x": 6,
+            "y": 2
+          },
+          {
+            "x": 7,
+            "y": 1
+          },
+          {
+            "x": 7,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 3
+          },
+          {
+            "x": 9,
+            "y": 2
+          },
+          {
+            "x": 9,
+            "y": 3
+          },
+          {
+            "x": 10,
+            "y": 2
+          },
+          {
+            "x": 10,
+            "y": 3
+          }
+        ],
+        "ballTime": 10,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 6,
+            "y": 1
+          },
+          {
+            "x": 6,
+            "y": 2
+          },
+          {
+            "x": 7,
+            "y": 1
+          },
+          {
+            "x": 7,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 3
+          },
+          {
+            "x": 9,
+            "y": 2
+          },
+          {
+            "x": 9,
+            "y": 3
+          },
+          {
+            "x": 10,
+            "y": 2
+          },
+          {
+            "x": 10,
+            "y": 3
+          }
+        ],
+        "ballTime": 10,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 134,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-26 01:39:18",
+    "updateDate": "2021-08-26 01:39:18",
+    "name": "I11. Intermediate BH Flick, 2 Random Topspin",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 1
+          },
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 1
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 1
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 1
+          },
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 1
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 1
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 133,
+    "uid": 0,
+    "createDate": "2021-08-26 01:31:30",
+    "updateDate": "2021-08-26 01:31:30",
+    "name": "I10. Intermediate FH Short Push, Random Loop",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 4,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 1
+          },
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 1
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 1
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 1
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 1
+          },
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 132,
+    "uid": 0,
+    "createDate": "2021-08-25 21:16:13",
+    "updateDate": "2021-08-25 21:16:13",
+    "name": "I9. Intermediate Middle FH Loop, Random Wide",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 13,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 131,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 04:00:29",
+    "updateDate": "2021-08-25 04:00:29",
+    "name": "I8. Intermediate BH Short Push, BH Loop",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 130,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:56:34",
+    "updateDate": "2021-08-25 03:59:18",
+    "name": "I7. Intermediate FH Short Push, FH Loop",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 4,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 129,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:45:09",
+    "updateDate": "2021-08-25 03:59:09",
+    "name": "I6. Intermediate BH Flick, BH Drive",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 128,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:43:57",
+    "updateDate": "2021-08-25 03:58:53",
+    "name": "I5. Intermediate FH Flick, FH Loop",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 4,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 127,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:41:56",
+    "updateDate": "2021-08-25 03:58:34",
+    "name": "I4. Intermediate BH Loop, FH Drive",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 126,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-25 03:40:40",
+    "updateDate": "2021-08-25 03:58:09",
+    "name": "I3. Intermediate FH Loop, BH Drive",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 125,
+    "uid": 0,
+    "createDate": "2021-08-25 03:39:15",
+    "updateDate": "2021-08-25 03:57:17",
+    "name": "I2. Intermediate BH Loop, BH Drive",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 124,
+    "uid": 0,
+    "createDate": "2021-08-25 03:37:31",
+    "updateDate": "2021-08-25 03:57:00",
+    "name": "I1. Intermediate FH Loop, FH Drive",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 10,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 2,
+      "skillLevel": "Intermediate"
+    }
+  },
+  {
+    "id": 147,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-09-01 22:35:06",
+    "updateDate": "2021-09-01 22:35:06",
+    "name": "A8. Advanced BH Flick and Topspin Random (8)",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 4,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 4,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  },
+  {
+    "id": 146,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-09-01 22:08:49",
+    "updateDate": "2021-09-01 22:08:49",
+    "name": "A7. 2/3 FH Loop, Random FH Smash",
+    "repeatNum": 15,
+    "repeatDelay": 5,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 4,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 3
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 2,
+        "spin": 1,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 9,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 6,
+            "y": 2
+          },
+          {
+            "x": 7,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 10,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 2
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  },
+  {
+    "id": 145,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-09-01 22:03:23",
+    "updateDate": "2021-09-01 22:03:23",
+    "name": "A6. Advanced Random BH Flick, BH Drive",
+    "repeatNum": 20,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 4,
+        "power": 3,
+        "landType": 3,
+        "points": [
+          {
+            "x": 2,
+            "y": 2
+          },
+          {
+            "x": 3,
+            "y": 2
+          },
+          {
+            "x": 4,
+            "y": 2
+          },
+          {
+            "x": 5,
+            "y": 2
+          },
+          {
+            "x": 2,
+            "y": 3
+          },
+          {
+            "x": 3,
+            "y": 3
+          },
+          {
+            "x": 4,
+            "y": 3
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 0,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  },
+  {
+    "id": 144,
+    "uid": 0,
+    "createDate": "2021-09-01 21:54:25",
+    "updateDate": "2021-09-01 21:54:25",
+    "name": "A5. FH Short Push, Random Full Table Loop",
+    "repeatNum": 20,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 4,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 5,
+            "y": 2
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 4,
+        "power": 2,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 3
+          }
+        ],
+        "ballTime": 8,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  },
+  {
+    "id": 143,
+    "uid": 0,
+    "createDate": "2021-09-01 21:37:37",
+    "updateDate": "2021-09-01 21:37:37",
+    "name": "A4. Advanced FH Flip, FH 2/3 Random (5)",
+    "repeatNum": 15,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 4,
+            "y": 2
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 15,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 15,
+            "y": 3
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 3
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 3
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 3
+          },
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  },
+  {
+    "id": 142,
+    "uid": 0,
+    "createDate": "2021-08-31 21:02:31",
+    "updateDate": "2021-08-31 21:02:31",
+    "name": "A3. Advanced FH Short Push, FH Step-Around Loop",
+    "repeatNum": 20,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 5,
+            "y": 2
+          }
+        ],
+        "ballTime": 8,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 8,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  },
+  {
+    "id": 141,
+    "uid": 0,
+    "createDate": "2021-08-27 02:47:38",
+    "updateDate": "2021-08-27 02:47:38",
+    "name": "A2. Advanced Middle Loop, Random Wide",
+    "repeatNum": 20,
+    "repeatDelay": 2,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 4,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 13,
+            "y": 2
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 1,
+        "landType": 3,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          }
+        ],
+        "ballTime": 6,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  },
+  {
+    "id": 140,
+    "uid": 0,
+    "lastPlayDate": 1735714800,
+    "lastPlayDateUTC": "2025-01-01 08:00:00",
+    "createDate": "2021-08-26 23:31:08",
+    "updateDate": "2021-08-26 23:31:08",
+    "name": "A1. Advanced Short FH or Long BH",
+    "repeatNum": 10,
+    "repeatDelay": 0,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 3,
+        "landType": 0,
+        "points": [
+          {
+            "x": 5,
+            "y": 2
+          }
+        ],
+        "ballTime": 8,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 11,
+            "y": 2
+          }
+        ],
+        "ballTime": 8,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0,
+    "isFavourite": 0,
+    "collectFlag": 0,
+    "skillLevel": {
+      "id": 3,
+      "skillLevel": "Advanced"
+    }
+  }
+]

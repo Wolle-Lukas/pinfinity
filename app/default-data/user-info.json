@@ -1,0 +1,64 @@
+{
+  "code": 200,
+  "msg": "SUCCESS",
+  "data": {
+    "id": 123,
+    "name": "XXX",
+    "playingStyle": 0,
+    "playingLevel": 0,
+    "playingHand": 0,
+    "playingGrip": 0,
+    "signature": "",
+    "creationDate": "2025-01-01 08:00:00",
+    "language": "EN",
+    "picture": "",
+    "address": "Berlin",
+    "country": "",
+    "robotSettingsHidden": false,
+    "email": "XXX",
+    "sports": [
+      {
+        "id": 1,
+        "name": "Table tennis",
+        "slug": "table_tennis",
+        "settings": [
+          {
+            "fieldId": 1,
+            "value": "0",
+            "slug": "playing_style"
+          },
+          {
+            "fieldId": 2,
+            "value": "0",
+            "slug": "playing_grip"
+          },
+          {
+            "fieldId": 3,
+            "value": "1",
+            "slug": "playing_level"
+          },
+          {
+            "fieldId": 4,
+            "value": "0",
+            "slug": "playing_hand"
+          },
+          {
+            "fieldId": 11,
+            "value": "",
+            "slug": "tt_blade"
+          },
+          {
+            "fieldId": 12,
+            "value": "",
+            "slug": "tt_front_rubber"
+          },
+          {
+            "fieldId": 13,
+            "value": "",
+            "slug": "tt_back_rubber"
+          }
+        ]
+      }
+    ]
+  }
+}

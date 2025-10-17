@@ -1,0 +1,210 @@
+{
+  "code": 200,
+  "msg": "SUCCESS",
+  "data": [
+    {
+      "id": 1,
+      "name": "Table tennis",
+      "slug": "table_tennis",
+      "fields": [
+        {
+          "id": 1,
+          "name": "Playing style",
+          "slug": "playing_style",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "0",
+              "description": "Offensive"
+            },
+            {
+              "id": "1",
+              "description": "Defensive"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Playing grip",
+          "slug": "playing_grip",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "0",
+              "description": "Shakehand"
+            },
+            {
+              "id": "1",
+              "description": "Penhold"
+            },
+            {
+              "id": "2",
+              "description": "Other"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Playing level",
+          "slug": "playing_level",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "0",
+              "description": "Beginner"
+            },
+            {
+              "id": "1",
+              "description": "Intermediate"
+            },
+            {
+              "id": "2",
+              "description": "Advanced"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Playing hand",
+          "slug": "playing_hand",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "1",
+              "description": "Left hand"
+            },
+            {
+              "id": "0",
+              "description": "Right hand"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "Preferred Blade",
+          "slug": "tt_blade",
+          "type": "text",
+          "values": null
+        },
+        {
+          "id": 12,
+          "name": "Preferred Front Rubber",
+          "slug": "tt_front_rubber",
+          "type": "text",
+          "values": null
+        },
+        {
+          "id": 13,
+          "name": "Preferred Back Rubber",
+          "slug": "tt_back_rubber",
+          "type": "text",
+          "values": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Pickleball",
+      "slug": "pickleball",
+      "fields": [
+        {
+          "id": 5,
+          "name": "Playing level",
+          "slug": "playing_level",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "0",
+              "description": "Beginner"
+            },
+            {
+              "id": "1",
+              "description": "Intermediate"
+            },
+            {
+              "id": "2",
+              "description": "Advanced"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Playing hand",
+          "slug": "playing_hand",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "1",
+              "description": "Left hand"
+            },
+            {
+              "id": "0",
+              "description": "Right hand"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "Preferred Paddle",
+          "slug": "pickleball_paddle",
+          "type": "text",
+          "values": null
+        },
+        {
+          "id": 8,
+          "name": "Preferred Ball",
+          "slug": "pickleball_ball",
+          "type": "text",
+          "values": null
+        },
+        {
+          "id": 9,
+          "name": "Preferred Side",
+          "slug": "pickleball_side",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "0",
+              "description": "Left"
+            },
+            {
+              "id": "1",
+              "description": "Right"
+            },
+            {
+              "id": "2",
+              "description": "Either"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "Preferred Shoe",
+          "slug": "pickleball_shoe",
+          "type": "text",
+          "values": null
+        },
+        {
+          "id": 14,
+          "name": "Playing Grip",
+          "slug": "playing_grip",
+          "type": "dropdown",
+          "values": [
+            {
+              "id": "0",
+              "description": "Eastern"
+            },
+            {
+              "id": "1",
+              "description": "Western"
+            },
+            {
+              "id": "2",
+              "description": "Continental"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

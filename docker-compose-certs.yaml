@@ -1,0 +1,11 @@
+services:
+  certs:
+    container_name: certs
+    image: paulczar/omgwtfssl
+    environment:
+      - SSL_SUBJECT=api-v6.admin.joola.com
+      - CA_EXPIRE=3650
+      - CA_SUBJECT=pinfinity
+      - SSL_EXPIRE=730
+    volumes:
+      - ./certs:/certs

@@ -1,0 +1,63 @@
+{
+  "code": 200,
+  "msg": "SUCCESS",
+  "data": {
+    "id": 1,
+    "uid": 0,
+    "name": "Default Pattern",
+    "repeatNum": 2,
+    "repeatDelay": 1,
+    "intervalTrain": 0,
+    "ballList": [
+      {
+        "ball": 0,
+        "spin": 2,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 8,
+            "y": 3
+          }
+        ],
+        "ballTime": 9,
+        "random": 0,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 3,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 14,
+            "y": 3
+          }
+        ],
+        "ballTime": 9,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      },
+      {
+        "ball": 1,
+        "spin": 1,
+        "power": 2,
+        "landType": 0,
+        "points": [
+          {
+            "x": 12,
+            "y": 3
+          }
+        ],
+        "ballTime": 9,
+        "random": 1,
+        "adjustSpin": 0,
+        "adjustPosition": 0
+      }
+    ],
+    "subTime": 0
+  }
+}
