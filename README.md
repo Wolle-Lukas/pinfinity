@@ -11,6 +11,7 @@ What will not work:
 - Any "Social" feature, like tutorials etc.
 - More then one robot connected to the Joola app.
 - Fine tuning of the robot settigs.
+- In case you need a specific function that is not yet implemented, feel free to open an issue!
 
 What should be considered:
 - The Joola app will show some random error messages, but they can be ignored.
