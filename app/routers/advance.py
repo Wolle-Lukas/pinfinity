@@ -1,3 +1,4 @@
+from datetime import datetime, time
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 import json
@@ -62,6 +63,59 @@ async def read_list(
         result["data"]["pages"] = (totalCount + pageSize - 1) // pageSize if pageSize > 0 else 1
         
     return JSONResponse(content=result)
+
+# Save endpoint for /api/advance/save
+@router.post("/advance/save", tags=["advance"])
+async def save_advance(request: Request):
+    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "advance-list.json")
+    advance_list = db("advance-list", path=data_path)
+    body = await request.json()
+
+    # Generate fields as in the sample response
+    now = datetime.now()
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    time_index = int(time.mktime(now.timetuple()))
+    new_id = advance_list.max("id") + 1 if advance_list.max("id") is not None else 1
+    uid = 123
+
+    doc = body.copy()
+
+    if body.get("id") == 0:
+        # Add json field with stringified ballList
+        doc.update({
+            "id": new_id,
+            "uid": uid,
+            "isFavourite": body.get("isFavourite", 0),
+            "createDate": now_str,
+            "updateDate": now_str,
+            "json": json.dumps(body.get("ballList", [])),
+            "subTime": 0,
+            "collectFlag": 0,
+            "lastPlayDate": time_index,
+            "lastPlayDateUTC": now_str
+        })
+        advance_list.add(doc)
+    else:
+        doc.update({
+            "updateDate": now_str,
+            "uid": uid,
+            "json": json.dumps(body.get("ballList", []))
+        })
+        advance_list.where("id").eq(body["id"]).update(doc)
+
+    # Fetch the saved document to return
+    response_doc = advance_list.where("id").eq(doc["id"]).first()
+
+    response = {
+        "code": 200,
+        "msg": "SUCCESS",
+        "data": response_doc,
+        "subTime": 0,
+        "source": "APP",
+        "isDefault": 0
+    }
+    return JSONResponse(content=response)
+
 
 # Delete training
 @router.delete("/advance/delete", tags=["advance"])
