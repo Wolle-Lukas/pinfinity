@@ -9,17 +9,22 @@ import time
 
 router = APIRouter()
 
+
 @router.get("/basic/skillLevel", tags=["basic"])
 async def read_skillevel():
-    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-skillLevel.json")
+    data_path = os.path.join(
+        os.path.dirname(__file__), "..", "data", "basic-skillLevel.json"
+    )
     with open(os.path.abspath(data_path), "r") as f:
         return json.load(f)
+
 
 @router.get("/basic/info", tags=["basic"])
 async def read_info():
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-info.json")
     with open(os.path.abspath(data_path), "r") as f:
         return json.load(f)
+
 
 @router.get("/basic/list", tags=["basic"])
 async def read_list(
@@ -28,10 +33,12 @@ async def read_list(
     ball: int = Query(-1, alias="ball"),
     spin: int = Query(-1, alias="spin"),
     pageNum: int = Query(1, alias="pageNum"),
-    pageSize: int = Query(100, alias="pageSize")
+    pageSize: int = Query(100, alias="pageSize"),
 ):
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-list.json")
-    metadata_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-list-metadata.json")
+    metadata_path = os.path.join(
+        os.path.dirname(__file__), "..", "data", "basic-list-metadata.json"
+    )
 
     basic_list = db("basic-list", path=data_path)
     with open(os.path.abspath(metadata_path), "r", encoding="utf-8") as f:
@@ -60,9 +67,11 @@ async def read_list(
         all_records = basic_list.all()
         totalCount = len(all_records)
         start = (pageNum - 1) * pageSize
-        paged_records = all_records[start:start+pageSize]
-    
-    paged_records = sorted(paged_records, key=lambda x: x.get("lastPlayDate", 0), reverse=True)
+        paged_records = all_records[start : start + pageSize]
+
+    paged_records = sorted(
+        paged_records, key=lambda x: x.get("lastPlayDate", 0), reverse=True
+    )
 
     # Keep the original structure
     result = metadata.copy()
@@ -72,7 +81,9 @@ async def read_list(
         result["data"]["current"] = pageNum
         result["data"]["totalCount"] = totalCount
         result["data"]["size"] = pageSize
-        result["data"]["pages"] = (totalCount + pageSize - 1) // pageSize if pageSize > 0 else 1
+        result["data"]["pages"] = (
+            (totalCount + pageSize - 1) // pageSize if pageSize > 0 else 1
+        )
 
     return JSONResponse(content=result)
 
@@ -94,23 +105,22 @@ async def save_basic(request: Request):
     doc = body.copy()
 
     if body.get("id") == 0:
-        doc.update({
-            "id": new_id,
-            "uid": uid,
-            "isFavourite": body.get("isFavourite", 0),
-            "createDate": now_str,
-            "updateDate": now_str,
-            "subTime": 0,
-            "collectFlag": 0,
-            "lastPlayDate": time_index,
-            "lastPlayDateUTC": now_str
-        })
+        doc.update(
+            {
+                "id": new_id,
+                "uid": uid,
+                "isFavourite": body.get("isFavourite", 0),
+                "createDate": now_str,
+                "updateDate": now_str,
+                "subTime": 0,
+                "collectFlag": 0,
+                "lastPlayDate": time_index,
+                "lastPlayDateUTC": now_str,
+            }
+        )
         basic_list.add(doc)
     else:
-        doc.update({
-            "updateDate": now_str,
-            "uid": uid
-        })
+        doc.update({"updateDate": now_str, "uid": uid})
         basic_list.where("id").eq(body["id"]).update(doc)
 
     # Fetch the saved document to return
@@ -122,9 +132,10 @@ async def save_basic(request: Request):
         "data": response_doc,
         "subTime": 0,
         "source": "APP",
-        "isDefault": 0
+        "isDefault": 0,
     }
     return JSONResponse(content=response)
+
 
 # Set favourite
 @router.post("/basic/setFavourite", tags=["basic"])
@@ -135,6 +146,7 @@ async def set_favourite(request: Request):
 
     basic_list.where("id").eq(body["id"]).update({"isFavourite": body["favourite"]})
 
+
 # Delete training
 @router.delete("/basic/delete", tags=["basic"])
 async def delete_item(request: Request):
@@ -144,8 +156,5 @@ async def delete_item(request: Request):
 
     basic_list.where("id").eq(body["id"]).delete()
 
-    response = {
-        "code": 200,
-        "msg": "SUCCESS"
-    }
+    response = {"code": 200, "msg": "SUCCESS"}
     return JSONResponse(content=response)
