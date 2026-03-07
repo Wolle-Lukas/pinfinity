@@ -11,6 +11,15 @@ import re
 router = APIRouter()
 
 
+def preserve_file_permissions(file_path):
+    """Ensure basic-list.json and advance-list.json maintain rw-r--r-- (644) permissions."""
+    if os.path.basename(file_path) in ["basic-list.json", "advance-list.json"]:
+        try:
+            os.chmod(file_path, 0o644)
+        except Exception as e:
+            print(f"Warning: Could not set permissions on {file_path}: {e}")
+
+
 @router.get("/advance/info", tags=["advance"])
 async def read_info():
     data_path = os.path.join(
@@ -122,6 +131,9 @@ async def save_advance(request: Request):
         )
         advance_list.where("id").eq(body["id"]).update(doc)
 
+    # Preserve file permissions after write
+    preserve_file_permissions(data_path)
+
     # Fetch the saved document to return
     response_doc = advance_list.where("id").eq(doc["id"]).first()
 
@@ -146,6 +158,9 @@ async def set_favourite(request: Request):
     body = await request.json()
 
     advance_list.where("id").eq(body["id"]).update({"isFavourite": body["favourite"]})
+
+    # Preserve file permissions after write
+    preserve_file_permissions(data_path)
 
 
 # Delete training
