@@ -3,7 +3,7 @@ import zipfile
 from io import BytesIO
 from datetime import datetime
 from fastapi import APIRouter
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
@@ -33,8 +33,8 @@ async def download_lists():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"pinfinity-backup_{timestamp}.zip"
     
-    return FileResponse(
+    return StreamingResponse(
         iter([zip_buffer.getvalue()]),
         media_type="application/zip",
-        filename=filename
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
