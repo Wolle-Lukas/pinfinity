@@ -118,5 +118,14 @@ else:
 PY
 fi
 
+# Debug output: Display all environment variables used
+echo "=== Debug: Environment Variables ==="
+echo "PINFINITY_NAME: ${PINFINITY_NAME:-not set}"
+echo "PINFINITY_EMAIL: ${PINFINITY_EMAIL:-not set}"
+echo "PINFINITY_DEVICE_ID: ${PINFINITY_DEVICE_ID:-not set}"
+echo "PINFINITY_DEVICE_NAME: ${PINFINITY_DEVICE_NAME:-not set}"
+echo "PINFINITY_SERIAL_NUMBER: ${PINFINITY_SERIAL_NUMBER:-not set}"
+echo "==================================="
+
 echo "Starting application..."
 exec "$@"
