@@ -1,6 +1,17 @@
 from fastapi import FastAPI
 
-from .routers import user, basic, config, node, device, base, tutorial, advance, log, download
+from .routers import (
+    user,
+    basic,
+    config,
+    node,
+    device,
+    base,
+    tutorial,
+    advance,
+    log,
+    download,
+)
 
 app = FastAPI(root_path="/api")
 

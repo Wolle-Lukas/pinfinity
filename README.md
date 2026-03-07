@@ -97,6 +97,19 @@ All relevant user content is stored in `./pinfinity` directory. Make sure to bac
 
 You can download `advance-list.json` and `basic-list.json` as a zip file via when you open `https://api-v6.admin.joola.com/api/download/lists` in your browser (ignore certifacte warnings). This is useful for backing up your custom trainings.
 
+## Changelog
+
+### [1.0.1] - 2026-03-07
+- Added backup endpoint for downloading training lists
+- Added missing save endpoint for advance list
+- Added missing set favorite endpoint for advance list
+
+### [1.0.0] - Initial Release
+- Complete basic training functionality
+- Complete advanced training functionality
+- Device management and configuration
+- User profile management
+
 ## Useful commands
 
 ```bash
