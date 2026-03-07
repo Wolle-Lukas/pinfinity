@@ -117,6 +117,14 @@ async def save_advance(request: Request):
     }
     return JSONResponse(content=response)
 
+# Set favourite
+@router.post("/advance/setFavourite", tags=["advance"])
+async def set_favourite(request: Request):
+    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "advance-list.json")
+    advance_list = db("advance-list", path=data_path)
+    body = await request.json()
+
+    advance_list.where("id").eq(body["id"]).update({"isFavourite": body["favourite"]})
 
 # Delete training
 @router.delete("/advance/delete", tags=["advance"])
