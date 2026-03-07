@@ -34,6 +34,9 @@ COPY --from=builder --chown=app:app /app /app
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
+# Set proper permissions on template data files to ensure all OS users can read them
+RUN chmod 644 /app/app/default-data/*.json
+
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 

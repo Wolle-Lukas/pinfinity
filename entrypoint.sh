@@ -21,6 +21,20 @@ else
   find "$TEMPLATE_DIR" -type f ! -name "basic-list.json" ! -name "advance-list.json" -exec cp -f {} "$DATA_DIR/" \;
 fi
 
+# Set proper file permissions for basic-list.json and advance-list.json (rw-r--r-- = 644)
+if [ -f "$DATA_DIR/basic-list.json" ]; then
+  chmod 644 "$DATA_DIR/basic-list.json"
+  echo "Set permissions for basic-list.json to 644"
+fi
+
+if [ -f "$DATA_DIR/advance-list.json" ]; then
+  chmod 644 "$DATA_DIR/advance-list.json"
+  echo "Set permissions for advance-list.json to 644"
+fi
+
+# Set umask to 0022 so that files created by the application will have world-readable permissions
+umask 0022
+
 # If environment variables prefixed with "pinfinity-" are present, override
 # the corresponding fields in user-info.json (Python reads env vars directly
 # to avoid shell-quoting issues).

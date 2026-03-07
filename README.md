@@ -99,6 +99,9 @@ You can download `advance-list.json` and `basic-list.json` as a zip file via whe
 
 ## Changelog
 
+### [1.0.2] - 2026-03-07
+- Fix file permissions, so tthat user files can always be read by every OS user
+
 ### [1.0.1] - 2026-03-07
 - Added backup endpoint for downloading training lists
 - Added missing save endpoint for advance list
