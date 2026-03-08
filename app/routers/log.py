@@ -43,7 +43,7 @@ async def set_last_play_time(request: Request):
         "msg": "SUCCESS",
         "data": {
             "uid": 123,
-            "region": body["region"],
+            "region": "",  # Seems to be always empty in the original response
             "pid": body["pid"],
             "pname": body["pname"],
             "ptype": body["ptype"],

@@ -99,6 +99,10 @@ You can download `advance-list.json` and `basic-list.json` as a zip file via whe
 
 ## Changelog
 
+### [1.0.3] - 2026-03-08
+- Fix logging error due to missing region.
+- Cleanup user endpoint
+
 ### [1.0.2] - 2026-03-07
 - Fix file permissions, so tthat user files can always be read by every OS user
 
