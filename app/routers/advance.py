@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 import time
 from fastapi import APIRouter, Query, Request
@@ -8,16 +9,10 @@ import os
 from coffy.nosql import db
 import re
 
+from .utils import preserve_file_permissions
+
+logger = logging.getLogger(__name__)
 router = APIRouter()
-
-
-def preserve_file_permissions(file_path):
-    """Ensure basic-list.json and advance-list.json maintain rw-r--r-- (644) permissions."""
-    if os.path.basename(file_path) in ["basic-list.json", "advance-list.json"]:
-        try:
-            os.chmod(file_path, 0o644)
-        except Exception as e:
-            print(f"Warning: Could not set permissions on {file_path}: {e}")
 
 
 @router.get("/advance/info", tags=["advance"])
@@ -56,6 +51,14 @@ async def read_list(
         regex = f"(?i).*{re.escape(name)}.*"
         filters.append(lambda q: q.where("name").matches(regex))
 
+    logger.debug(
+        "GET /advance/list: patternType=%d name=%r page=%d size=%d",
+        patternType,
+        name,
+        pageNum,
+        pageSize,
+    )
+
     if filters:
         query = advance_list.match_all(*filters)
         totalCount = query.count()
@@ -66,6 +69,10 @@ async def read_list(
         totalCount = len(all_records)
         start = (pageNum - 1) * pageSize
         paged_records = all_records[start : start + pageSize]
+
+    logger.debug(
+        "GET /advance/list: returning %d/%d records", len(paged_records), totalCount
+    )
 
     paged_records = sorted(
         paged_records, key=lambda x: x.get("lastPlayDate", 0), reverse=True
@@ -93,7 +100,12 @@ async def save_advance(request: Request):
         os.path.dirname(__file__), "..", "data", "advance-list.json"
     )
     advance_list = db("advance-list", path=data_path)
-    body = await request.json()
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse(
+            status_code=400, content={"code": 400, "msg": "Invalid JSON body"}
+        )
 
     # Generate fields as in the sample response
     now = datetime.now()
@@ -105,6 +117,11 @@ async def save_advance(request: Request):
     doc = body.copy()
 
     if body.get("id") == 0:
+        logger.debug(
+            "POST /advance/save: creating new training name=%r id=%d",
+            body.get("name"),
+            new_id,
+        )
         # Add json field with stringified ballList
         doc.update(
             {
@@ -122,6 +139,7 @@ async def save_advance(request: Request):
         )
         advance_list.add(doc)
     else:
+        logger.debug("POST /advance/save: updating training id=%d", body["id"])
         doc.update(
             {
                 "updateDate": now_str,
@@ -155,12 +173,28 @@ async def set_favourite(request: Request):
         os.path.dirname(__file__), "..", "data", "advance-list.json"
     )
     advance_list = db("advance-list", path=data_path)
-    body = await request.json()
+    try:
+        body = await request.json()
+        if "id" not in body or "favourite" not in body:
+            return JSONResponse(
+                status_code=400,
+                content={"code": 400, "msg": "Missing field: id or favourite"},
+            )
+    except Exception:
+        return JSONResponse(
+            status_code=400, content={"code": 400, "msg": "Invalid JSON body"}
+        )
 
+    logger.debug(
+        "POST /advance/setFavourite: id=%s favourite=%s", body["id"], body["favourite"]
+    )
     advance_list.where("id").eq(body["id"]).update({"isFavourite": body["favourite"]})
 
     # Preserve file permissions after write
     preserve_file_permissions(data_path)
+
+    response = {"code": 200, "msg": "SUCCESS"}
+    return JSONResponse(content=response)
 
 
 # Delete training
@@ -170,7 +204,18 @@ async def delete_item(request: Request):
         os.path.dirname(__file__), "..", "data", "advance-list.json"
     )
     advance_list = db("advance-list", path=data_path)
-    body = await request.json()
+    try:
+        body = await request.json()
+        if "id" not in body:
+            return JSONResponse(
+                status_code=400, content={"code": 400, "msg": "Missing field: id"}
+            )
+    except Exception:
+        return JSONResponse(
+            status_code=400, content={"code": 400, "msg": "Invalid JSON body"}
+        )
+
+    logger.debug("DELETE /advance/delete: id=%s", body["id"])
 
     advance_list.where("id").eq(body["id"]).delete()
 

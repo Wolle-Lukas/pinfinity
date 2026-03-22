@@ -1,16 +1,26 @@
+import logging
+import os
+
 from fastapi import FastAPI
 
 from .routers import (
-    user,
+    advance,
+    base,
     basic,
     config,
-    node,
     device,
-    base,
-    tutorial,
-    advance,
-    log,
     download,
+    log,
+    node,
+    tutorial,
+    user,
+)
+
+logging.basicConfig(
+    level=getattr(
+        logging, os.environ.get("LOG_LEVEL", "WARNING").upper(), logging.WARNING
+    ),
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 
 app = FastAPI(root_path="/api")

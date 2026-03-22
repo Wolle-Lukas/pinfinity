@@ -1,14 +1,16 @@
+import logging
 from fastapi import APIRouter
 import json
 import os
 from fastapi import Query
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
 @router.post("/tutorial/myTraining", tags=["tutorial"])
 async def read_myTraining(version: int = Query(0)):
-    print(f"Received version: {version}")
+    logger.debug("POST /tutorial/myTraining called with version=%d", version)
     data_path = os.path.join(
         os.path.dirname(__file__), "..", "data", "tutorial-myTraining.json"
     )
