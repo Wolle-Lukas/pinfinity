@@ -76,6 +76,7 @@ Open `docker-compose.yaml` and set the environment variables for the `pinfinity`
 - `PINFINITY_DEVICE_NAME` — Use any name to identify your robot.
 - `PINFINITY_DEVICE_ID` — To get that value go to the app, add a new device and scan the barcode from the back of your robot.
 - `PINFINITY_SERIAL_NUMBER` — To get that value go to the app, add a new device and scan the barcode from the back of your robot.
+- `LOG_LEVEL` — Set to DEBUG to enable application logging. By default no logs are written.
 
 The sample `docker-compose.yaml` already contains placeholders — replace `"XXX"` with real values.
 
