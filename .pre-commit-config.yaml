@@ -26,10 +26,7 @@ repos:
     - id: ruff-check
     # Run the formatter.
     - id: ruff-format
-- repo: local
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.30.0
   hooks:
     - id: gitleaks
-      name: Detect hardcoded secrets
-      language: system
-      entry: gitleaks git --pre-commit --staged --redact --no-banner
-      pass_filenames: false
