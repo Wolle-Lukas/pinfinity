@@ -2,7 +2,7 @@
 # pinfinity — Deployment Guide
 
 > [!NOTE]
-> This project's code and documentation was partially developed with the assistance of GitHub Copilot
+> This project's code and documentation was partially developed with the assistance of GitHub Copilot and Claude Code
 
 As Joola decided to not longer support their infinity table tennis robots, I built a small app to still use the robot after the shutdown of the Joola server. It is a bit complicated to set up and we need to work around some restrictions.
 
@@ -96,26 +96,6 @@ This will create the following on the host:
 All relevant user content is stored in `./pinfinity` directory. Make sure to backup `advance-list.json` and `basic-list.json`, as they contain your custom trainings. All other files only contain static content and there is no need to create a backup of these.
 
 You can download `advance-list.json` and `basic-list.json` as a zip file via when you open `https://api-v6.admin.joola.com/api/download/lists` in your browser (ignore certifacte warnings). This is useful for backing up your custom trainings.
-
-## Changelog
-
-### [1.0.3] - 2026-03-08
-- Fix logging error due to missing region.
-- Cleanup user endpoint
-
-### [1.0.2] - 2026-03-07
-- Fix file permissions, so tthat user files can always be read by every OS user
-
-### [1.0.1] - 2026-03-07
-- Added backup endpoint for downloading training lists
-- Added missing save endpoint for advance list
-- Added missing set favorite endpoint for advance list
-
-### [1.0.0] - Initial Release
-- Complete basic training functionality
-- Complete advanced training functionality
-- Device management and configuration
-- User profile management
 
 ## Useful commands
 
