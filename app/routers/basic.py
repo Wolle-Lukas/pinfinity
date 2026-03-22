@@ -1,3 +1,4 @@
+import logging
 from coffy.nosql import db
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
@@ -7,16 +8,10 @@ import re
 from datetime import datetime
 import time
 
+from .utils import preserve_file_permissions
+
+logger = logging.getLogger(__name__)
 router = APIRouter()
-
-
-def preserve_file_permissions(file_path):
-    """Ensure basic-list.json and advance-list.json maintain rw-r--r-- (644) permissions."""
-    if os.path.basename(file_path) in ["basic-list.json", "advance-list.json"]:
-        try:
-            os.chmod(file_path, 0o644)
-        except Exception as e:
-            print(f"Warning: Could not set permissions on {file_path}: {e}")
 
 
 @router.get("/basic/skillLevel", tags=["basic"])
@@ -66,6 +61,16 @@ async def read_list(
     if spin != -1:
         filters.append(lambda q: q.where("spin").eq(spin))
 
+    logger.debug(
+        "GET /basic/list: patternType=%d name=%r ball=%d spin=%d page=%d size=%d",
+        patternType,
+        name,
+        ball,
+        spin,
+        pageNum,
+        pageSize,
+    )
+
     if filters:
         query = basic_list.match_all(*filters)
         totalCount = query.count()
@@ -77,6 +82,10 @@ async def read_list(
         totalCount = len(all_records)
         start = (pageNum - 1) * pageSize
         paged_records = all_records[start : start + pageSize]
+
+    logger.debug(
+        "GET /basic/list: returning %d/%d records", len(paged_records), totalCount
+    )
 
     paged_records = sorted(
         paged_records, key=lambda x: x.get("lastPlayDate", 0), reverse=True
@@ -102,7 +111,12 @@ async def read_list(
 async def save_basic(request: Request):
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-list.json")
     basic_list = db("basic-list", path=data_path)
-    body = await request.json()
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse(
+            status_code=400, content={"code": 400, "msg": "Invalid JSON body"}
+        )
 
     # Generate fields as in the sample response
     now = datetime.now()
@@ -114,6 +128,11 @@ async def save_basic(request: Request):
     doc = body.copy()
 
     if body.get("id") == 0:
+        logger.debug(
+            "POST /basic/save: creating new training name=%r id=%d",
+            body.get("name"),
+            new_id,
+        )
         doc.update(
             {
                 "id": new_id,
@@ -129,6 +148,7 @@ async def save_basic(request: Request):
         )
         basic_list.add(doc)
     else:
+        logger.debug("POST /basic/save: updating training id=%d", body["id"])
         doc.update({"updateDate": now_str, "uid": uid})
         basic_list.where("id").eq(body["id"]).update(doc)
 
@@ -154,12 +174,28 @@ async def save_basic(request: Request):
 async def set_favourite(request: Request):
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-list.json")
     basic_list = db("basic-list", path=data_path)
-    body = await request.json()
+    try:
+        body = await request.json()
+        if "id" not in body or "favourite" not in body:
+            return JSONResponse(
+                status_code=400,
+                content={"code": 400, "msg": "Missing field: id or favourite"},
+            )
+    except Exception:
+        return JSONResponse(
+            status_code=400, content={"code": 400, "msg": "Invalid JSON body"}
+        )
 
+    logger.debug(
+        "POST /basic/setFavourite: id=%s favourite=%s", body["id"], body["favourite"]
+    )
     basic_list.where("id").eq(body["id"]).update({"isFavourite": body["favourite"]})
 
     # Preserve file permissions after write
     preserve_file_permissions(data_path)
+
+    response = {"code": 200, "msg": "SUCCESS"}
+    return JSONResponse(content=response)
 
 
 # Delete training
@@ -167,8 +203,18 @@ async def set_favourite(request: Request):
 async def delete_item(request: Request):
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-list.json")
     basic_list = db("basic-list", path=data_path)
-    body = await request.json()
+    try:
+        body = await request.json()
+        if "id" not in body:
+            return JSONResponse(
+                status_code=400, content={"code": 400, "msg": "Missing field: id"}
+            )
+    except Exception:
+        return JSONResponse(
+            status_code=400, content={"code": 400, "msg": "Invalid JSON body"}
+        )
 
+    logger.debug("DELETE /basic/delete: id=%s", body["id"])
     basic_list.where("id").eq(body["id"]).delete()
 
     response = {"code": 200, "msg": "SUCCESS"}
