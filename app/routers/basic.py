@@ -60,7 +60,6 @@ async def read_list(
         filters.append(lambda q: q.where("ball").eq(ball))
     if spin != -1:
         filters.append(lambda q: q.where("spin").eq(spin))
-
     logger.debug(
         "GET /basic/list: patternType=%d name=%r ball=%d spin=%d page=%d size=%d",
         patternType,

@@ -47,7 +47,7 @@ SAMPLE_TRAINING = {
 
 class TestAdvanceSave:
     def test_create_new_training(self, client, restore_advance_list):
-        r = client.post("/advance/save", json=SAMPLE_TRAINING)
+        r = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         assert r.status_code == 200
         data = r.json()
         assert data["code"] == 200
@@ -58,37 +58,37 @@ class TestAdvanceSave:
         assert "updateDate" in data["data"]
 
     def test_create_serializes_ball_list(self, client, restore_advance_list):
-        r = client.post("/advance/save", json=SAMPLE_TRAINING)
+        r = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         assert r.status_code == 200
         # ballList is stored as stringified JSON in the "json" field
         assert "json" in r.json()["data"]
 
     def test_create_assigns_new_id(self, client, restore_advance_list):
-        r1 = client.post("/advance/save", json=SAMPLE_TRAINING)
-        r2 = client.post("/advance/save", json=SAMPLE_TRAINING)
+        r1 = client.post("/api/advance/save", json=SAMPLE_TRAINING)
+        r2 = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         assert r1.json()["data"]["id"] != r2.json()["data"]["id"]
 
     def test_update_existing_training(self, client, restore_advance_list):
-        r = client.post("/advance/save", json=SAMPLE_TRAINING)
+        r = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         new_id = r.json()["data"]["id"]
 
         updated = {**SAMPLE_TRAINING, "id": new_id, "name": "Updated Combo"}
-        r = client.post("/advance/save", json=updated)
+        r = client.post("/api/advance/save", json=updated)
         assert r.status_code == 200
         assert r.json()["data"]["name"] == "Updated Combo"
         assert r.json()["data"]["id"] == new_id
 
     def test_created_training_appears_in_list(self, client, restore_advance_list):
-        r = client.post("/advance/save", json=SAMPLE_TRAINING)
+        r = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         new_id = r.json()["data"]["id"]
 
-        r = client.get("/advance/list?patternType=1")
+        r = client.get("/api/advance/list?patternType=1")
         ids = [rec["id"] for rec in r.json()["data"]["records"]]
         assert new_id in ids
 
     def test_invalid_json_returns_400(self, client):
         r = client.post(
-            "/advance/save",
+            "/api/advance/save",
             content="not-json",
             headers={"Content-Type": "application/json"},
         )
@@ -97,35 +97,35 @@ class TestAdvanceSave:
 
 class TestAdvanceSetFavourite:
     def test_set_favourite(self, client, restore_advance_list):
-        r = client.post("/advance/setFavourite", json={"id": 123, "favourite": 1})
+        r = client.post("/api/advance/setFavourite", json={"id": 123, "favourite": 1})
         assert r.status_code == 200
         assert r.json()["code"] == 200
         assert r.json()["msg"] == "SUCCESS"
 
     def test_unset_favourite(self, client, restore_advance_list):
-        client.post("/advance/setFavourite", json={"id": 123, "favourite": 1})
-        r = client.post("/advance/setFavourite", json={"id": 123, "favourite": 0})
+        client.post("/api/advance/setFavourite", json={"id": 123, "favourite": 1})
+        r = client.post("/api/advance/setFavourite", json={"id": 123, "favourite": 0})
         assert r.status_code == 200
 
     def test_favourite_reflected_in_list(self, client, restore_advance_list):
-        client.post("/advance/setFavourite", json={"id": 123, "favourite": 1})
-        r = client.get("/advance/list")
+        client.post("/api/advance/setFavourite", json={"id": 123, "favourite": 1})
+        r = client.get("/api/advance/list")
         records = r.json()["data"]["records"]
         entry = next((rec for rec in records if rec["id"] == 123), None)
         assert entry is not None
         assert entry["isFavourite"] == 1
 
     def test_missing_favourite_field_returns_400(self, client):
-        r = client.post("/advance/setFavourite", json={"id": 123})
+        r = client.post("/api/advance/setFavourite", json={"id": 123})
         assert r.status_code == 400
 
     def test_missing_id_field_returns_400(self, client):
-        r = client.post("/advance/setFavourite", json={"favourite": 1})
+        r = client.post("/api/advance/setFavourite", json={"favourite": 1})
         assert r.status_code == 400
 
     def test_invalid_json_returns_400(self, client):
         r = client.post(
-            "/advance/setFavourite",
+            "/api/advance/setFavourite",
             content="not-json",
             headers={"Content-Type": "application/json"},
         )
@@ -134,32 +134,32 @@ class TestAdvanceSetFavourite:
 
 class TestAdvanceDelete:
     def test_delete_training(self, client, restore_advance_list):
-        r = client.post("/advance/save", json=SAMPLE_TRAINING)
+        r = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         new_id = r.json()["data"]["id"]
 
-        r = client.request("DELETE", "/advance/delete", json={"id": new_id})
+        r = client.request("DELETE", "/api/advance/delete", json={"id": new_id})
         assert r.status_code == 200
         assert r.json()["code"] == 200
         assert r.json()["msg"] == "SUCCESS"
 
     def test_deleted_training_not_in_list(self, client, restore_advance_list):
-        r = client.post("/advance/save", json=SAMPLE_TRAINING)
+        r = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         new_id = r.json()["data"]["id"]
 
-        client.request("DELETE", "/advance/delete", json={"id": new_id})
+        client.request("DELETE", "/api/advance/delete", json={"id": new_id})
 
-        r = client.get("/advance/list?patternType=1")
+        r = client.get("/api/advance/list?patternType=1")
         ids = [rec["id"] for rec in r.json()["data"]["records"]]
         assert new_id not in ids
 
     def test_missing_id_returns_400(self, client):
-        r = client.request("DELETE", "/advance/delete", json={})
+        r = client.request("DELETE", "/api/advance/delete", json={})
         assert r.status_code == 400
 
     def test_invalid_json_returns_400(self, client):
         r = client.request(
             "DELETE",
-            "/advance/delete",
+            "/api/advance/delete",
             content="not-json",
             headers={"Content-Type": "application/json"},
         )
