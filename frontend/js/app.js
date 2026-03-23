@@ -114,7 +114,7 @@ function bindEvents() {
 
   // Timing slider
   $('#timing-slider').addEventListener('input', (e) => {
-    state.ballTime = parseInt(e.target.value);
+    state.ballTime = 21 - parseInt(e.target.value);
     $('#timing-value').textContent = state.ballTime;
   });
 
@@ -281,7 +281,7 @@ function syncEditorUI() {
   $$('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
 
   // Timing
-  $('#timing-slider').value = state.ballTime;
+  $('#timing-slider').value = 21 - state.ballTime;
   $('#timing-value').textContent = state.ballTime;
 
   // Ball count
