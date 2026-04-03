@@ -452,7 +452,7 @@ async function onPlay(mode) {
       tmode: mode,
       stime: now,
       etime: now,
-      startTime: new Date().toISOString(),
+      startTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
     });
   } catch { /* logging is best-effort */ }
 }
