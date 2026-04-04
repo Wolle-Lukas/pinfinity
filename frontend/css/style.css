@@ -348,6 +348,17 @@ a { color: inherit; text-decoration: none; }
 .grid-cell.active {
   background: var(--grid-cell-active);
 }
+.grid-cell.impossible {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.grid-cell.impossible::after {
+  content: '✕';
+  position: absolute;
+  color: #e53935;
+  font-size: 1rem;
+  font-weight: bold;
+}
 
 .grid-cell-label {
   position: absolute;
@@ -582,6 +593,31 @@ a { color: inherit; text-decoration: none; }
   transition: all .15s;
 }
 .power-label.selected { color: var(--text); font-weight: 700; font-size: 1rem; }
+
+.conflict-message {
+  font-size: .9rem;
+  color: var(--text-light);
+  text-align: center;
+  padding: 8px 0 4px;
+  line-height: 1.5;
+}
+
+/* Impossible combinations (not in base-conf.json) */
+.ball-type-label.impossible,
+.spin-label.impossible,
+.power-label.impossible {
+  opacity: 0.35;
+  pointer-events: none;
+  position: relative;
+  text-decoration: line-through;
+}
+.ball-type-label.impossible::after,
+.spin-label.impossible::after,
+.power-label.impossible::after {
+  content: ' ✕';
+  color: #e53935;
+  font-weight: bold;
+}
 
 /* Count dialog */
 .count-body {

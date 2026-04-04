@@ -27,6 +27,7 @@ const state = {
 };
 
 const robot = new RobotConnection();
+let baseConf = [];  // loaded from /api/base/conf at startup
 
 // ── DOM refs ─────────────────────────────────────────────────
 const $ = (sel) => document.querySelector(sel);
@@ -35,11 +36,55 @@ const $$ = (sel) => document.querySelectorAll(sel);
 // ── Init ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', init);
 
-function init() {
+async function init() {
   buildGrid();
   bindEvents();
   setupBluetooth();
   loadDrills();
+  await loadBaseConf();
+}
+
+async function loadBaseConf() {
+  try {
+    const res = await api.getBaseConf();
+    baseConf = res.data || [];
+    robot.baseConf = baseConf;
+    console.log(`[app] Loaded ${baseConf.length} base-conf entries`);
+  } catch (e) {
+    console.error('[app] Failed to load base-conf:', e);
+  }
+}
+
+function isComboAvailable(ball, spin, power) {
+  return baseConf.some(e => e.ball === ball && e.spin === spin && e.power === power);
+}
+
+function isLandareaAvailable(ball, spin, power, landarea) {
+  return baseConf.some(e => e.ball === ball && e.spin === spin && e.power === power && e.landarea === landarea);
+}
+
+// Pending function to execute if user confirms the conflict dialog
+let _pendingApply = null;
+
+function getConflictingPoints(ball, spin, power) {
+  return state.points.filter(p => !isLandareaAvailable(ball, spin, power, p.x));
+}
+
+function applyWithConflictCheck(newBall, newSpin, newPower, applyFn) {
+  const conflicts = getConflictingPoints(newBall, newSpin, newPower);
+  if (conflicts.length === 0) {
+    applyFn();
+    return;
+  }
+  const count = conflicts.length;
+  $('#conflict-message').textContent =
+    `${count} placed ball${count > 1 ? 's are' : ' is'} in area${count > 1 ? 's' : ''} `+
+    `that won't be reachable with the new setting and will be removed.`;
+  _pendingApply = () => {
+    state.points = state.points.filter(p => isLandareaAvailable(newBall, newSpin, newPower, p.x));
+    applyFn();
+  };
+  $('#dialog-conflict').classList.remove('hidden');
 }
 
 // ── Grid builder ─────────────────────────────────────────────
@@ -307,6 +352,8 @@ function renderGrid() {
       }
     }
 
+    const landAvailable = isLandareaAvailable(state.ball, state.spin, state.power, cellPoint.x);
+    cell.classList.toggle('impossible', !landAvailable);
     cell.classList.toggle('active', matchIndex !== -1);
 
     if (matchIndex !== -1) {
@@ -330,6 +377,7 @@ function renderGrid() {
 
 function onCellClick(index) {
   const point = cellToPoint(index);
+  if (!isLandareaAvailable(state.ball, state.spin, state.power, point.x)) return;
 
   if (state.mode === 'single') {
     // Single mode: replace any existing point
@@ -513,19 +561,25 @@ function openDialog(id) {
   const overlay = $(`#${id}`);
   overlay.classList.remove('hidden');
 
-  // Pre-select current values
+  // Pre-select current values and mark impossible combinations
   if (id === 'dialog-ball') {
     overlay.querySelectorAll('.ball-type-label').forEach(l => {
-      l.classList.toggle('selected', parseInt(l.dataset.ball) === state.ball);
+      const b = parseInt(l.dataset.ball);
+      l.classList.toggle('selected', b === state.ball);
+      l.classList.toggle('impossible', !isComboAvailable(b, state.spin, state.power));
     });
     updateBallTypeVisual(state.ball);
   } else if (id === 'dialog-spin') {
     overlay.querySelectorAll('.spin-label').forEach(l => {
-      l.classList.toggle('selected', parseInt(l.dataset.spin) === state.spin);
+      const s = parseInt(l.dataset.spin);
+      l.classList.toggle('selected', s === state.spin);
+      l.classList.toggle('impossible', !isComboAvailable(state.ball, s, state.power));
     });
   } else if (id === 'dialog-power') {
     overlay.querySelectorAll('.power-label').forEach(l => {
-      l.classList.toggle('selected', parseInt(l.dataset.power) === state.power);
+      const p = parseInt(l.dataset.power);
+      l.classList.toggle('selected', p === state.power);
+      l.classList.toggle('impossible', !isComboAvailable(state.ball, state.spin, p));
     });
     updatePowerDialogVisual(state.power);
   } else if (id === 'dialog-count') {
@@ -563,10 +617,13 @@ function setupDialogs() {
     });
   });
   $('#dialog-ball .dialog-btn.confirm').addEventListener('click', () => {
-    state.ball = tempBall;
-    updateBallVisual();
-    $('#ball-value').textContent = BALL_LABELS[state.ball];
     closeDialog('dialog-ball');
+    applyWithConflictCheck(tempBall, state.spin, state.power, () => {
+      state.ball = tempBall;
+      updateBallVisual();
+      $('#ball-value').textContent = BALL_LABELS[state.ball];
+      renderGrid();
+    });
   });
 
   // ── Spin dialog ──
@@ -579,9 +636,12 @@ function setupDialogs() {
     });
   });
   $('#dialog-spin .dialog-btn.confirm').addEventListener('click', () => {
-    state.spin = tempSpin;
-    $('#spin-value').textContent = SPIN_LABELS[state.spin];
     closeDialog('dialog-spin');
+    applyWithConflictCheck(state.ball, tempSpin, state.power, () => {
+      state.spin = tempSpin;
+      $('#spin-value').textContent = SPIN_LABELS[state.spin];
+      renderGrid();
+    });
   });
 
   // ── Power dialog ──
@@ -595,10 +655,23 @@ function setupDialogs() {
     });
   });
   $('#dialog-power .dialog-btn.confirm').addEventListener('click', () => {
-    state.power = tempPower;
-    updatePowerVisual();
-    $('#power-value').textContent = POWER_LABELS[state.power];
     closeDialog('dialog-power');
+    applyWithConflictCheck(state.ball, state.spin, tempPower, () => {
+      state.power = tempPower;
+      updatePowerVisual();
+      $('#power-value').textContent = POWER_LABELS[state.power];
+      renderGrid();
+    });
+  });
+
+  // ── Conflict dialog ──
+  $('#dialog-conflict .dialog-btn.confirm').addEventListener('click', () => {
+    closeDialog('dialog-conflict');
+    if (_pendingApply) { _pendingApply(); _pendingApply = null; }
+  });
+  $('#dialog-conflict .dialog-btn.cancel').addEventListener('click', () => {
+    _pendingApply = null;
+    closeDialog('dialog-conflict');
   });
 
   // ── Ball Count dialog ──

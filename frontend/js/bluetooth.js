@@ -123,6 +123,7 @@ export class RobotConnection {
     this.onResponse = null;      // callback(parsedFrame: object)
     this._rxBuffer = [];         // accumulates incoming notification bytes
     this._rxComplete = false;
+    this.baseConf = [];          // populated by app.js after fetching /api/base/conf
   }
 
   get connected() {
@@ -254,6 +255,16 @@ export class RobotConnection {
 
   // ── Internal ─────────────────────────────────────────────
 
+  _lookupMotorParams(ball, spin, power, landarea) {
+    const entry = this.baseConf.find(
+      e => e.ball === ball && e.spin === spin && e.power === power && e.landarea === landarea
+    );
+    if (!entry) {
+      console.warn(`[BT] No base-conf entry for ball=${ball} spin=${spin} power=${power} landarea=${landarea}`);
+    }
+    return entry ?? null;
+  }
+
   _encodeBasicPattern(drill) {
     // Each ball position is encoded as 12 bytes, plus 4 trailing bytes
     const points = drill.points || [];
@@ -263,12 +274,13 @@ export class RobotConnection {
       const off = i * 12;
       const p = points[i];
 
-      // Bytes 0-4: motor/axis config
-      buf[off + 0] = drill.ball & 0xFF;
-      buf[off + 1] = drill.spin & 0xFF;
-      buf[off + 2] = drill.power & 0xFF;
-      buf[off + 3] = drill.landType & 0xFF;
-      buf[off + 4] = 0;
+      // Bytes 0-4: physical motor params from base-conf lookup (NOT raw ball/spin/power)
+      const params = this._lookupMotorParams(drill.ball, drill.spin, drill.power, p.x);
+      buf[off + 0] = params ? (params.m1speed & 0xFF) : 0;
+      buf[off + 1] = params ? (params.m2speed & 0xFF) : 0;
+      buf[off + 2] = params ? (params.xaxis   & 0xFF) : 0;
+      buf[off + 3] = params ? (params.yaxis   & 0xFF) : 0;
+      buf[off + 4] = params ? (params.zaxis   & 0xFF) : 0;
 
       // Bytes 5-6: speed (big-endian)
       const speed = drill.ballTime || 9;
@@ -288,7 +300,10 @@ export class RobotConnection {
       buf[off + 10] = (drill.adjustSpin ?? 0) & 0xFF;
       buf[off + 11] = (drill.adjustPosition ?? 0) & 0xFF;
 
-      console.debug(`[BT]   point[${i}] x=${p.x} y=${p.y} ball=${drill.ball} spin=${drill.spin} power=${drill.power} speed=${speed} landType=${drill.landType} adjustSpin=${drill.adjustSpin} adjustPos=${drill.adjustPosition}`);
+      const motorStr = params
+        ? `m1=${params.m1speed} m2=${params.m2speed} x=${params.xaxis} y=${params.yaxis} z=${params.zaxis}`
+        : 'MISSING(fallback 0s)';
+      console.debug(`[BT]   point[${i}] landarea=${p.x} ${motorStr} speed=${speed} adjustSpin=${drill.adjustSpin} adjustPos=${drill.adjustPosition}`);
     }
 
     // 4 trailing bytes (drill-level flags, matching APK defaults)
