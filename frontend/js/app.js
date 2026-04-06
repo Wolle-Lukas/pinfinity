@@ -21,6 +21,7 @@ const state = {
   power: 2,
   mode: 'single',       // 'single' | 'sequence' | 'random'
   points: [],           // [{x, y}] selected landing points
+  undoStack: [],        // snapshots of points before each mutation
   ballTime: 9,
   ballCount: 20,
   dirty: false,
@@ -63,6 +64,19 @@ function isLandareaAvailable(ball, spin, power, landarea) {
   return baseConf.some(e => e.ball === ball && e.spin === spin && e.power === power && e.landarea === landarea);
 }
 
+// what: 'points' | 'settings' | 'all'
+function pushUndo(what) {
+  const snap = {};
+  if (what === 'points' || what === 'all')
+    snap.points = state.points.map(p => ({ ...p }));
+  if (what === 'settings' || what === 'all') {
+    snap.ball  = state.ball;
+    snap.spin  = state.spin;
+    snap.power = state.power;
+  }
+  state.undoStack.push(snap);
+}
+
 // Pending function to execute if user confirms the conflict dialog
 let _pendingApply = null;
 
@@ -73,6 +87,7 @@ function getConflictingPoints(ball, spin, power) {
 function applyWithConflictCheck(newBall, newSpin, newPower, applyFn) {
   const conflicts = getConflictingPoints(newBall, newSpin, newPower);
   if (conflicts.length === 0) {
+    pushUndo('settings');
     applyFn();
     return;
   }
@@ -81,6 +96,7 @@ function applyWithConflictCheck(newBall, newSpin, newPower, applyFn) {
     `${count} placed ball${count > 1 ? 's are' : ' is'} in area${count > 1 ? 's' : ''} `+
     `that won't be reachable with the new setting and will be removed.`;
   _pendingApply = () => {
+    pushUndo('all');
     state.points = state.points.filter(p => isLandareaAvailable(newBall, newSpin, newPower, p.x));
     applyFn();
   };
@@ -149,8 +165,14 @@ function bindEvents() {
 
   // Grid actions
   $('#btn-undo').addEventListener('click', () => {
-    state.points.pop();
-    renderGrid();
+    if (state.undoStack.length > 0) {
+      const snap = state.undoStack.pop();
+      if (snap.points  !== undefined) state.points = snap.points;
+      if (snap.ball    !== undefined) state.ball   = snap.ball;
+      if (snap.spin    !== undefined) state.spin   = snap.spin;
+      if (snap.power   !== undefined) state.power  = snap.power;
+      syncEditorUI();
+    }
   });
   $('#btn-clear').addEventListener('click', () => {
     state.points = [];
@@ -305,6 +327,7 @@ function openEditor(drill) {
     state.mode = 'single';
   }
 
+  state.undoStack = [];
   state.dirty = false;
   syncEditorUI();
   showView('editor');
@@ -378,6 +401,8 @@ function renderGrid() {
 function onCellClick(index) {
   const point = cellToPoint(index);
   if (!isLandareaAvailable(state.ball, state.spin, state.power, point.x)) return;
+
+  pushUndo('points');
 
   if (state.mode === 'single') {
     // Single mode: replace any existing point
