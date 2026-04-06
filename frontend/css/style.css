@@ -575,24 +575,39 @@ a { color: inherit; text-decoration: none; }
 /* Power dialog */
 .power-body {
   display: flex;
-  align-items: center;
-  gap: 16px;
   justify-content: center;
 }
-.power-labels {
+.power-options {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+}
+.power-option {
+  display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 12px;
+  cursor: pointer;
+}
+.power-bar-col {
+  width: 120px;
+  display: flex;
+  justify-content: center;
 }
 .power-label {
   font-size: .82rem;
   color: var(--text-light);
-  padding: 3px 8px;
-  cursor: pointer;
   transition: all .15s;
 }
 .power-label.selected { color: var(--text); font-weight: 700; font-size: 1rem; }
+.power-bar-track {
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  transition: background .15s;
+}
+.power-bar-track.active {
+  background: var(--primary);
+}
 
 .conflict-message {
   font-size: .9rem;

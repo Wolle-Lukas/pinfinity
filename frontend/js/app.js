@@ -671,8 +671,9 @@ function setupDialogs() {
 
   // ── Power dialog ──
   let tempPower = state.power;
-  $('#dialog-power').querySelectorAll('.power-label').forEach(l => {
-    l.addEventListener('click', () => {
+  $('#dialog-power').querySelectorAll('.power-option').forEach(row => {
+    row.addEventListener('click', () => {
+      const l = row.querySelector('.power-label');
       tempPower = parseInt(l.dataset.power);
       $('#dialog-power').querySelectorAll('.power-label').forEach(x =>
         x.classList.toggle('selected', x === l));
@@ -815,10 +816,9 @@ function updatePowerVisual() {
 }
 
 function updatePowerDialogVisual(power) {
-  // 0=Extreme (3 bars), 1=Strong (2 bars), 2=Medium (1 bar), 3=Light (0 bars)
-  $('#power-bar1').setAttribute('opacity', power <= 0 ? '1' : '0');
-  $('#power-bar2').setAttribute('opacity', power <= 1 ? '1' : '0');
-  $('#power-bar3').setAttribute('opacity', power <= 2 ? '1' : '0');
+  for (let i = 1; i <= 4; i++) {
+    $(`#power-bar${i}`).classList.toggle('active', i - 1 >= power);
+  }
 }
 
 // ── Utilities ────────────────────────────────────────────────
