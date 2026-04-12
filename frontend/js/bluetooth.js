@@ -266,8 +266,10 @@ export class RobotConnection {
   }
 
   _encodeBasicPattern(drill) {
-    // Each ball position is encoded as 12 bytes, plus 4 trailing bytes
+    // Each ball position is encoded as 12 bytes, plus 4 trailing bytes.
+    // Layout confirmed against Android app logcat (20260406_App_logs.txt).
     const points = drill.points || [];
+    const isRandom = (drill.landType ?? 0) === 2;
     const buf = new Uint8Array((points.length * 12) + 4);
 
     for (let i = 0; i < points.length; i++) {
@@ -282,36 +284,42 @@ export class RobotConnection {
       buf[off + 3] = params ? (params.yaxis   & 0xFF) : 0;
       buf[off + 4] = params ? (params.zaxis   & 0xFF) : 0;
 
-      // Bytes 5-6: speed (big-endian)
-      const speed = drill.ballTime || 9;
-      buf[off + 5] = (speed >> 8) & 0xFF;
-      buf[off + 6] = speed & 0xFF;
+      // Byte 5: always 0x00 (high byte of 16-bit field)
+      buf[off + 5] = 0x00;
 
-      // Byte 7: spin parameter
-      buf[off + 7] = drill.spin & 0xFF;
+      // Byte 6: sequential=times (ball count), random=0x01
+      buf[off + 6] = isRandom ? 0x01 : ((drill.times ?? 0) & 0xFF);
 
-      // Byte 8: position X
-      buf[off + 8] = (p.x & 0xFF);
+      // Byte 7: sequential=spin, random=0x80 (mode flag; spin is implicit in motor params)
+      buf[off + 7] = isRandom ? 0x80 : (drill.spin & 0xFF);
 
-      // Byte 9: position Y / depth
-      buf[off + 9] = (p.y & 0xFF);
+      // Byte 8: ballTime (raw JSON value).
+      // Note: original app sends 0x00 for single-point sequential despite non-zero JSON
+      // ballTime — the robot likely ignores it in that mode.
+      buf[off + 8] = (drill.ballTime ?? 0) & 0xFF;
 
-      // Bytes 10-11: additional params
-      buf[off + 10] = (drill.adjustSpin ?? 0) & 0xFF;
-      buf[off + 11] = (drill.adjustPosition ?? 0) & 0xFF;
+      // Byte 9: y − 1 (depth, 0-indexed; JSON y=2 → sends 1)
+      buf[off + 9] = ((p.y ?? 2) - 1) & 0xFF;
+
+      // Byte 10: landType (0=sequential, 2=random)
+      buf[off + 10] = (drill.landType ?? 0) & 0xFF;
+
+      // Byte 11: is_random flag (0 or 1)
+      buf[off + 11] = isRandom ? 1 : 0;
 
       const motorStr = params
         ? `m1=${params.m1speed} m2=${params.m2speed} x=${params.xaxis} y=${params.yaxis} z=${params.zaxis}`
         : 'MISSING(fallback 0s)';
-      console.debug(`[BT]   point[${i}] landarea=${p.x} ${motorStr} speed=${speed} adjustSpin=${drill.adjustSpin} adjustPos=${drill.adjustPosition}`);
+      console.debug(`[BT]   point[${i}] landarea=${p.x} ${motorStr} ballTime=${drill.ballTime} y-1=${(p.y ?? 2) - 1} landType=${drill.landType} isRandom=${isRandom}`);
     }
 
-    // 4 trailing bytes (drill-level flags, matching APK defaults)
+    // 4 trailing bytes
     const trailerOff = points.length * 12;
-    buf[trailerOff + 0] = 1;  // E
-    buf[trailerOff + 1] = 1;  // F
-    buf[trailerOff + 2] = 0;  // G
-    buf[trailerOff + 3] = 0;  // H
+    // Byte 0: sequential=numType (1=ball-count mode), random=times (total ball count)
+    buf[trailerOff + 0] = isRandom ? ((drill.times ?? 0) & 0xFF) : (drill.numType ?? 1);
+    buf[trailerOff + 1] = 0;  // confirmed 0x00 (was wrongly 0x01)
+    buf[trailerOff + 2] = 0;
+    buf[trailerOff + 3] = 0;
 
     return buf;
   }
