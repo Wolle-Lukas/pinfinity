@@ -481,6 +481,15 @@ a { color: inherit; text-decoration: none; }
   color: #fff;
   border-radius: 0 var(--radius) var(--radius) 0;
 }
+.stop-btn {
+  background: #e53935;
+  color: #fff;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.action-btn:disabled {
+  opacity: .4;
+  pointer-events: none;
+}
 
 /* ── Dialogs ──────────────────────────────────────────────── */
 .dialog-overlay {

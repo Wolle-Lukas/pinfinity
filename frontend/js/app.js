@@ -191,6 +191,7 @@ function bindEvents() {
   // Action buttons
   $('#btn-test').addEventListener('click', () => onPlay('test'));
   $('#btn-play').addEventListener('click', () => onPlay('play'));
+  $('#btn-stop').addEventListener('click', onStop);
 
   // Robot banner
   $('#robot-banner').addEventListener('click', onRobotBannerClick);
@@ -493,6 +494,13 @@ async function doSave(name) {
   }
 }
 
+// ── Training state ───────────────────────────────────────────
+function setTrainingActive(active) {
+  $('#btn-play').classList.toggle('hidden', active);
+  $('#btn-stop').classList.toggle('hidden', !active);
+  $('#btn-test').disabled = active;
+}
+
 // ── Play / Test ──────────────────────────────────────────────
 async function onPlay(mode) {
   if (state.points.length === 0) {
@@ -505,7 +513,12 @@ async function onPlay(mode) {
   if (robot.connected) {
     try {
       await robot.sendBasicDrill(drill);
-      toast(mode === 'test' ? 'Testing...' : 'Playing...');
+      if (mode === 'play') {
+        setTrainingActive(true);
+        toast('Playing...');
+      } else {
+        toast('Testing...');
+      }
     } catch (err) {
       toast('Failed to send to robot');
       console.error(err);
@@ -528,6 +541,19 @@ async function onPlay(mode) {
       startTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
     });
   } catch { /* logging is best-effort */ }
+}
+
+async function onStop() {
+  setTrainingActive(false);
+  if (robot.connected) {
+    try {
+      await robot.stop();
+      toast('Training stopped');
+    } catch (err) {
+      toast('Failed to stop robot');
+      console.error(err);
+    }
+  }
 }
 
 function buildDrillPayload() {
@@ -560,6 +586,7 @@ function setupBluetooth() {
     } else {
       $('#robot-name').textContent = 'No Robot';
       $('#robot-status').textContent = 'Tap to connect';
+      setTrainingActive(false);
     }
   };
 }
