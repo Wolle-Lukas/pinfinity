@@ -572,6 +572,13 @@ function buildDrillPayload() {
 
 // ── Bluetooth UI ─────────────────────────────────────────────
 function setupBluetooth() {
+  robot.onResponse = (parsed) => {
+    // 0x82 = training finished naturally, 0x85 = stop command acknowledged
+    if (parsed?.cmd === 0x82 || parsed?.cmd === 0x85) {
+      setTrainingActive(false);
+    }
+  };
+
   robot.onStatusChange = (status) => {
     const banner = $('#robot-banner');
     banner.classList.toggle('online', status === 'connected');
