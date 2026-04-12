@@ -62,7 +62,7 @@ device picker as `J-...`.
 Connect an Android device via USB, enable USB debugging, then run:
 
 ```bash
-adb logcat | grep -i "bluetooth\|joola\|robot"
+adb logcat | grep -i "bluetooth\|joola\|robot|datacontent:"
 ```
 
 ## Example output
