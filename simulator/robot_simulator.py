@@ -30,59 +30,301 @@ try:
         GATTAttributePermissions,
     )
 except ImportError:
-    print("ERROR: 'bless' library not installed. Run: pip install bless", file=sys.stderr)
+    print(
+        "ERROR: 'bless' library not installed. Run: pip install bless", file=sys.stderr
+    )
     sys.exit(1)
 
 # ── BLE UUIDs ────────────────────────────────────────────────────────────────
 SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb"
-CHAR_UUID    = "0000ffe1-0000-1000-8000-00805f9b34fb"
+CHAR_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb"
 
 # ── Frame constants ──────────────────────────────────────────────────────────
 FRAME_START = 0x68
-FRAME_END   = 0x16
+FRAME_END = 0x16
 FRAME_FIXED = 0x01
 
 # ── Command bytes ────────────────────────────────────────────────────────────
-CMD_CONNECT     = 0x89
-CMD_DISCONNECT  = 0x99
-CMD_PATTERN     = 0x01  # standard firmware
+CMD_CONNECT = 0x89
+CMD_DISCONNECT = 0x99
+CMD_PATTERN = 0x01  # standard firmware
 CMD_PATTERN_ALT = 0x98  # newer firmware variant
-CMD_STOP        = 0x02
+CMD_STOP = 0x02
 CMD_CALIBRATION = 0x03
 
 CMD_NAMES = {
-    CMD_CONNECT:     "CONNECT",
-    CMD_DISCONNECT:  "DISCONNECT",
-    CMD_PATTERN:     "PATTERN",
+    CMD_CONNECT: "CONNECT",
+    CMD_DISCONNECT: "DISCONNECT",
+    CMD_PATTERN: "PATTERN",
     CMD_PATTERN_ALT: "PATTERN_ALT",
-    CMD_STOP:        "STOP",
+    CMD_STOP: "STOP",
     CMD_CALIBRATION: "CALIBRATION",
 }
 
 # ── ACK response command bytes ───────────────────────────────────────────────
-ACK_CONNECT      = 0x81  # response to CMD_CONNECT
+ACK_CONNECT = 0x81  # response to CMD_CONNECT
 ACK_PATTERN_RECV = 0x8F  # response to CMD_PATTERN: received
-ACK_DRILL_START  = 0x82  # response to CMD_PATTERN: drill started
+ACK_DRILL_START = 0x82  # response to CMD_PATTERN: drill started
 
 # ── CRC-CCITT (poly=0x1021, init=0x0000) ─────────────────────────────────────
 # Lookup table extracted from the original Joola robot APK (via frontend/js/bluetooth.js)
 _CRC_TABLE = [
-    0, 4129, 8258, 12387, 16516, 20645, 24774, 28903, 33032, 37161, 41290, 45419, 49548, 53677, 57806, 61935,
-    4657, 528, 12915, 8786, 21173, 17044, 29431, 25302, 37689, 33560, 45947, 41818, 54205, 50076, 62463, 58334,
-    9314, 13379, 1056, 5121, 25830, 29895, 17572, 21637, 42346, 46411, 34088, 38153, 58862, 62927, 50604, 54669,
-    13907, 9842, 5649, 1584, 30423, 26358, 22165, 18100, 46939, 42874, 38681, 34616, 63455, 59390, 55197, 51132,
-    18628, 22757, 26758, 30887, 2112, 6241, 10242, 14371, 51660, 55789, 59790, 63919, 35144, 39273, 43274, 47403,
-    23285, 19156, 31415, 27286, 6769, 2640, 14899, 10770, 56317, 52188, 64447, 60318, 39801, 35672, 47931, 43802,
-    27814, 31879, 19684, 23749, 11298, 15363, 3168, 7233, 60846, 64911, 52716, 56781, 44330, 48395, 36200, 40265,
-    32407, 28342, 24277, 20212, 15891, 11826, 7761, 3696, 65439, 61374, 57309, 53244, 48923, 44858, 40793, 36728,
-    37256, 33193, 45514, 41451, 53516, 49453, 61774, 57711, 4224, 161, 12482, 8419, 20484, 16421, 28742, 24679,
-    33721, 37784, 41979, 46042, 49981, 54044, 58239, 62302, 689, 4752, 8947, 13010, 16949, 21012, 25207, 29270,
-    46570, 42443, 38312, 34185, 62830, 58703, 54572, 50445, 13538, 9411, 5280, 1153, 29798, 25671, 21540, 17413,
-    42971, 47098, 34713, 38840, 59231, 63358, 50973, 55100, 9939, 14066, 1681, 5808, 26199, 30326, 17941, 22068,
-    55628, 51565, 63758, 59695, 39368, 35305, 47498, 43435, 22596, 18533, 30726, 26663, 6336, 2273, 14466, 10403,
-    52093, 56156, 60223, 64286, 35833, 39896, 43963, 48026, 19061, 23124, 27191, 31254, 2801, 6864, 10931, 14994,
-    64814, 60687, 56684, 52557, 48554, 44427, 40424, 36297, 31782, 27655, 23652, 19525, 15522, 11395, 7392, 3265,
-    61215, 65342, 53085, 57212, 44955, 49082, 36825, 40952, 28183, 32310, 20053, 24180, 11923, 16050, 3793, 7920,
+    0,
+    4129,
+    8258,
+    12387,
+    16516,
+    20645,
+    24774,
+    28903,
+    33032,
+    37161,
+    41290,
+    45419,
+    49548,
+    53677,
+    57806,
+    61935,
+    4657,
+    528,
+    12915,
+    8786,
+    21173,
+    17044,
+    29431,
+    25302,
+    37689,
+    33560,
+    45947,
+    41818,
+    54205,
+    50076,
+    62463,
+    58334,
+    9314,
+    13379,
+    1056,
+    5121,
+    25830,
+    29895,
+    17572,
+    21637,
+    42346,
+    46411,
+    34088,
+    38153,
+    58862,
+    62927,
+    50604,
+    54669,
+    13907,
+    9842,
+    5649,
+    1584,
+    30423,
+    26358,
+    22165,
+    18100,
+    46939,
+    42874,
+    38681,
+    34616,
+    63455,
+    59390,
+    55197,
+    51132,
+    18628,
+    22757,
+    26758,
+    30887,
+    2112,
+    6241,
+    10242,
+    14371,
+    51660,
+    55789,
+    59790,
+    63919,
+    35144,
+    39273,
+    43274,
+    47403,
+    23285,
+    19156,
+    31415,
+    27286,
+    6769,
+    2640,
+    14899,
+    10770,
+    56317,
+    52188,
+    64447,
+    60318,
+    39801,
+    35672,
+    47931,
+    43802,
+    27814,
+    31879,
+    19684,
+    23749,
+    11298,
+    15363,
+    3168,
+    7233,
+    60846,
+    64911,
+    52716,
+    56781,
+    44330,
+    48395,
+    36200,
+    40265,
+    32407,
+    28342,
+    24277,
+    20212,
+    15891,
+    11826,
+    7761,
+    3696,
+    65439,
+    61374,
+    57309,
+    53244,
+    48923,
+    44858,
+    40793,
+    36728,
+    37256,
+    33193,
+    45514,
+    41451,
+    53516,
+    49453,
+    61774,
+    57711,
+    4224,
+    161,
+    12482,
+    8419,
+    20484,
+    16421,
+    28742,
+    24679,
+    33721,
+    37784,
+    41979,
+    46042,
+    49981,
+    54044,
+    58239,
+    62302,
+    689,
+    4752,
+    8947,
+    13010,
+    16949,
+    21012,
+    25207,
+    29270,
+    46570,
+    42443,
+    38312,
+    34185,
+    62830,
+    58703,
+    54572,
+    50445,
+    13538,
+    9411,
+    5280,
+    1153,
+    29798,
+    25671,
+    21540,
+    17413,
+    42971,
+    47098,
+    34713,
+    38840,
+    59231,
+    63358,
+    50973,
+    55100,
+    9939,
+    14066,
+    1681,
+    5808,
+    26199,
+    30326,
+    17941,
+    22068,
+    55628,
+    51565,
+    63758,
+    59695,
+    39368,
+    35305,
+    47498,
+    43435,
+    22596,
+    18533,
+    30726,
+    26663,
+    6336,
+    2273,
+    14466,
+    10403,
+    52093,
+    56156,
+    60223,
+    64286,
+    35833,
+    39896,
+    43963,
+    48026,
+    19061,
+    23124,
+    27191,
+    31254,
+    2801,
+    6864,
+    10931,
+    14994,
+    64814,
+    60687,
+    56684,
+    52557,
+    48554,
+    44427,
+    40424,
+    36297,
+    31782,
+    27655,
+    23652,
+    19525,
+    15522,
+    11395,
+    7392,
+    3265,
+    61215,
+    65342,
+    53085,
+    57212,
+    44955,
+    49082,
+    36825,
+    40952,
+    28183,
+    32310,
+    20053,
+    24180,
+    11923,
+    16050,
+    3793,
+    7920,
 ]
 
 
@@ -95,6 +337,7 @@ def _crc_ccitt(data: bytes) -> int:
 
 
 # ── Frame builder ────────────────────────────────────────────────────────────
+
 
 def _build_frame(device_id_bytes: bytes, cmd: int, payload: bytes) -> bytes:
     """
@@ -121,16 +364,17 @@ def _build_frame(device_id_bytes: bytes, cmd: int, payload: bytes) -> bytes:
     frame.append(FRAME_START)
     frame.append(cmd & 0xFF)
     frame.append((length >> 8) & 0xFF)  # length high byte (big-endian)
-    frame.append(length & 0xFF)          # length low byte
+    frame.append(length & 0xFF)  # length low byte
     frame.extend(payload)
     crc = _crc_ccitt(bytes(frame))
-    frame.append((crc >> 8) & 0xFF)     # CRC high byte (big-endian)
-    frame.append(crc & 0xFF)             # CRC low byte
+    frame.append((crc >> 8) & 0xFF)  # CRC high byte (big-endian)
+    frame.append(crc & 0xFF)  # CRC low byte
     frame.append(FRAME_END)
     return bytes(frame)
 
 
 # ── Frame parser ─────────────────────────────────────────────────────────────
+
 
 def _parse_frame(data: bytes) -> Optional[dict]:
     """
@@ -154,23 +398,24 @@ def _parse_frame(data: bytes) -> Optional[dict]:
         return None
 
     device_id = data[2:10]
-    payload = data[14:14 + payload_len]
+    payload = data[14 : 14 + payload_len]
     crc_received = (data[-3] << 8) | data[-2]
-    crc_computed = _crc_ccitt(data[:14 + payload_len])
+    crc_computed = _crc_ccitt(data[: 14 + payload_len])
 
     return {
-        "cmd":          cmd,
-        "cmd_name":     CMD_NAMES.get(cmd, f"0x{cmd:02x}"),
-        "device_id":    device_id,
+        "cmd": cmd,
+        "cmd_name": CMD_NAMES.get(cmd, f"0x{cmd:02x}"),
+        "device_id": device_id,
         "device_id_hex": device_id.hex().upper(),
-        "payload":      payload,
-        "crc_ok":       crc_received == crc_computed,
+        "payload": payload,
+        "crc_ok": crc_received == crc_computed,
         "crc_received": crc_received,
         "crc_computed": crc_computed,
     }
 
 
 # ── Pattern payload decoder ───────────────────────────────────────────────────
+
 
 def _decode_pattern(payload: bytes) -> list:
     """
@@ -185,24 +430,27 @@ def _decode_pattern(payload: bytes) -> list:
         return []
     points = []
     for i in range(len(points_data) // 12):
-        p = points_data[i * 12:(i + 1) * 12]
-        points.append({
-            "m1speed":    p[0],
-            "m2speed":    p[1],
-            "xaxis":      p[2],
-            "yaxis":      p[3],
-            "zaxis":      p[4],
-            "speed_raw":  (p[5] << 8) | p[6],  # big-endian
-            "spin":       p[7],
-            "landarea":   p[8],
-            "depth":      p[9],
-            "adj_spin":   p[10],
-            "adj_pos":    p[11],
-        })
+        p = points_data[i * 12 : (i + 1) * 12]
+        points.append(
+            {
+                "m1speed": p[0],
+                "m2speed": p[1],
+                "xaxis": p[2],
+                "yaxis": p[3],
+                "zaxis": p[4],
+                "speed_raw": (p[5] << 8) | p[6],  # big-endian
+                "spin": p[7],
+                "landarea": p[8],
+                "depth": p[9],
+                "adj_spin": p[10],
+                "adj_pos": p[11],
+            }
+        )
     return points
 
 
 # ── Robot simulator ───────────────────────────────────────────────────────────
+
 
 class RobotSimulator:
     def __init__(self, device_id_hex: str, loop: asyncio.AbstractEventLoop):
@@ -227,7 +475,7 @@ class RobotSimulator:
             return
         chunk_size = 20
         for offset in range(0, len(data), chunk_size):
-            self._char.value = bytearray(data[offset:offset + chunk_size])
+            self._char.value = bytearray(data[offset : offset + chunk_size])
             self._server.update_value(SERVICE_UUID, CHAR_UUID)
 
     def _send_ack(self, cmd: int, payload: bytes = b""):
@@ -249,8 +497,16 @@ class RobotSimulator:
             self.log.info(
                 "  [%d] landarea=%d  depth=%d  spin=%d  speed=%d"
                 "  m1=%d m2=%d  x=%d y=%d z=%d",
-                i, p["landarea"], p["depth"], p["spin"], p["speed_raw"],
-                p["m1speed"], p["m2speed"], p["xaxis"], p["yaxis"], p["zaxis"],
+                i,
+                p["landarea"],
+                p["depth"],
+                p["spin"],
+                p["speed_raw"],
+                p["m1speed"],
+                p["m2speed"],
+                p["xaxis"],
+                p["yaxis"],
+                p["zaxis"],
             )
         self._send_ack(ACK_PATTERN_RECV)
 
@@ -272,8 +528,18 @@ class RobotSimulator:
     def _dispatch(self, frame: dict):
         cmd = frame["cmd"]
         payload = frame["payload"]
-        crc_str = "crc=ok" if frame["crc_ok"] else f"crc=BAD (got 0x{frame['crc_received']:04x} want 0x{frame['crc_computed']:04x})"
-        self.log.debug("[FRAME] cmd=0x%02x (%s) payloadLen=%d %s", cmd, frame["cmd_name"], len(payload), crc_str)
+        crc_str = (
+            "crc=ok"
+            if frame["crc_ok"]
+            else f"crc=BAD (got 0x{frame['crc_received']:04x} want 0x{frame['crc_computed']:04x})"
+        )
+        self.log.debug(
+            "[FRAME] cmd=0x%02x (%s) payloadLen=%d %s",
+            cmd,
+            frame["cmd_name"],
+            len(payload),
+            crc_str,
+        )
 
         if cmd == CMD_CONNECT:
             self._handle_connect(payload)
@@ -348,6 +614,7 @@ class RobotSimulator:
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
+
 def main():
     parser = argparse.ArgumentParser(
         description=(
@@ -362,7 +629,8 @@ def main():
         help="16-char hex device ID (e.g. 98D331F33F040001). Default: 0102030405060708",
     )
     parser.add_argument(
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         action="store_true",
         help="Show debug output including raw frame hex dumps",
     )
