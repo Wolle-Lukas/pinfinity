@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Final image without uv
 FROM python:3.12-slim-trixie
 
-RUN groupadd --system pinfinity && useradd --system --gid pinfinity pinfinity
+RUN groupadd --system --gid 1001 pinfinity && useradd --system --uid 1001 --gid pinfinity pinfinity
 
 COPY --from=builder --chown=pinfinity:pinfinity /pinfinity /pinfinity
 
