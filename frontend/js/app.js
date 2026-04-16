@@ -573,8 +573,8 @@ function buildDrillPayload() {
 // ── Bluetooth UI ─────────────────────────────────────────────
 function setupBluetooth() {
   robot.onResponse = (parsed) => {
-    // 0x82 = training finished naturally, 0x85 = stop command acknowledged
-    if (parsed?.cmd === 0x82 || parsed?.cmd === 0x85) {
+    // 0x82 = training finished naturally, 0x83 = control-cmd ack (stop / cancel)
+    if (parsed?.cmd === 0x82 || parsed?.cmd === 0x83) {
       setTrainingActive(false);
     }
   };

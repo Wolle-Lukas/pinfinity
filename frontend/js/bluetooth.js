@@ -16,18 +16,22 @@ const FRAME_END   = 0x16;
 const FRAME_FIXED = 0x01;
 
 // ── Command IDs ──────────────────────────────────────────────
-const CMD_CONNECT     = 0x89;
-const CMD_DISCONNECT  = 0x99;
-const CMD_PATTERN     = 0x01;
-const CMD_STOP        = 0x05;
-const CMD_CALIBRATION = 0x03;
+// Cmd byte sits at frame offset 11. Sub-action (when present) is in payload[0].
+const CMD_CONNECT     = 0x89;  // payload {0x00}
+const CMD_DISCONNECT  = 0x99;  // payload {0x00}
+const CMD_PATTERN     = 0x01;  // payload = drill bytes
+const CMD_CONTROL     = 0x03;  // payload {0x00}=STOP, {0x01}=START_CALIBRATION
+const CMD_GET_INFO    = 0x05;  // empty payload; robot replies with firmware version (cmd 0x85)
+
+const CTRL_STOP        = 0x00;
+const CTRL_CALIBRATION = 0x01;
 
 const CMD_NAMES = {
-  [CMD_CONNECT]:     'CONNECT',
-  [CMD_DISCONNECT]:  'DISCONNECT',
-  [CMD_PATTERN]:     'PATTERN',
-  [CMD_STOP]:        'STOP',
-  [CMD_CALIBRATION]: 'CALIBRATION',
+  [CMD_CONNECT]:    'CONNECT',
+  [CMD_DISCONNECT]: 'DISCONNECT',
+  [CMD_PATTERN]:    'PATTERN',
+  [CMD_CONTROL]:    'CONTROL',
+  [CMD_GET_INFO]:   'GET_INFO',
 };
 
 // ── Grid position mapping ────────────────────────────────────
@@ -250,7 +254,7 @@ export class RobotConnection {
 
   async stop() {
     console.log('[BT] Sending stop command');
-    await this._send(CMD_STOP, new Uint8Array(0));
+    await this._send(CMD_CONTROL, new Uint8Array([CTRL_STOP]));
   }
 
   // ── Internal ─────────────────────────────────────────────
