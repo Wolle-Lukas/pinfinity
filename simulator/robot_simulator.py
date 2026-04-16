@@ -49,16 +49,17 @@ CMD_CONNECT = 0x89
 CMD_DISCONNECT = 0x99
 CMD_PATTERN = 0x01  # standard firmware
 CMD_PATTERN_ALT = 0x98  # newer firmware variant
-CMD_STOP = 0x02
-CMD_CALIBRATION = 0x03
+CMD_CONTROL = 0x03  # payload[0]: 0x00=stop, 0x01=start calibration
+
+CTRL_STOP = 0x00
+CTRL_CALIBRATION = 0x01
 
 CMD_NAMES = {
     CMD_CONNECT: "CONNECT",
     CMD_DISCONNECT: "DISCONNECT",
     CMD_PATTERN: "PATTERN",
     CMD_PATTERN_ALT: "PATTERN_ALT",
-    CMD_STOP: "STOP",
-    CMD_CALIBRATION: "CALIBRATION",
+    CMD_CONTROL: "CONTROL",
 }
 
 # ── ACK response command bytes ───────────────────────────────────────────────
@@ -516,11 +517,14 @@ class RobotSimulator:
 
         asyncio.run_coroutine_threadsafe(_delayed_drill_start(), self._loop)
 
-    def _handle_stop(self, payload: bytes):
-        self.log.info("[CMD_STOP]")
-
-    def _handle_calibration(self, payload: bytes):
-        self.log.info("[CMD_CALIBRATION] payload=%s", payload.hex())
+    def _handle_control(self, payload: bytes):
+        sub = payload[0] if payload else None
+        if sub == CTRL_STOP:
+            self.log.info("[CMD_CONTROL] STOP")
+        elif sub == CTRL_CALIBRATION:
+            self.log.info("[CMD_CONTROL] START_CALIBRATION")
+        else:
+            self.log.info("[CMD_CONTROL] payload=%s", payload.hex())
 
     def _handle_disconnect(self, payload: bytes):
         self.log.info("[CMD_DISCONNECT]")
@@ -545,10 +549,8 @@ class RobotSimulator:
             self._handle_connect(payload)
         elif cmd in (CMD_PATTERN, CMD_PATTERN_ALT):
             self._handle_pattern(payload, alt=(cmd == CMD_PATTERN_ALT))
-        elif cmd == CMD_STOP:
-            self._handle_stop(payload)
-        elif cmd == CMD_CALIBRATION:
-            self._handle_calibration(payload)
+        elif cmd == CMD_CONTROL:
+            self._handle_control(payload)
         elif cmd == CMD_DISCONNECT:
             self._handle_disconnect(payload)
         else:
