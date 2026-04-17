@@ -445,12 +445,13 @@ def _decode_pattern(payload: bytes) -> tuple[list, bytes]:
                 "xaxis": p[2],
                 "yaxis": p[3],
                 "zaxis": p[4],
-                "speed_raw": (p[5] << 8) | p[6],  # big-endian
-                "spin": p[7],
-                "landarea": p[8],
+                # p[5] is always 0x00
+                "times": p[6],  # sequential: ball count; random: 0x01
+                "spin": p[7],  # sequential: drill.spin (0–5); random: 0x80
+                "ball_time": p[8],
                 "depth": p[9],
-                "adj_spin": p[10],
-                "adj_pos": p[11],
+                "land_type": p[10],  # 0=sequential, 2=random
+                "is_random": p[11],  # 0=sequential, 1=random
             }
         )
     return points, trailer
@@ -502,13 +503,15 @@ class RobotSimulator:
         self.log.info("[%s] %d point(s)  trailer=%s", tag, len(points), trailer.hex())
         for i, p in enumerate(points):
             self.log.info(
-                "  [%d] landarea=%d  depth=%d  spin=%d  speed=%d"
-                "  m1=%d m2=%d  x=%d y=%d z=%d",
+                "  [%d] times=%d  spin=%d  ball_time=%d  depth=%d"
+                "  land_type=%d  is_random=%d  m1=%d m2=%d  x=%d y=%d z=%d",
                 i,
-                p["landarea"],
-                p["depth"],
+                p["times"],
                 p["spin"],
-                p["speed_raw"],
+                p["ball_time"],
+                p["depth"],
+                p["land_type"],
+                p["is_random"],
                 p["m1speed"],
                 p["m2speed"],
                 p["xaxis"],
