@@ -558,9 +558,11 @@ class RobotSimulator:
 
     # ── BLE write handler ──
 
-    def _on_write(self, characteristic: BlessGATTCharacteristic, **kwargs):
+    def _on_write(
+        self, characteristic: BlessGATTCharacteristic, value: bytearray, **kwargs
+    ):
         """Called by bless on every GATT write to the characteristic."""
-        data = bytes(characteristic.value)
+        data = bytes(value)
         self.log.debug("[RX chunk] %s", self._hex(data))
 
         # Re-assembly: a chunk starting with FRAME_START resets the buffer
