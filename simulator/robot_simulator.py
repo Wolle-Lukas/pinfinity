@@ -50,6 +50,7 @@ CMD_DISCONNECT = 0x99
 CMD_PATTERN = 0x01  # standard firmware
 CMD_PATTERN_ALT = 0x98  # newer firmware variant
 CMD_CONTROL = 0x03  # payload[0]: 0x00=stop, 0x01=start calibration
+CMD_STATUS = 0x05  # heartbeat poll sent every ~3 s while a drill is running
 
 CTRL_STOP = 0x00
 CTRL_CALIBRATION = 0x01
@@ -60,12 +61,14 @@ CMD_NAMES = {
     CMD_PATTERN: "PATTERN",
     CMD_PATTERN_ALT: "PATTERN_ALT",
     CMD_CONTROL: "CONTROL",
+    CMD_STATUS: "STATUS",
 }
 
 # ── ACK response command bytes ───────────────────────────────────────────────
 ACK_CONNECT = 0x81  # response to CMD_CONNECT
 ACK_PATTERN_RECV = 0x8F  # response to CMD_PATTERN: received
-ACK_DRILL_START = 0x82  # response to CMD_PATTERN: drill started
+ACK_DRILL_START = 0x82  # sent by real robot when drill completes (timing TBD)
+ACK_STATUS = 0x85  # response to CMD_STATUS
 
 # ── CRC-CCITT (poly=0x1021, init=0x0000) ─────────────────────────────────────
 # Lookup table extracted from the original Joola robot APK (via frontend/js/bluetooth.js)
@@ -418,17 +421,20 @@ def _parse_frame(data: bytes) -> Optional[dict]:
 # ── Pattern payload decoder ───────────────────────────────────────────────────
 
 
-def _decode_pattern(payload: bytes) -> list:
+def _decode_pattern(payload: bytes) -> tuple[list, bytes]:
     """
-    Decode a PATTERN command payload into a list of point dicts.
+    Decode a PATTERN command payload into a list of point dicts and the raw trailer.
 
-    Each point is 12 bytes; the payload ends with a 4-byte trailer {0x01,0x01,0x00,0x00}.
+    Each point is 12 bytes; the payload ends with a 4-byte trailer whose meaning
+    is not yet fully understood (byte[0] may encode repetitions or ball count).
+    Returns (points, trailer).
     """
     if len(payload) < 4:
-        return []
-    points_data = payload[:-4]  # strip trailer
+        return [], payload
+    points_data = payload[:-4]
+    trailer = payload[-4:]
     if len(points_data) % 12 != 0:
-        return []
+        return [], trailer
     points = []
     for i in range(len(points_data) // 12):
         p = points_data[i * 12 : (i + 1) * 12]
@@ -447,7 +453,7 @@ def _decode_pattern(payload: bytes) -> list:
                 "adj_pos": p[11],
             }
         )
-    return points
+    return points, trailer
 
 
 # ── Robot simulator ───────────────────────────────────────────────────────────
@@ -492,8 +498,8 @@ class RobotSimulator:
 
     def _handle_pattern(self, payload: bytes, alt: bool):
         tag = "CMD_PATTERN_ALT" if alt else "CMD_PATTERN"
-        points = _decode_pattern(payload)
-        self.log.info("[%s] %d point(s):", tag, len(points))
+        points, trailer = _decode_pattern(payload)
+        self.log.info("[%s] %d point(s)  trailer=%s", tag, len(points), trailer.hex())
         for i, p in enumerate(points):
             self.log.info(
                 "  [%d] landarea=%d  depth=%d  spin=%d  speed=%d"
@@ -529,6 +535,10 @@ class RobotSimulator:
     def _handle_disconnect(self, payload: bytes):
         self.log.info("[CMD_DISCONNECT]")
 
+    def _handle_status(self, payload: bytes):
+        self.log.debug("[CMD_STATUS] heartbeat → ACK 0x85")
+        self._send_ack(ACK_STATUS, bytes([0x00, 0x01, 0x01, 0x04]))
+
     def _dispatch(self, frame: dict):
         cmd = frame["cmd"]
         payload = frame["payload"]
@@ -553,6 +563,8 @@ class RobotSimulator:
             self._handle_control(payload)
         elif cmd == CMD_DISCONNECT:
             self._handle_disconnect(payload)
+        elif cmd == CMD_STATUS:
+            self._handle_status(payload)
         else:
             self.log.warning("[UNKNOWN] cmd=0x%02x payload=%s", cmd, payload.hex())
 

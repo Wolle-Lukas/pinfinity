@@ -15,22 +15,47 @@ to it — all received commands are decoded and logged.
 ```bash
 # 1. System packages
 sudo apt update
-sudo apt install -y python3-pip python3-dbus bluez
+sudo apt install -y python3-venv python3-dbus bluez
 
-# 2. Python dependency
-pip3 install -r ~/pinfinity/simulator/requirements.txt
+# 2. Virtual environment + Python dependency
+python3 -m venv ~/simulator-venv
+~/simulator-venv/bin/pip install -r ~/pinfinity/simulator/requirements.txt
 ```
+
+### BlueZ configuration
+
+Enable BLE advertising and auto-power in `/etc/bluetooth/main.conf`:
+
+```ini
+[General]
+Experimental = true
+
+[Policy]
+AutoEnable = true
+```
+
+Then restart Bluetooth:
+
+```bash
+sudo systemctl restart bluetooth
+```
+
+`Experimental = true` enables the LE Advertising Manager required by `bless`.
+`AutoEnable = true` ensures the adapter is powered on automatically after every reboot.
 
 ## Starting the simulator
 
-```bash
-# Enable BLE adapter (once per boot)
-sudo hciconfig hci0 up
-sudo btmgmt le on
+Always restart Bluetooth right before starting the simulator to avoid stale
+advertisement state from a previous run:
 
-# Start the simulator
-sudo python3 ~/pinfinity/simulator/robot_simulator.py
+```bash
+sudo systemctl restart bluetooth && sleep 2 && \
+sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py
 ```
+
+> **Note:** Use the full venv path (`~/simulator-venv/bin/python3`) even with
+> `sudo` — otherwise `sudo` picks up the system Python which does not have
+> `bless` installed.
 
 The Pi now advertises itself as `J-0102030405060708` and waits for connections.
 
@@ -41,13 +66,15 @@ If you know the real ID of your robot (visible in a BT sniffer or via
 accept the connection without complaints:
 
 ```bash
-sudo python3 ~/pinfinity/simulator/robot_simulator.py --device-id 00A331D33F040001
+sudo systemctl restart bluetooth && sleep 2 && \
+sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py --device-id 00A331D33F040001
 ```
 
 ### Verbose mode (raw hex dumps)
 
 ```bash
-sudo python3 ~/pinfinity/simulator/robot_simulator.py --verbose
+sudo systemctl restart bluetooth && sleep 2 && \
+sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py --verbose
 ```
 
 ## Connecting
@@ -85,7 +112,41 @@ adb logcat | grep -i "bluetooth\|joola\|robot|datacontent:"
 
 | Problem | Solution |
 |---|---|
-| `bless` import fails | Re-run `pip3 install bless`, add `--break-system-packages` if needed |
-| `hciconfig: command not found` | `sudo apt install bluez` |
-| Device does not appear in the app | Run `sudo btmgmt le on`, then restart the simulator |
+| `bless` import fails | Check that you are using the venv Python: `~/simulator-venv/bin/python3` |
 | `Permission denied` on startup | Run the script with `sudo` |
+| Device does not appear in the app | See "Adapter soft-blocked" and "Failed to register advertisement" below |
+
+### Adapter soft-blocked / `Powered: no`
+
+If `bluetoothctl show` shows `Powered: no` or `rfkill list bluetooth` shows
+`Soft blocked: yes`:
+
+```bash
+sudo rfkill unblock bluetooth
+sudo bluetoothctl power on
+```
+
+To prevent this after every reboot, set `AutoEnable = true` in
+`/etc/bluetooth/main.conf` (see Installation above).
+
+### `Failed to register advertisement`
+
+This error from `bless`/BlueZ has two common causes:
+
+**1. `Experimental` key in wrong section** — check `systemctl status bluetooth`
+for `Unknown key Experimental`. If present, move the key from `[Policy]` to
+`[General]` in `/etc/bluetooth/main.conf`, then restart Bluetooth.
+
+**2. Stale advertisement state from a previous run** — always restart Bluetooth
+before starting the simulator:
+
+```bash
+sudo systemctl restart bluetooth && sleep 2 && \
+sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py
+```
+
+If the error persists, check the BlueZ log for the underlying HCI error:
+
+```bash
+sudo journalctl -u bluetooth -n 30 --no-pager
+```
