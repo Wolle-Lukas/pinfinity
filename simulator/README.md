@@ -41,7 +41,7 @@ If you know the real ID of your robot (visible in a BT sniffer or via
 accept the connection without complaints:
 
 ```bash
-sudo python3 ~/pinfinity/simulator/robot_simulator.py --device-id 98D331F33F040001
+sudo python3 ~/pinfinity/simulator/robot_simulator.py --device-id 00A331D33F040001
 ```
 
 ### Verbose mode (raw hex dumps)

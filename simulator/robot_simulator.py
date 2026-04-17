@@ -8,7 +8,7 @@ and sends minimal ACK responses so the app believes it is talking to a real robo
 
 Usage:
     sudo python3 robot_simulator.py
-    sudo python3 robot_simulator.py --device-id 98D331F33F040001
+    sudo python3 robot_simulator.py --device-id 0102030405060708
     sudo python3 robot_simulator.py --verbose
 
 Requirements:
@@ -628,7 +628,7 @@ def main():
         "--device-id",
         default="0102030405060708",
         metavar="HEX16",
-        help="16-char hex device ID (e.g. 98D331F33F040001). Default: 0102030405060708",
+        help="16-char hex device ID (e.g. 00A331D33F040001). Default: 0102030405060708",
     )
     parser.add_argument(
         "--verbose",
