@@ -294,13 +294,18 @@ export class RobotConnection {
       // Byte 6: sequential=times (ball count), random=0x01
       buf[off + 6] = isRandom ? 0x01 : ((drill.times ?? 0) & 0xFF);
 
-      // Byte 7: sequential=spin, random=0x80 (mode flag; spin is implicit in motor params)
-      buf[off + 7] = isRandom ? 0x80 : (drill.spin & 0xFF);
+      // Byte 7: ball timing wire value.
+      // single-point: (int)((19 - ballTime) * 3.5), clamped to 0 for ballTime>=20
+      // multi-point:  0 (ball_time byte carries the value instead)
+      // random:       0x80 (mode flag)
+      const ballTime = drill.ballTime ?? 9;
+      const singlePoint = points.length === 1;
+      buf[off + 7] = isRandom ? 0x80 : (singlePoint ? (Math.max(0, 19 - ballTime) * 3.5 | 0) : 0);
 
-      // Byte 8: ballTime (raw JSON value).
-      // Note: original app sends 0x00 for single-point sequential despite non-zero JSON
-      // ballTime — the robot likely ignores it in that mode.
-      buf[off + 8] = (drill.ballTime ?? 0) & 0xFF;
+      // Byte 8: raw app ballTime (1-20).
+      // single-point sequential: 0 (ball_timing byte carries the value instead)
+      // multi-point sequential and random: raw app value
+      buf[off + 8] = (singlePoint && !isRandom) ? 0 : (ballTime & 0xFF);
 
       // Byte 9: y − 1 (depth, 0-indexed; JSON y=2 → sends 1)
       buf[off + 9] = ((p.y ?? 2) - 1) & 0xFF;

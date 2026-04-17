@@ -447,7 +447,9 @@ def _decode_pattern(payload: bytes) -> tuple[list, bytes]:
                 "zaxis": p[4],
                 # p[5] is always 0x00
                 "times": p[6],  # sequential: ball count; random: 0x01
-                "spin": p[7],  # sequential: drill.spin (0–5); random: 0x80
+                # single-point: (int)((19 - app_ballTime) * 3.5), range 0-63; multi-point: 0
+                "ball_timing": p[7],
+                # single-point: 0; multi-point: raw app ballTime value (1-20)
                 "ball_time": p[8],
                 "depth": p[9],
                 "land_type": p[10],  # 0=sequential, 2=random
@@ -503,11 +505,11 @@ class RobotSimulator:
         self.log.info("[%s] %d point(s)  trailer=%s", tag, len(points), trailer.hex())
         for i, p in enumerate(points):
             self.log.info(
-                "  [%d] times=%d  spin=%d  ball_time=%d  depth=%d"
+                "  [%d] times=%d  ball_timing=%d  ball_time=%d  depth=%d"
                 "  land_type=%d  is_random=%d  m1=%d m2=%d  x=%d y=%d z=%d",
                 i,
                 p["times"],
-                p["spin"],
+                p["ball_timing"],
                 p["ball_time"],
                 p["depth"],
                 p["land_type"],

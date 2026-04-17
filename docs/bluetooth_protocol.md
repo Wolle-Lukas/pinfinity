@@ -176,11 +176,12 @@ Byte  Name            Source / Notes
  5    (zero)          0x00 always
  6    times/flag      sequential: drill.times (ball count, 1 byte)
                       random:     0x01
- 7    spin/mode       sequential: drill.spin (raw 0–5)
-                      random:     0x80 (mode flag; spin implicit in motor params)
- 8    ballTime        drill.ballTime (raw JSON value, 1 byte)
-                      NOTE: original app sends 0 for single-point sequential —
-                      robot may ignore this field in that mode (see §10)
+ 7    ball_timing     single-point: (int)((19 − ballTime) × 3.5), range 0–63
+                      multi-point:  0x00 (ball_time byte carries the value)
+                      random:       0x80 (mode flag)
+ 8    ball_time       single-point sequential: 0x00 (ball_timing byte carries the value)
+                      multi-point sequential: raw app ballTime value (1–20)
+                      random:       raw app ballTime value (1–20)
  9    depth           p.y − 1  (0-indexed: JSON y=2 → sends 1)
 10    landType        drill.landType  (0=sequential, 2=random)
 11    isRandom        0 for sequential, 1 for random
@@ -219,10 +220,21 @@ y = depth parameter (1=short, 2=medium, 3=long)
 
 ### ballTime Encoding
 
-`ballTime` is sent as a **single raw byte** at byte 8. The value is taken directly from the
-JSON field. The unit (seconds? deciseconds? robot-internal?) is not confirmed.
+Ball timing is encoded differently depending on how many points the pattern has:
 
-> Previous documentation stating ballTime was split big-endian across bytes 5–6 was **incorrect**.
+**Single-point patterns (N=1):**
+- Byte 7 (`ball_timing`): `(int)((19 − ballTime) × 3.5)`, clamped to 0 for ballTime ≥ 20. Range 0–63.
+- Byte 8 (`ball_time`): always `0x00`.
+
+**Multi-point patterns (N>1):**
+- Byte 7 (`ball_timing`): always `0x00`.
+- Byte 8 (`ball_time`): raw app value (1–20).
+
+The app UI exposes ballTime as a slider from 1 (most frequent) to 20 (least frequent). Both BT=19 and BT=20 produce wire value 0 for single-point (negative result clamped).
+
+Confirmed against all 20 slider positions in live simulator logs.
+
+> Previous documentation describing byte 7 as `spin` (0–5) and byte 8 as raw ballTime for all patterns was **incorrect**.
 
 ---
 
