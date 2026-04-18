@@ -45,17 +45,24 @@ sudo systemctl restart bluetooth
 
 ## Starting the simulator
 
-Always restart Bluetooth right before starting the simulator to avoid stale
-advertisement state from a previous run:
+Use the provided start script — it handles rfkill unblocking, Bluetooth restart,
+and the venv Python path automatically:
 
 ```bash
-sudo systemctl restart bluetooth && sleep 2 && \
-sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py
+~/pinfinity/simulator/start.sh
 ```
 
-> **Note:** Use the full venv path (`~/simulator-venv/bin/python3`) even with
-> `sudo` — otherwise `sudo` picks up the system Python which does not have
-> `bless` installed.
+All arguments are passed through to `robot_simulator.py`:
+
+```bash
+~/pinfinity/simulator/start.sh --device-id 00A331D33F040001 --drill-duration 20 --verbose
+```
+
+Make the script executable once after cloning:
+
+```bash
+chmod +x ~/pinfinity/simulator/start.sh
+```
 
 The Pi now advertises itself as `J-0102030405060708` and waits for connections.
 
@@ -66,8 +73,7 @@ If you know the real ID of your robot (visible in a BT sniffer or via
 accept the connection without complaints:
 
 ```bash
-sudo systemctl restart bluetooth && sleep 2 && \
-sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py --device-id 00A331D33F040001
+~/pinfinity/simulator/start.sh --device-id 00A331D33F040001
 ```
 
 ### Drill duration
@@ -78,15 +84,13 @@ Use `--drill-duration` to delay that signal and keep the drill "running" for a
 configurable number of seconds — useful for testing the Stop flow:
 
 ```bash
-sudo systemctl restart bluetooth && sleep 2 && \
-sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py --drill-duration 30
+~/pinfinity/simulator/start.sh --drill-duration 30
 ```
 
 ### Verbose mode (raw hex dumps)
 
 ```bash
-sudo systemctl restart bluetooth && sleep 2 && \
-sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py --verbose
+~/pinfinity/simulator/start.sh --verbose
 ```
 
 ## Connecting
