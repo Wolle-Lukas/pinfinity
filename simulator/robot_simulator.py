@@ -65,11 +65,18 @@ CMD_NAMES = {
 }
 
 # ── ACK response command bytes ───────────────────────────────────────────────
-ACK_CONNECT = 0x81  # response to CMD_CONNECT
-ACK_PATTERN_RECV = 0x8F  # response to CMD_PATTERN: received
-ACK_DRILL_START = 0x82  # sent by real robot when drill completes
+# 0x81: triggers "drill running" screen in app (also used as connect ACK)
+# 0x82: ends drill ("Ballausgabe abgeschlossen")
+# 0x8f: error code — do NOT send after CMD_PATTERN
+# 0x83: ball output status / control ACK
+ACK_CONNECT = 0x81  # response to CMD_CONNECT (handled by connection screen)
+ACK_DRILL_RUNNING = (
+    0x81  # same byte — in drill context: triggers "drill running" screen
+)
+ACK_DRILL_END = (
+    0x82  # drill completed: hides running screen, shows "Ballausgabe abgeschlossen"
+)
 ACK_CONTROL = 0x83  # ack for CMD_CONTROL (stop/cancel/calibration)
-ACK_DRILL_RUNNING = 0x84  # periodic heartbeat sent while drill is active; likely triggers "drill running" screen in app
 ACK_STATUS = 0x85  # response to CMD_STATUS
 
 # ── CRC-CCITT (poly=0x1021, init=0x0000) ─────────────────────────────────────
@@ -528,17 +535,14 @@ class RobotSimulator:
                 p["yaxis"],
                 p["zaxis"],
             )
-        self._send_ack(ACK_PATTERN_RECV)
+        # 0x81 triggers the "drill running" screen; 0x8f is an error code — do not send it here
+        self._send_ack(ACK_DRILL_RUNNING)
 
         async def _drill_lifecycle():
-            # Send 0x84 immediately — real robot sends this during active ball output;
-            # hypothesis: this triggers the app's "drill running" screen
-            await asyncio.sleep(0.05)
-            self._send_ack(ACK_DRILL_RUNNING, bytes([0x01]))
             if self._drill_duration > 0:
                 self.log.info("[DRILL] running for %.1f s…", self._drill_duration)
                 await asyncio.sleep(self._drill_duration)
-                self._send_ack(ACK_DRILL_START)  # 0x82 = drill ended
+                self._send_ack(ACK_DRILL_END)  # 0x82 = drill ended
                 self.log.info("[DRILL] done")
 
         asyncio.run_coroutine_threadsafe(_drill_lifecycle(), self._loop)

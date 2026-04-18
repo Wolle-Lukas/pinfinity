@@ -349,13 +349,14 @@ BLE notifications arrive in ≤20-byte chunks. The receive buffer accumulates ch
 
 | Command | Value | Meaning | Verified |
 |---|---|---|---|
-| Connect ACK | `0x81` | Robot acknowledged CMD_CONNECT | Observed live |
-| Pattern ACK | `0x8f` | Robot acknowledged CMD_PATTERN receipt | Observed live |
-| Drill Start ACK | `0x82` | Robot confirmed drill started | Observed live |
-| Control ACK | `0x83` | Ack for `CMD_CONTROL` (stop / cancel). `payload[0]`: `0x00`/`0x01` = drill stopped or control aborted, `0x02` = calibration complete | Confirmed |
-| Firmware Version | `0x85` | 4-byte payload: `[major, minor, patch, build]` — response to `CMD_GET_INFO` | Confirmed |
+| Drill Running | `0x81` | Triggers "drill running" screen in app | Confirmed |
+| Drill End | `0x82` | Ends drill, shows "Ballausgabe abgeschlossen" | Confirmed |
+| Control ACK | `0x83` | Ball output status; sub-codes in `payload[0]`: `0x00`/`0x01` = stopped/aborted, `0x02` = calibration complete | Confirmed |
+| Firmware Version | `0x85` | 4-byte payload: `[major, minor, patch, build]` — response to `CMD_GET_INFO` | Live testing |
+| Error | `0x8f` | **Error code** — do NOT send after CMD_PATTERN. Shows error toast and hides running screen. | Confirmed |
+| Cool-down Dialog | `0x88` | Triggers cool-down attention dialog | Observed |
 
-Responses `0x8f` and `0x82` semantics are inferred from the observed connection-log sequence. `0x83` and `0x85` are additionally confirmed via controlled testing.
+> **Note:** `0x81` serves double duty — on the connection screen it ACKs `CMD_CONNECT`; on the drill detail screen it triggers the "drill running" state. The same byte, different context.
 
 ### CRC Validation (Incoming)
 
@@ -415,11 +416,10 @@ to be changed if alt-service robots fail to accept patterns.
 
 ### Response Semantics
 
-`0x82` is sent by the robot when the drill ends (confirmed: app shows "Ballausgabe abgeschlossen" on receipt). It does **not** signal drill start.
-
-`0x83` is the ACK for `CMD_CONTROL` (stop/calibration). `payload[0]` values: `0x00` = drill stopped, `0x01` = control aborted, `0x02` = calibration complete.
-
-`0x84` (payload `0x01`) appears periodically in the btsnoop log while a drill is active. Hypothesis: sending `0x84` immediately after `0x8f` triggers the app's "drill running" screen. Unverified — needs live testing.
+- **`0x81`** triggers the "drill running" screen. The simulator sends this after CMD_PATTERN.
+- **`0x82`** ends the drill and shows "Ballausgabe abgeschlossen".
+- **`0x8f`** is an **error code**, not a pattern ACK. Sending it after CMD_PATTERN was the root cause of the missing "drill running" screen — it immediately hid the running screen before it could appear.
+- **`0x83`** is the control/stop ACK and also signals ball output status end.
 
 ---
 
@@ -456,7 +456,7 @@ All fixes are implemented in [frontend/js/bluetooth.js](../frontend/js/bluetooth
 
 | # | Bug | Was | Fixed To |
 |---|---|---|---|
-| 11 | "Drill running" screen missing | Simulator never sent `0x84` during drill | `0x84 {0x01}` sent immediately after `0x8f` (hypothesis: triggers app's "drill running" screen) |
+| 11 | "Drill running" screen never appeared | Simulator sent `0x8f` after CMD_PATTERN (`0x8f` is an error code — immediately hides running screen) | Send `0x81` after CMD_PATTERN (triggers "drill running" screen) |
 | 12 | `CMD_CONTROL` not ACKed | Simulator logged stop/calibration but never sent `0x83` reply | `0x83 {0x00}` sent for stop, `0x83 {0x02}` for calibration complete |
 
 ---
