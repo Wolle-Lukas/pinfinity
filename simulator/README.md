@@ -70,6 +70,18 @@ sudo systemctl restart bluetooth && sleep 2 && \
 sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py --device-id 00A331D33F040001
 ```
 
+### Drill duration
+
+By default the simulator sends `ACK_DRILL_START` (0x82) 0.1 s after receiving a
+PATTERN command, which makes the app think the drill completed almost instantly.
+Use `--drill-duration` to delay that signal and keep the drill "running" for a
+configurable number of seconds — useful for testing the Stop flow:
+
+```bash
+sudo systemctl restart bluetooth && sleep 2 && \
+sudo ~/simulator-venv/bin/python3 ~/pinfinity/simulator/robot_simulator.py --drill-duration 30
+```
+
 ### Verbose mode (raw hex dumps)
 
 ```bash

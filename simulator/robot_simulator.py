@@ -463,11 +463,17 @@ def _decode_pattern(payload: bytes) -> tuple[list, bytes]:
 
 
 class RobotSimulator:
-    def __init__(self, device_id_hex: str, loop: asyncio.AbstractEventLoop):
+    def __init__(
+        self,
+        device_id_hex: str,
+        loop: asyncio.AbstractEventLoop,
+        drill_duration: float = 0.1,
+    ):
         hex_str = device_id_hex.upper().ljust(16, "0")[:16]
         self.device_id_bytes = bytes.fromhex(hex_str)
         self.device_name = f"J-{hex_str}"
         self._loop = loop
+        self._drill_duration = drill_duration
         self._server: Optional[BlessServer] = None
         self._char: Optional[BlessGATTCharacteristic] = None
         self._rx_buffer = bytearray()
@@ -523,7 +529,9 @@ class RobotSimulator:
         self._send_ack(ACK_PATTERN_RECV)
 
         async def _delayed_drill_start():
-            await asyncio.sleep(0.1)
+            if self._drill_duration > 0.1:
+                self.log.info("[DRILL] running for %.1f s…", self._drill_duration)
+            await asyncio.sleep(self._drill_duration)
             self._send_ack(ACK_DRILL_START)
 
         asyncio.run_coroutine_threadsafe(_delayed_drill_start(), self._loop)
@@ -655,6 +663,13 @@ def main():
         action="store_true",
         help="Show debug output including raw frame hex dumps",
     )
+    parser.add_argument(
+        "--drill-duration",
+        type=float,
+        default=0.1,
+        metavar="SECONDS",
+        help="Seconds to wait after PATTERN before sending ACK_DRILL_START. Default: 0.1",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -666,7 +681,7 @@ def main():
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    sim = RobotSimulator(args.device_id, loop)
+    sim = RobotSimulator(args.device_id, loop, drill_duration=args.drill_duration)
 
     try:
         loop.run_until_complete(sim.run())
