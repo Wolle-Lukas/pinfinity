@@ -483,6 +483,7 @@ class RobotSimulator:
         self.device_name = f"J-{hex_str}"
         self._loop = loop
         self._drill_duration = drill_duration
+        self._drill_task: Optional[asyncio.Task] = None
         self._server: Optional[BlessServer] = None
         self._char: Optional[BlessGATTCharacteristic] = None
         self._rx_buffer = bytearray()
@@ -539,19 +540,30 @@ class RobotSimulator:
         self._send_ack(ACK_DRILL_RUNNING)
 
         async def _drill_lifecycle():
-            if self._drill_duration > 0:
-                self.log.info("[DRILL] running for %.1f s…", self._drill_duration)
-                await asyncio.sleep(self._drill_duration)
-                self._send_ack(ACK_DRILL_END)  # 0x82 = drill ended
-                self.log.info("[DRILL] done")
+            try:
+                if self._drill_duration > 0:
+                    self.log.info("[DRILL] running for %.1f s…", self._drill_duration)
+                    await asyncio.sleep(self._drill_duration)
+                    self._send_ack(ACK_DRILL_END)  # 0x82 = drill ended
+                    self.log.info("[DRILL] done")
+            except asyncio.CancelledError:
+                pass
 
-        asyncio.run_coroutine_threadsafe(_drill_lifecycle(), self._loop)
+        if self._drill_task and not self._drill_task.done():
+            self._drill_task.cancel()
+        self._drill_task = asyncio.run_coroutine_threadsafe(
+            _drill_lifecycle(), self._loop
+        )
 
     def _handle_control(self, payload: bytes):
         sub = payload[0] if payload else None
         if sub == CTRL_STOP:
             self.log.info("[CMD_CONTROL] STOP")
+            if self._drill_task and not self._drill_task.done():
+                self._drill_task.cancel()
+                self._drill_task = None
             self._send_ack(ACK_CONTROL, bytes([0x00]))
+            self._send_ack(ACK_DRILL_END)  # 0x82 immediately on stop
         elif sub == CTRL_CALIBRATION:
             self.log.info("[CMD_CONTROL] START_CALIBRATION")
             self._send_ack(ACK_CONTROL, bytes([0x02]))
