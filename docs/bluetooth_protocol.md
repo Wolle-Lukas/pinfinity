@@ -415,7 +415,9 @@ to be changed if alt-service robots fail to accept patterns.
 
 ### Response Semantics
 
-The meaning of response codes `0x8f` and `0x82` is inferred from the connection log sequence but not verified via controlled testing of each code individually.
+`0x82` is confirmed to be sent **immediately** after `0x8f` (within the same HCI packet in the btsnoop log), which triggers the app's "drill running" screen. It does **not** signal drill completion.
+
+`0x83` is the ACK for `CMD_CONTROL` (stop/calibration) and is also sent proactively by the robot when a drill ends naturally. `payload[0]` values: `0x00` = drill stopped, `0x01` = control aborted, `0x02` = calibration complete.
 
 ---
 
@@ -447,5 +449,12 @@ All fixes are implemented in [frontend/js/bluetooth.js](../frontend/js/bluetooth
 | # | Bug | Was | Fixed To |
 |---|---|---|---|
 | 10 | Wrong stop command | cmd `0x05` + empty payload (actually `CMD_GET_INFO` — triggers firmware-version reply, drill keeps running) | cmd `0x03` + payload `{ 0x00 }` (`CMD_CONTROL` stop sub-action) |
+
+### Simulator drill-lifecycle fix (2026-04-18)
+
+| # | Bug | Was | Fixed To |
+|---|---|---|---|
+| 11 | `0x82` sent too late | Simulator sent `0x82` after `drill_duration` seconds (app skipped "drill running" screen) | `0x82` sent immediately after `0x8f` (triggers "drill running" screen); `0x83 {0x00}` sent after `drill_duration` to signal natural drill end |
+| 12 | `CMD_CONTROL` not ACKed | Simulator logged stop/calibration but never sent `0x83` reply | `0x83 {0x00}` sent for stop, `0x83 {0x02}` for calibration complete |
 
 ---

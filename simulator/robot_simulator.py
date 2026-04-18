@@ -67,7 +67,10 @@ CMD_NAMES = {
 # ── ACK response command bytes ───────────────────────────────────────────────
 ACK_CONNECT = 0x81  # response to CMD_CONNECT
 ACK_PATTERN_RECV = 0x8F  # response to CMD_PATTERN: received
-ACK_DRILL_START = 0x82  # sent by real robot when drill completes (timing TBD)
+ACK_DRILL_START = (
+    0x82  # sent immediately when drill begins; triggers "drill running" screen in app
+)
+ACK_CONTROL = 0x83  # ack for CMD_CONTROL (stop/cancel/calibration); also sent when drill ends naturally
 ACK_STATUS = 0x85  # response to CMD_STATUS
 
 # ── CRC-CCITT (poly=0x1021, init=0x0000) ─────────────────────────────────────
@@ -467,7 +470,7 @@ class RobotSimulator:
         self,
         device_id_hex: str,
         loop: asyncio.AbstractEventLoop,
-        drill_duration: float = 0.1,
+        drill_duration: float = 0.1,  # seconds until 0x83 (drill-ended); 0 = no auto-end
     ):
         hex_str = device_id_hex.upper().ljust(16, "0")[:16]
         self.device_id_bytes = bytes.fromhex(hex_str)
@@ -528,20 +531,27 @@ class RobotSimulator:
             )
         self._send_ack(ACK_PATTERN_RECV)
 
-        async def _delayed_drill_start():
-            if self._drill_duration > 0.1:
-                self.log.info("[DRILL] running for %.1f s…", self._drill_duration)
-            await asyncio.sleep(self._drill_duration)
+        async def _drill_lifecycle():
+            # Signal drill started immediately — triggers the "drill running" screen in the app
+            await asyncio.sleep(0.05)
             self._send_ack(ACK_DRILL_START)
+            if self._drill_duration > 0:
+                self.log.info("[DRILL] running for %.1f s…", self._drill_duration)
+                await asyncio.sleep(self._drill_duration)
+                # Signal drill ended naturally (same as when user stops via CMD_CONTROL)
+                self._send_ack(ACK_CONTROL, bytes([0x00]))
+                self.log.info("[DRILL] done")
 
-        asyncio.run_coroutine_threadsafe(_delayed_drill_start(), self._loop)
+        asyncio.run_coroutine_threadsafe(_drill_lifecycle(), self._loop)
 
     def _handle_control(self, payload: bytes):
         sub = payload[0] if payload else None
         if sub == CTRL_STOP:
             self.log.info("[CMD_CONTROL] STOP")
+            self._send_ack(ACK_CONTROL, bytes([0x00]))
         elif sub == CTRL_CALIBRATION:
             self.log.info("[CMD_CONTROL] START_CALIBRATION")
+            self._send_ack(ACK_CONTROL, bytes([0x02]))
         else:
             self.log.info("[CMD_CONTROL] payload=%s", payload.hex())
 
@@ -668,7 +678,10 @@ def main():
         type=float,
         default=0.1,
         metavar="SECONDS",
-        help="Seconds to wait after PATTERN before sending ACK_DRILL_START. Default: 0.1",
+        help=(
+            "How long the drill runs before the simulator sends the drill-ended notification (0x83). "
+            "0 = no auto-end (drill runs until the app sends CMD_CONTROL stop). Default: 0.1"
+        ),
     )
     args = parser.parse_args()
 
