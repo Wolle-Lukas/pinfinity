@@ -415,9 +415,11 @@ to be changed if alt-service robots fail to accept patterns.
 
 ### Response Semantics
 
-`0x82` is confirmed to be sent **immediately** after `0x8f` (within the same HCI packet in the btsnoop log), which triggers the app's "drill running" screen. It does **not** signal drill completion.
+`0x82` is sent by the robot when the drill ends (confirmed: app shows "Ballausgabe abgeschlossen" on receipt). It does **not** signal drill start.
 
-`0x83` is the ACK for `CMD_CONTROL` (stop/calibration) and is also sent proactively by the robot when a drill ends naturally. `payload[0]` values: `0x00` = drill stopped, `0x01` = control aborted, `0x02` = calibration complete.
+`0x83` is the ACK for `CMD_CONTROL` (stop/calibration). `payload[0]` values: `0x00` = drill stopped, `0x01` = control aborted, `0x02` = calibration complete.
+
+`0x84` (payload `0x01`) appears periodically in the btsnoop log while a drill is active. Hypothesis: sending `0x84` immediately after `0x8f` triggers the app's "drill running" screen. Unverified — needs live testing.
 
 ---
 
@@ -454,7 +456,7 @@ All fixes are implemented in [frontend/js/bluetooth.js](../frontend/js/bluetooth
 
 | # | Bug | Was | Fixed To |
 |---|---|---|---|
-| 11 | `0x82` sent too late | Simulator sent `0x82` after `drill_duration` seconds (app skipped "drill running" screen) | `0x82` sent immediately after `0x8f` (triggers "drill running" screen); `0x83 {0x00}` sent after `drill_duration` to signal natural drill end |
+| 11 | "Drill running" screen missing | Simulator never sent `0x84` during drill | `0x84 {0x01}` sent immediately after `0x8f` (hypothesis: triggers app's "drill running" screen) |
 | 12 | `CMD_CONTROL` not ACKed | Simulator logged stop/calibration but never sent `0x83` reply | `0x83 {0x00}` sent for stop, `0x83 {0x02}` for calibration complete |
 
 ---

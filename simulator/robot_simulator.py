@@ -67,10 +67,9 @@ CMD_NAMES = {
 # ── ACK response command bytes ───────────────────────────────────────────────
 ACK_CONNECT = 0x81  # response to CMD_CONNECT
 ACK_PATTERN_RECV = 0x8F  # response to CMD_PATTERN: received
-ACK_DRILL_START = (
-    0x82  # sent immediately when drill begins; triggers "drill running" screen in app
-)
-ACK_CONTROL = 0x83  # ack for CMD_CONTROL (stop/cancel/calibration); also sent when drill ends naturally
+ACK_DRILL_START = 0x82  # sent by real robot when drill completes
+ACK_CONTROL = 0x83  # ack for CMD_CONTROL (stop/cancel/calibration)
+ACK_DRILL_RUNNING = 0x84  # periodic heartbeat sent while drill is active; likely triggers "drill running" screen in app
 ACK_STATUS = 0x85  # response to CMD_STATUS
 
 # ── CRC-CCITT (poly=0x1021, init=0x0000) ─────────────────────────────────────
@@ -532,14 +531,14 @@ class RobotSimulator:
         self._send_ack(ACK_PATTERN_RECV)
 
         async def _drill_lifecycle():
-            # Signal drill started immediately — triggers the "drill running" screen in the app
+            # Send 0x84 immediately — real robot sends this during active ball output;
+            # hypothesis: this triggers the app's "drill running" screen
             await asyncio.sleep(0.05)
-            self._send_ack(ACK_DRILL_START)
+            self._send_ack(ACK_DRILL_RUNNING, bytes([0x01]))
             if self._drill_duration > 0:
                 self.log.info("[DRILL] running for %.1f s…", self._drill_duration)
                 await asyncio.sleep(self._drill_duration)
-                # Signal drill ended naturally (same as when user stops via CMD_CONTROL)
-                self._send_ack(ACK_CONTROL, bytes([0x00]))
+                self._send_ack(ACK_DRILL_START)  # 0x82 = drill ended
                 self.log.info("[DRILL] done")
 
         asyncio.run_coroutine_threadsafe(_drill_lifecycle(), self._loop)
