@@ -1,6 +1,9 @@
 # CUSTOM
 certs/
 pinfinity/
+.ruff_cache/
+.claude/
+/app/data/
 
 
 # Byte-compiled / optimized / DLL files
