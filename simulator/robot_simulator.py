@@ -572,6 +572,22 @@ class RobotSimulator:
 
     def _handle_disconnect(self, payload: bytes):
         self.log.info("[CMD_DISCONNECT]")
+        self._rx_buffer = bytearray()
+        if self._drill_task and not self._drill_task.done():
+            self._drill_task.cancel()
+            self._drill_task = None
+        asyncio.run_coroutine_threadsafe(self._restart_advertising(), self._loop)
+
+    async def _restart_advertising(self):
+        """Stop and restart the BlessServer so BlueZ accepts fresh connections."""
+        try:
+            self.log.info("[SIM] Restarting advertising after disconnect…")
+            await self._server.stop()
+            await asyncio.sleep(0.2)
+            await self._server.start()
+            self.log.info("[SIM] Ready for new connection")
+        except Exception as e:
+            self.log.warning("[SIM] Failed to restart advertising: %s", e)
 
     def _handle_status(self, payload: bytes):
         self.log.debug("[CMD_STATUS] heartbeat → ACK 0x85")
