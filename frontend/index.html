@@ -3,325 +3,301 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#283593">
   <title>Pinfinity</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-<body>
+<body data-theme="dark">
   <div id="app">
-    <!-- Header -->
-    <header id="header">
-      <div class="header-bar">
-        <button id="btn-back" class="header-btn hidden" aria-label="Back">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <h1 id="header-title">Pinfinity</h1>
-        <div class="header-spacer"></div>
-      </div>
-      <nav id="tabs" class="tabs">
-        <button class="tab active" data-tab="basic">Basic</button>
-        <button class="tab" data-tab="advance">Advance</button>
-      </nav>
-    </header>
-
-    <!-- Robot status banner -->
-    <div id="robot-banner" class="robot-banner offline">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <div class="robot-info">
-        <span id="robot-name">No Robot</span>
-        <span id="robot-status">Tap to connect</span>
-      </div>
-    </div>
-
-    <!-- View: Drill List -->
     <main id="view-list" class="view active">
-      <div class="list-toolbar">
-        <button id="btn-filter" class="icon-btn" aria-label="Filter">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-        </button>
-        <div class="search-box">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="search-input" type="text" placeholder="Search drills...">
+      <header class="list-head">
+        <div id="robot-banner" class="robot-banner" role="button" tabindex="0">
+          <span class="robot-dot"></span>
+          <div class="robot-info">
+            <span id="robot-name">No robot</span>
+            <span id="robot-status">Tap to connect</span>
+          </div>
+          <svg class="robot-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
-      </div>
+        <div class="list-head-inner">
+          <div class="list-head-top">
+            <h1 class="list-title">Drills</h1>
+            <button id="btn-theme" class="icon-btn" aria-label="Toggle theme">
+              <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+          </div>
+          <nav id="tabs" class="tabs" role="tablist">
+            <button class="tab active" data-tab="basic" role="tab">Basic</button>
+            <button class="tab hidden" data-tab="advance" role="tab">Advance</button>
+          </nav>
+
+          <div id="basic-toolbar" class="list-toolbar">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="search-input" type="text" placeholder="Search drills…" autocomplete="off">
+              <button id="search-clear" class="search-clear hidden" aria-label="Clear search">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <button id="btn-filter" class="filter-btn" aria-label="Filter drills">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
+              <span>Filter</span>
+              <span id="filter-badge" class="filter-badge hidden">0</span>
+            </button>
+          </div>
+
+          <div id="advance-toolbar" class="list-toolbar hidden">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="advance-search-input" type="text" placeholder="Search advance drills…" autocomplete="off">
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div id="drill-count" class="drill-count"></div>
       <div id="drill-list" class="drill-list"></div>
+      <div id="drill-empty" class="drill-empty hidden">No drills match your filters.</div>
+      <div id="advance-drill-list" class="drill-list hidden"></div>
+
       <button id="btn-new-drill" class="fab" aria-label="New drill">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
     </main>
 
-    <!-- View: Drill Editor -->
     <main id="view-editor" class="view">
-      <div class="editor-header">
-        <span id="drill-name" class="drill-name">Default Pattern</span>
-        <div class="editor-actions">
-          <button id="btn-reset" class="icon-btn" aria-label="Reset">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+      <header class="editor-head">
+        <button id="btn-back" class="icon-btn" aria-label="Back">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="editor-title">
+          <span id="drill-name" class="editor-name">Untitled</span>
+          <span id="drill-dirty" class="dirty-dot hidden"></span>
+        </div>
+        <div class="editor-head-actions">
+          <button id="btn-undo" class="icon-btn" aria-label="Undo" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
           </button>
-          <button id="btn-save" class="icon-btn" aria-label="Save">
+          <button id="btn-save" class="icon-btn icon-btn-primary" aria-label="Save">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
           </button>
         </div>
-      </div>
+      </header>
 
-      <!-- Ball settings bar -->
-      <div class="settings-bar">
-        <button id="btn-ball" class="setting-btn">
-          <span class="setting-label">Ball</span>
-          <svg class="setting-icon" width="28" height="18" viewBox="0 0 28 18"><path id="ball-arc" d="M2,16 Q14,0 26,16" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-          <span id="ball-value" class="setting-value">Normal</span>
-        </button>
-        <button id="btn-spin" class="setting-btn">
-          <span class="setting-label">Spin</span>
-          <svg class="setting-icon" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path id="spin-arrow" d="M12,2 A10,10 0 0,1 22,12" fill="none" stroke="currentColor" stroke-width="2" marker-end="url(#arrowhead)"/><defs><marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><polygon points="0 0, 6 2, 0 4" fill="currentColor"/></marker></defs></svg>
-          <span id="spin-value" class="setting-value">None</span>
-        </button>
-        <button id="btn-power" class="setting-btn">
-          <span class="setting-label">Power</span>
-          <svg class="setting-icon" width="24" height="20" viewBox="0 0 24 20">
-            <line id="power-line1" x1="4" y1="4" x2="20" y2="4" stroke="currentColor" stroke-width="2.5" opacity="0.3"/>
-            <line id="power-line2" x1="4" y1="10" x2="20" y2="10" stroke="currentColor" stroke-width="2.5" opacity="0.3"/>
-            <line id="power-line3" x1="4" y1="16" x2="20" y2="16" stroke="currentColor" stroke-width="2.5"/>
-          </svg>
-          <span id="power-value" class="setting-value">Medium</span>
-        </button>
-      </div>
-
-      <!-- Landing mode selector -->
-      <div class="mode-bar">
-        <button class="mode-btn active" data-mode="single">Single</button>
-        <button class="mode-btn" data-mode="sequence">Sequence</button>
-        <button class="mode-btn" data-mode="random">Random</button>
-      </div>
-
-      <!-- Instruction text -->
-      <p class="grid-hint">Tap to select ball landing positions</p>
-
-      <!-- Table grid -->
-      <div class="table-container">
-        <div class="table-grid" id="table-grid">
-          <!-- Net side label -->
-          <div class="net-label">&#8593; Net</div>
+      <div class="editor-scroll">
+        <div class="summary-row">
+          <button id="chip-ball" class="summary-chip">
+            <span class="sc-label">Ball</span>
+            <span class="sc-glyph" id="chip-ball-glyph"></span>
+            <span class="sc-value" id="chip-ball-value">Normal</span>
+          </button>
+          <button id="chip-spin" class="summary-chip">
+            <span class="sc-label">Spin</span>
+            <span class="sc-glyph" id="chip-spin-glyph"></span>
+            <span class="sc-value" id="chip-spin-value">No Spin</span>
+          </button>
+          <button id="chip-power" class="summary-chip">
+            <span class="sc-label">Power</span>
+            <span class="sc-glyph" id="chip-power-glyph"></span>
+            <span class="sc-value" id="chip-power-value">Medium</span>
+          </button>
         </div>
-      </div>
 
-      <!-- Grid actions -->
-      <div class="grid-actions" id="grid-actions" style="display:none">
-        <button id="btn-undo" class="text-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          Undo
+        <div class="segmented" role="radiogroup" aria-label="Landing mode">
+          <button class="seg-btn active" data-mode="single" role="radio">Single</button>
+          <button class="seg-btn" data-mode="sequence" role="radio">Sequence</button>
+          <button class="seg-btn" data-mode="random" role="radio">Random</button>
+          <span class="seg-indicator"></span>
+        </div>
+        <p class="mode-hint" id="mode-hint">Tap a zone where the ball should land.</p>
+
+        <div class="court-wrap">
+          <div class="court-axis-far">Far court · roboter side · ↓ Net</div>
+          <div class="court" id="court"></div>
+          <div class="court-axis-near">Near court · your side</div>
+        </div>
+
+        <div class="court-actions">
+          <button id="btn-clear" class="text-btn" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Clear court
+          </button>
+        </div>
+
+        <div class="field-card">
+          <div class="field-head">
+            <span class="field-label">Ball timing</span>
+            <span class="field-value"><span id="timing-value">9</span></span>
+          </div>
+          <div class="slider-wrap">
+            <span class="slider-caption">Less often</span>
+            <input id="timing-slider" type="range" min="1" max="20" value="12" class="slider">
+            <span class="slider-caption">More often</span>
+          </div>
+        </div>
+
+        <button id="row-ball-count" class="field-card field-row">
+          <span class="field-label">Ball count</span>
+          <span class="field-value"><span id="ball-count-value">20</span><span class="field-unit">balls</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
         </button>
-        <button id="btn-clear" class="text-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          Clear all
-        </button>
       </div>
 
-      <!-- Timing slider -->
-      <div class="setting-row">
-        <span class="setting-row-label">Ball Timing</span>
-        <span id="timing-value" class="setting-row-value">9</span>
-      </div>
-      <div class="slider-container">
-        <span class="slider-label">Less often</span>
-        <input type="range" id="timing-slider" min="1" max="20" value="12" class="slider">
-        <span class="slider-label">More often</span>
-      </div>
-
-      <!-- Ball count -->
-      <div class="setting-row clickable" id="row-ball-count">
-        <span class="setting-row-label">Ball Count</span>
-        <span id="ball-count-value" class="setting-row-value">20 Balls ›</span>
-      </div>
-
-      <!-- Action buttons -->
-      <div class="action-bar">
-        <button id="btn-test" class="action-btn test-btn">Test</button>
-        <button id="btn-play" class="action-btn play-btn">
+      <footer class="editor-footer">
+        <button id="btn-test" class="btn btn-ghost">Test</button>
+        <button id="btn-play" class="btn btn-primary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Play
         </button>
-        <button id="btn-stop" class="action-btn stop-btn hidden">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16"/></svg>
+        <button id="btn-stop" class="btn btn-stop hidden">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
           Stop
         </button>
-      </div>
+      </footer>
     </main>
 
-    <!-- Filter Sheet -->
-    <div id="filter-sheet" class="filter-overlay hidden">
-      <div class="filter-sheet">
-        <div class="filter-header">
-          <span class="filter-title">Filter</span>
-          <button id="filter-reset" class="filter-reset-btn">Reset</button>
-          <button id="filter-close" class="icon-btn" aria-label="Close">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-        <div class="filter-body">
-          <div class="filter-section">
-            <div class="filter-section-title">Ball</div>
-            <div class="filter-chips">
-              <button class="filter-chip" data-ball="0">Serve</button>
-              <button class="filter-chip" data-ball="1">Normal</button>
-              <button class="filter-chip" data-ball="2">Lob</button>
-            </div>
-          </div>
-          <div class="filter-divider"></div>
-          <div class="filter-section">
-            <div class="filter-section-title">Spin</div>
-            <div class="filter-chips">
-              <button class="filter-chip" data-spin="0">Max Topspin</button>
-              <button class="filter-chip" data-spin="1">Topspin</button>
-              <button class="filter-chip" data-spin="2">No Spin</button>
-              <button class="filter-chip" data-spin="3">Backspin</button>
-              <button class="filter-chip" data-spin="4">Max Backspin</button>
-            </div>
-          </div>
-          <div class="filter-divider"></div>
-          <div class="filter-section">
-            <div class="filter-section-title">Source</div>
-            <div class="filter-chips">
-              <button class="filter-chip" data-pattern="0">Official</button>
-              <button class="filter-chip" data-pattern="1">My Drills</button>
-            </div>
-          </div>
-        </div>
+    <div id="picker" class="sheet-overlay hidden">
+      <div class="sheet" role="dialog">
+        <div class="sheet-handle"></div>
+        <header class="sheet-head">
+          <h2 id="picker-title" class="sheet-title">Ball</h2>
+          <button class="icon-btn sheet-close" data-close="picker"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </header>
+        <div class="sheet-body"><div id="picker-options" class="picker-options"></div></div>
+        <footer class="sheet-foot">
+          <button class="btn btn-ghost" data-close="picker">Cancel</button>
+          <button id="picker-confirm" class="btn btn-primary">Done</button>
+        </footer>
       </div>
     </div>
 
-    <!-- Dialog: Ball Type -->
-    <div id="dialog-ball" class="dialog-overlay hidden">
-      <div class="dialog">
-        <h2 class="dialog-title">Ball Type</h2>
-        <div class="dialog-body ball-type-body">
-          <div class="ball-type-visual">
-            <svg width="200" height="120" viewBox="0 0 200 120">
-              <path id="ball-type-arc" d="M20,100 Q100,20 180,100" fill="none" stroke="var(--primary)" stroke-width="3"/>
-              <circle id="ball-type-dot" cx="20" cy="100" r="6" fill="var(--primary)"/>
-            </svg>
-          </div>
-          <div class="ball-type-labels">
-            <span class="ball-type-label" data-ball="0">Serve</span>
-            <span class="ball-type-label selected" data-ball="1">Normal</span>
-            <span class="ball-type-label" data-ball="2">Lob</span>
-          </div>
-        </div>
-        <div class="dialog-actions">
-          <button class="dialog-btn cancel">Cancel</button>
-          <button class="dialog-btn confirm">Done</button>
-        </div>
+    <div id="actions-sheet" class="sheet-overlay hidden">
+      <div class="sheet sheet-compact" role="dialog">
+        <div class="sheet-handle"></div>
+        <header class="sheet-head">
+          <h2 class="sheet-title">Drill actions</h2>
+          <button class="icon-btn sheet-close" data-close="actions-sheet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </header>
+        <div class="sheet-body sheet-actions-body" id="actions-body"></div>
       </div>
     </div>
 
-    <!-- Dialog: Spin -->
-    <div id="dialog-spin" class="dialog-overlay hidden">
-      <div class="dialog">
-        <h2 class="dialog-title">Spin</h2>
-        <div class="dialog-body spin-body">
-          <div class="spin-visual">
-            <svg width="120" height="120" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="50" fill="none" stroke="#ddd" stroke-width="3"/>
-              <path id="spin-indicator" d="" fill="none" stroke="var(--primary)" stroke-width="3"/>
-              <circle id="spin-dot" cx="60" cy="60" r="4" fill="var(--primary)"/>
-            </svg>
-          </div>
-          <div class="spin-labels">
-            <span class="spin-label" data-spin="0">Max Topspin</span>
-            <span class="spin-label" data-spin="1">Topspin</span>
-            <span class="spin-label selected" data-spin="2">No Spin</span>
-            <span class="spin-label" data-spin="3">Backspin</span>
-            <span class="spin-label" data-spin="4">Max Backspin</span>
-          </div>
-        </div>
-        <div class="dialog-actions">
-          <button class="dialog-btn cancel">Cancel</button>
-          <button class="dialog-btn confirm">Done</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dialog: Power -->
-    <div id="dialog-power" class="dialog-overlay hidden">
-      <div class="dialog">
-        <h2 class="dialog-title">Power</h2>
-        <div class="dialog-body power-body">
-          <div class="power-options">
-            <div class="power-option">
-              <div class="power-bar-col"><div id="power-bar1" class="power-bar-track" style="width:110px"></div></div>
-              <span class="power-label" data-power="0">Extreme</span>
-            </div>
-            <div class="power-option">
-              <div class="power-bar-col"><div id="power-bar2" class="power-bar-track" style="width:84px"></div></div>
-              <span class="power-label" data-power="1">Strong</span>
-            </div>
-            <div class="power-option">
-              <div class="power-bar-col"><div id="power-bar3" class="power-bar-track" style="width:56px"></div></div>
-              <span class="power-label selected" data-power="2">Medium</span>
-            </div>
-            <div class="power-option">
-              <div class="power-bar-col"><div id="power-bar4" class="power-bar-track" style="width:28px"></div></div>
-              <span class="power-label" data-power="3">Light</span>
-            </div>
-          </div>
-        </div>
-        <div class="dialog-actions">
-          <button class="dialog-btn cancel">Cancel</button>
-          <button class="dialog-btn confirm">Done</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dialog: Ball Count -->
     <div id="dialog-count" class="dialog-overlay hidden">
       <div class="dialog">
-        <h2 class="dialog-title">Ball Count</h2>
+        <h2 class="dialog-title">Ball count</h2>
         <div class="dialog-body count-body">
-          <input type="number" id="count-input" min="1" max="999" value="20" class="count-input">
-          <span class="count-unit">Balls</span>
+          <button id="count-minus" class="stepper-btn">−</button>
+          <input id="count-input" type="number" min="1" max="999" value="20" class="count-input">
+          <button id="count-plus" class="stepper-btn">+</button>
         </div>
+        <div class="count-unit-label">balls</div>
         <div class="dialog-actions">
-          <button class="dialog-btn cancel">Cancel</button>
-          <button class="dialog-btn confirm">Done</button>
+          <button class="btn btn-ghost" data-close="dialog-count">Cancel</button>
+          <button id="count-confirm" class="btn btn-primary">Done</button>
         </div>
       </div>
     </div>
 
-    <!-- Dialog: Save Drill -->
     <div id="dialog-save" class="dialog-overlay hidden">
       <div class="dialog">
-        <h2 class="dialog-title">Save Drill</h2>
+        <h2 class="dialog-title">Save drill</h2>
         <div class="dialog-body">
-          <input type="text" id="save-name-input" placeholder="Drill name" class="text-input">
+          <input id="save-name-input" type="text" placeholder="Drill name" class="text-input" maxlength="60">
         </div>
         <div class="dialog-actions">
-          <button class="dialog-btn cancel">Cancel</button>
-          <button class="dialog-btn confirm">Save</button>
+          <button class="btn btn-ghost" data-close="dialog-save">Cancel</button>
+          <button id="save-confirm" class="btn btn-primary">Save</button>
         </div>
       </div>
     </div>
 
-    <!-- Dialog: Conflict warning (impossible land areas after param change) -->
+    <div id="dialog-rename" class="dialog-overlay hidden">
+      <div class="dialog">
+        <h2 class="dialog-title">Rename drill</h2>
+        <div class="dialog-body">
+          <input id="rename-input" type="text" class="text-input" maxlength="60">
+        </div>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" data-close="dialog-rename">Cancel</button>
+          <button id="rename-confirm" class="btn btn-primary">Rename</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="dialog-delete" class="dialog-overlay hidden">
+      <div class="dialog">
+        <h2 class="dialog-title">Delete drill?</h2>
+        <div class="dialog-body">
+          <p id="delete-message" class="dialog-message">This can't be undone.</p>
+        </div>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" data-close="dialog-delete">Cancel</button>
+          <button id="delete-confirm" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+
     <div id="dialog-conflict" class="dialog-overlay hidden">
       <div class="dialog">
-        <h2 class="dialog-title">Remove Placed Balls?</h2>
+        <h2 class="dialog-title">Remove placed balls?</h2>
         <div class="dialog-body">
-          <p id="conflict-message" class="conflict-message"></p>
+          <p id="conflict-message" class="dialog-message"></p>
         </div>
         <div class="dialog-actions">
-          <button class="dialog-btn cancel">Abort</button>
-          <button class="dialog-btn confirm">Change &amp; Remove</button>
+          <button class="btn btn-ghost" data-close="dialog-conflict">Abort</button>
+          <button id="conflict-confirm" class="btn btn-primary">Change &amp; remove</button>
         </div>
       </div>
     </div>
 
-    <!-- Toast notifications -->
-    <div id="toast" class="toast hidden"></div>
+    <div id="filter-sheet" class="sheet-overlay hidden">
+      <div class="sheet" role="dialog">
+        <div class="sheet-handle"></div>
+        <header class="sheet-head">
+          <h2 class="sheet-title">Filter</h2>
+          <button class="icon-btn sheet-close" data-close="filter-sheet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </header>
+        <div class="sheet-body" id="filter-chips">
+          <div class="filter-group">
+            <div class="filter-group-label">Ball type</div>
+            <div class="filter-chip-wrap">
+              <button class="chip" data-group="ball" data-value="0">Serve</button>
+              <button class="chip" data-group="ball" data-value="1">Normal</button>
+              <button class="chip" data-group="ball" data-value="2">Lob</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-label">Landing mode</div>
+            <div class="filter-chip-wrap">
+              <button class="chip" data-group="mode" data-value="single">Single</button>
+              <button class="chip" data-group="mode" data-value="sequence">Sequence</button>
+              <button class="chip" data-group="mode" data-value="random">Random</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-label">Source</div>
+            <div class="filter-chip-wrap">
+              <button class="chip" data-group="source" data-value="official">Official</button>
+              <button class="chip" data-group="source" data-value="custom">Custom</button>
+              <button class="chip chip-star" data-group="source" data-value="favorite">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Favorites
+              </button>
+            </div>
+          </div>
+        </div>
+        <footer class="sheet-foot">
+          <button id="filter-reset" class="btn btn-ghost">Reset</button>
+          <button class="btn btn-primary" data-close="filter-sheet">Show results</button>
+        </footer>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status"></div>
   </div>
 
-  <script type="module" src="/js/app.js"></script>
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>

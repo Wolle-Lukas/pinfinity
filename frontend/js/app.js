@@ -3,46 +3,81 @@ import { RobotConnection, cellToPoint, pointToCell } from './bluetooth.js';
 
 // ── Constants ────────────────────────────────────────────────
 const BALL_LABELS  = ['Serve', 'Normal', 'Lob'];
+const BALL_SUBS    = ['Flat trajectory, robot behind baseline', 'Everyday rally ball', 'High arcing ball'];
 const SPIN_LABELS  = ['Max Topspin', 'Topspin', 'No Spin', 'Backspin', 'Max Backspin'];
 const POWER_LABELS = ['Extreme', 'Strong', 'Medium', 'Light'];
-const CELL_NAMES   = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15'];
+const POWER_SUBS   = ['Fastest setting', 'Firm pace', 'Typical rally speed', 'Gentle, great for warm-up'];
+
+// Inline SVG glyphs for summary chips + picker options
+const BALL_GLYPHS = {
+  0: '<svg width="28" height="14" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 10 L26 10"/></svg>',
+  1: '<svg width="28" height="14" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12 Q14 2 26 12"/></svg>',
+  2: '<svg width="28" height="14" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 13 Q14 -3 26 13"/></svg>',
+};
+const SPIN_GLYPHS = {
+  0: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 3 A8 8 0 0 1 20 11"/><polyline points="17 9 20 11 22 8"/></svg>',
+  1: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 3 A8 8 0 0 1 18 7"/><polyline points="16 5 18 7 20 5"/></svg>',
+  2: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/></svg>',
+  3: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 19 A8 8 0 0 1 6 15"/><polyline points="8 17 6 15 4 17"/></svg>',
+  4: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 19 A8 8 0 0 1 4 11"/><polyline points="7 13 4 11 2 14"/></svg>',
+};
+const POWER_GLYPHS = {
+  0: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor"/><rect x="2" y="14" width="22" height="3" rx="1" fill="currentColor"/></svg>',
+  1: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor"/><rect x="2" y="14" width="22" height="3" rx="1" fill="currentColor"/></svg>',
+  2: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="14" width="22" height="3" rx="1" fill="currentColor"/></svg>',
+  3: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="14" width="8" height="3" rx="1" fill="currentColor"/></svg>',
+};
+
+const ICONS = {
+  edit:      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  duplicate: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  rename:    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
+  trash:     '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  star:      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  more:      '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+};
 
 // ── State ────────────────────────────────────────────────────
 const state = {
-  view: 'list',         // 'list' | 'editor'
-  tab: 'basic',         // 'basic' | 'advance'
-  drills: [],           // loaded drill list
+  view: 'list',
+  tab: 'basic',
+  drills: [],
+  advanceDrills: [],
   searchQuery: '',
-  filter: { ball: -1, spin: -1, patternType: -1 },
+  advanceSearchQuery: '',
+  filter: { ball: -1, spin: -1, patternType: -1, mode: null, favorite: false },
   // Editor state
-  currentDrill: null,   // full drill object being edited
-  ball: 1,
-  spin: 2,
-  power: 2,
-  mode: 'single',       // 'single' | 'sequence' | 'random'
-  points: [],           // [{x, y}] selected landing points
-  undoStack: [],        // snapshots of points before each mutation
+  currentDrill: null,
+  ball: 1, spin: 2, power: 2,
+  mode: 'single',
+  points: [],
+  undoStack: [],
   ballTime: 9,
   ballCount: 20,
   dirty: false,
+  playing: false,
 };
 
 const robot = new RobotConnection();
-let baseConf = [];  // loaded from /api/base/conf at startup
+let baseConf = [];
 
-// ── DOM refs ─────────────────────────────────────────────────
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => document.querySelectorAll(sel);
+// ── DOM helpers ──────────────────────────────────────────────
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
 
 // ── Init ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
-  buildGrid();
+  // Theme: read from localStorage, default dark
+  const storedTheme = localStorage.getItem('pinfinity.theme') || 'dark';
+  document.body.dataset.theme = storedTheme;
+
+  buildCourt();
   bindEvents();
   setupBluetooth();
-  loadDrills();
   await loadBaseConf();
+  loadDrills();
 }
 
 async function loadBaseConf() {
@@ -59,136 +94,235 @@ async function loadBaseConf() {
 function isComboAvailable(ball, spin, power) {
   return baseConf.some(e => e.ball === ball && e.spin === spin && e.power === power);
 }
-
 function isLandareaAvailable(ball, spin, power, landarea) {
   return baseConf.some(e => e.ball === ball && e.spin === spin && e.power === power && e.landarea === landarea);
 }
 
-// what: 'points' | 'settings' | 'all'
 function pushUndo(what) {
   const snap = {};
-  if (what === 'points' || what === 'all')
-    snap.points = state.points.map(p => ({ ...p }));
+  if (what === 'points' || what === 'all') snap.points = state.points.map(p => ({ ...p }));
   if (what === 'settings' || what === 'all') {
-    snap.ball  = state.ball;
-    snap.spin  = state.spin;
-    snap.power = state.power;
+    snap.ball = state.ball; snap.spin = state.spin; snap.power = state.power;
   }
   state.undoStack.push(snap);
+  $('#btn-undo').disabled = state.undoStack.length === 0;
 }
 
-// Pending function to execute if user confirms the conflict dialog
 let _pendingApply = null;
-
 function getConflictingPoints(ball, spin, power) {
   return state.points.filter(p => !isLandareaAvailable(ball, spin, power, p.x));
 }
-
 function applyWithConflictCheck(newBall, newSpin, newPower, applyFn) {
   const conflicts = getConflictingPoints(newBall, newSpin, newPower);
   if (conflicts.length === 0) {
-    pushUndo('settings');
-    applyFn();
-    return;
+    pushUndo('settings'); applyFn(); return;
   }
-  const count = conflicts.length;
+  const n = conflicts.length;
   $('#conflict-message').textContent =
-    `${count} placed ball${count > 1 ? 's are' : ' is'} in area${count > 1 ? 's' : ''} `+
+    `${n} placed ball${n > 1 ? 's are' : ' is'} in ${n > 1 ? 'areas' : 'an area'} ` +
     `that won't be reachable with the new setting and will be removed.`;
   _pendingApply = () => {
     pushUndo('all');
     state.points = state.points.filter(p => isLandareaAvailable(newBall, newSpin, newPower, p.x));
     applyFn();
   };
-  $('#dialog-conflict').classList.remove('hidden');
+  openOverlay('dialog-conflict');
 }
 
-// ── Grid builder ─────────────────────────────────────────────
-function buildGrid() {
-  const grid = $('#table-grid');
+// ── Court ────────────────────────────────────────────────────
+function buildCourt() {
+  const grid = $('#court');
   for (let i = 0; i < 15; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'grid-cell';
+    const cell = document.createElement('button');
+    cell.className = 'cell';
     cell.dataset.index = i;
-    cell.innerHTML = `<span class="grid-cell-label">${CELL_NAMES[i]}</span>`;
+    cell.setAttribute('aria-label', `Cell ${i + 1}`);
     cell.addEventListener('click', () => onCellClick(i));
     grid.appendChild(cell);
   }
 }
 
+function renderCourt() {
+  const cells = $$('#court .cell');
+  cells.forEach((cell, idx) => {
+    const point = cellToPoint(idx);
+    const avail = isLandareaAvailable(state.ball, state.spin, state.power, point.x);
+    const match = state.points.findIndex(p => p.x === point.x);
+
+    cell.classList.toggle('imp', !avail);
+    cell.classList.toggle('on', match !== -1);
+    cell.disabled = !avail;
+    cell.innerHTML = '';
+
+    if (match !== -1) {
+      const lbl = document.createElement('span');
+      lbl.className = 'dot-label';
+      if (state.mode === 'sequence') lbl.textContent = match + 1;
+      else if (state.mode === 'random') lbl.textContent = 'R';
+      else lbl.textContent = '●';
+      cell.appendChild(lbl);
+    }
+  });
+
+  $('#btn-clear').disabled = state.points.length === 0;
+  const hint = $('#mode-hint');
+  if (state.mode === 'single')   hint.textContent = 'Tap one zone. Each shot lands in the same spot.';
+  if (state.mode === 'sequence') hint.textContent = 'Tap zones in order. The robot cycles through them.';
+  if (state.mode === 'random')   hint.textContent = 'Tap any zones. The robot picks one at random per shot.';
+}
+
+function onCellClick(index) {
+  const point = cellToPoint(index);
+  if (!isLandareaAvailable(state.ball, state.spin, state.power, point.x)) return;
+
+  pushUndo('points');
+  if (state.mode === 'single') {
+    state.points = [point];
+  } else {
+    const idx = state.points.findIndex(p => p.x === point.x);
+    if (idx !== -1) state.points.splice(idx, 1);
+    else state.points.push(point);
+  }
+  markDirty();
+  renderCourt();
+}
+
 // ── Event bindings ───────────────────────────────────────────
 function bindEvents() {
+  // Theme toggle
+  $('#btn-theme').addEventListener('click', () => {
+    const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.body.dataset.theme = next;
+    localStorage.setItem('pinfinity.theme', next);
+  });
+
   // Tabs
   $$('.tab').forEach(t => t.addEventListener('click', () => {
     state.tab = t.dataset.tab;
     $$('.tab').forEach(x => x.classList.toggle('active', x === t));
-    // Filter only applies to basic tab
-    state.filter = { ball: -1, spin: -1, patternType: -1 };
-    updateFilterBadge();
-    $('#btn-filter').classList.toggle('hidden', state.tab === 'advance');
+    const isBasic = state.tab === 'basic';
+    $('#basic-toolbar').classList.toggle('hidden', !isBasic);
+    $('#drill-list').classList.toggle('hidden', !isBasic);
+    $('#advance-toolbar').classList.toggle('hidden', isBasic);
+    $('#advance-drill-list').classList.toggle('hidden', isBasic);
     loadDrills();
   }));
-
-  // Filter
-  $('#btn-filter').addEventListener('click', () => openFilterSheet());
 
   // Search
   $('#search-input').addEventListener('input', (e) => {
     state.searchQuery = e.target.value;
+    $('#search-clear').classList.toggle('hidden', !e.target.value);
     renderDrillList();
+  });
+  $('#search-clear').addEventListener('click', () => {
+    $('#search-input').value = '';
+    state.searchQuery = '';
+    $('#search-clear').classList.add('hidden');
+    renderDrillList();
+  });
+  $('#advance-search-input').addEventListener('input', (e) => {
+    state.advanceSearchQuery = e.target.value;
+    renderAdvanceList();
+  });
+
+  // Filter chips
+  $('#filter-chips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const g = chip.dataset.group, v = chip.dataset.value;
+    if (g === 'ball') {
+      const val = parseInt(v);
+      state.filter.ball = state.filter.ball === val ? -1 : val;
+    } else if (g === 'mode') {
+      state.filter.mode = state.filter.mode === v ? null : v;
+    } else if (g === 'source') {
+      if (v === 'favorite') state.filter.favorite = !state.filter.favorite;
+      else {
+        const patternValue = v === 'official' ? 0 : 1;
+        state.filter.patternType = state.filter.patternType === patternValue ? -1 : patternValue;
+      }
+    }
+    syncFilterChips();
+    loadDrills();
+  });
+
+  // Filter button → open sheet
+  $('#btn-filter').addEventListener('click', () => {
+    syncFilterChips();
+    $('#filter-sheet').classList.remove('hidden');
+  });
+  $('#filter-reset').addEventListener('click', () => {
+    state.filter = { ball: -1, spin: -1, patternType: -1, mode: null, favorite: false };
+    syncFilterChips();
+    loadDrills();
   });
 
   // New drill
-  $('#btn-new-drill').addEventListener('click', () => {
-    openEditor(null);
-  });
+  $('#btn-new-drill').addEventListener('click', () => openEditor(null));
 
-  // Back button
+  // Back / editor actions
   $('#btn-back').addEventListener('click', () => showView('list'));
-
-  // Editor header
-  $('#btn-reset').addEventListener('click', resetEditor);
   $('#btn-save').addEventListener('click', onSave);
+  $('#btn-undo').addEventListener('click', doUndo);
 
-  // Settings buttons
-  $('#btn-ball').addEventListener('click', () => openDialog('dialog-ball'));
-  $('#btn-spin').addEventListener('click', () => openDialog('dialog-spin'));
-  $('#btn-power').addEventListener('click', () => openDialog('dialog-power'));
+  // Summary chips → picker
+  $('#chip-ball').addEventListener('click',  () => openPicker('ball'));
+  $('#chip-spin').addEventListener('click',  () => openPicker('spin'));
+  $('#chip-power').addEventListener('click', () => openPicker('power'));
 
-  // Mode buttons
-  $$('.mode-btn').forEach(b => b.addEventListener('click', () => {
+  // Segmented mode
+  $$('.seg-btn').forEach(b => b.addEventListener('click', () => {
+    if (state.mode === b.dataset.mode) return;
+    pushUndo('points');
     state.mode = b.dataset.mode;
     state.points = [];
-    $$('.mode-btn').forEach(x => x.classList.toggle('active', x === b));
-    renderGrid();
+    $$('.seg-btn').forEach((x, i) => {
+      x.classList.toggle('active', x === b);
+      x.setAttribute('aria-checked', x === b);
+    });
+    updateSegIndicator();
+    markDirty();
+    renderCourt();
   }));
 
-  // Grid actions
-  $('#btn-undo').addEventListener('click', () => {
-    if (state.undoStack.length > 0) {
-      const snap = state.undoStack.pop();
-      if (snap.points  !== undefined) state.points = snap.points;
-      if (snap.ball    !== undefined) state.ball   = snap.ball;
-      if (snap.spin    !== undefined) state.spin   = snap.spin;
-      if (snap.power   !== undefined) state.power  = snap.power;
-      syncEditorUI();
-    }
-  });
+  // Clear court
   $('#btn-clear').addEventListener('click', () => {
+    if (state.points.length === 0) return;
+    pushUndo('points');
     state.points = [];
-    renderGrid();
+    markDirty();
+    renderCourt();
   });
 
   // Timing slider
   $('#timing-slider').addEventListener('input', (e) => {
     state.ballTime = 21 - parseInt(e.target.value);
     $('#timing-value').textContent = state.ballTime;
+    markDirty();
   });
 
   // Ball count
-  $('#row-ball-count').addEventListener('click', () => openDialog('dialog-count'));
+  $('#row-ball-count').addEventListener('click', () => {
+    $('#count-input').value = state.ballCount;
+    openOverlay('dialog-count');
+  });
+  $('#count-minus').addEventListener('click', () => {
+    const v = Math.max(1, (parseInt($('#count-input').value) || 1) - 1);
+    $('#count-input').value = v;
+  });
+  $('#count-plus').addEventListener('click', () => {
+    const v = Math.min(999, (parseInt($('#count-input').value) || 0) + 1);
+    $('#count-input').value = v;
+  });
+  $('#count-confirm').addEventListener('click', () => {
+    const v = Math.max(1, Math.min(999, parseInt($('#count-input').value) || 20));
+    state.ballCount = v;
+    $('#ball-count-value').textContent = v;
+    markDirty();
+    closeOverlay('dialog-count');
+  });
 
-  // Action buttons
+  // Play / test / stop
   $('#btn-test').addEventListener('click', () => onPlay('test'));
   $('#btn-play').addEventListener('click', () => onPlay('play'));
   $('#btn-stop').addEventListener('click', onStop);
@@ -196,8 +330,52 @@ function bindEvents() {
   // Robot banner
   $('#robot-banner').addEventListener('click', onRobotBannerClick);
 
-  // Dialog events
-  setupDialogs();
+  // Picker
+  $('#picker-confirm').addEventListener('click', onPickerConfirm);
+
+  // Save dialog
+  $('#save-confirm').addEventListener('click', () => {
+    const name = $('#save-name-input').value.trim();
+    if (!name) { toast('Enter a drill name'); return; }
+    closeOverlay('dialog-save');
+    doSave(name);
+  });
+
+  // Rename dialog
+  $('#rename-confirm').addEventListener('click', onRenameConfirm);
+
+  // Delete dialog
+  $('#delete-confirm').addEventListener('click', onDeleteConfirm);
+
+  // Conflict dialog
+  $('#conflict-confirm').addEventListener('click', () => {
+    closeOverlay('dialog-conflict');
+    if (_pendingApply) { _pendingApply(); _pendingApply = null; }
+  });
+
+  // Generic close handlers (data-close="<id>")
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-close]');
+    if (btn) { closeOverlay(btn.dataset.close); return; }
+    // click overlay background
+    const overlay = e.target.closest('.sheet-overlay, .dialog-overlay');
+    if (overlay && e.target === overlay) closeOverlay(overlay.id);
+  });
+
+  // Escape key closes top overlay
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const open = [...$$('.sheet-overlay, .dialog-overlay')].reverse().find(o => !o.classList.contains('hidden'));
+      if (open) closeOverlay(open.id);
+    }
+  });
+}
+
+function updateSegIndicator() {
+  const map = { single: 0, sequence: 1, random: 2 };
+  const i = map[state.mode] ?? 0;
+  const ind = $('.seg-indicator');
+  if (ind) ind.style.transform = `translateX(${i * 100}%)`;
 }
 
 // ── Views ────────────────────────────────────────────────────
@@ -205,32 +383,25 @@ function showView(view) {
   state.view = view;
   $('#view-list').classList.toggle('active', view === 'list');
   $('#view-editor').classList.toggle('active', view === 'editor');
-  $('#btn-back').classList.toggle('hidden', view === 'list');
-  $('#tabs').classList.toggle('hidden', view === 'editor');
-
-  if (view === 'list') {
-    $('#header-title').textContent = 'Pinfinity';
-    loadDrills();
-  } else {
-    $('#header-title').textContent = state.tab === 'basic' ? 'Basic Training' : 'Advance Training';
-  }
+  if (view === 'list') loadDrills();
 }
 
-// ── Drill List ───────────────────────────────────────────────
+// ── Drill list ───────────────────────────────────────────────
 async function loadDrills() {
   try {
-    let res;
     if (state.tab === 'basic') {
-      res = await api.getBasicList({
+      const res = await api.getBasicList({
         ball: state.filter.ball,
         spin: state.filter.spin,
         patternType: state.filter.patternType,
       });
+      state.drills = res?.data?.records || [];
+      renderDrillList();
     } else {
-      res = await api.getAdvanceList();
+      const res = await api.getAdvanceList();
+      state.advanceDrills = res?.data?.records || [];
+      renderAdvanceList();
     }
-    state.drills = res?.data?.records || [];
-    renderDrillList();
   } catch (err) {
     toast('Failed to load drills');
     console.error(err);
@@ -240,94 +411,294 @@ async function loadDrills() {
 function renderDrillList() {
   const list = $('#drill-list');
   const q = state.searchQuery.toLowerCase();
-  const filtered = state.drills.filter(d => !q || d.name.toLowerCase().includes(q));
+  let filtered = state.drills.filter(d => !q || d.name.toLowerCase().includes(q));
+  if (state.filter.favorite) filtered = filtered.filter(d => d.isFavourite);
+  if (state.filter.mode) {
+    filtered = filtered.filter(d => {
+      const ls = d.landType === 2 ? 'random' : ((d.points?.length ?? 0) > 1 ? 'sequence' : 'single');
+      return ls === state.filter.mode;
+    });
+  }
+  // Sort: newest first by updateDate/createDate
+  filtered = filtered.slice().sort((a, b) => {
+    const ta = new Date(a.updateDate || a.createDate || 0).getTime();
+    const tb = new Date(b.updateDate || b.createDate || 0).getTime();
+    return tb - ta;
+  });
 
-  $('#drill-count').textContent = `${filtered.length} Results`;
+  $('#drill-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'drill' : 'drills'}`;
+  $('#drill-empty').classList.toggle('hidden', filtered.length > 0);
 
-  list.innerHTML = filtered.map(d => {
-    const isCustom = d.uid && d.uid !== 0;
-    const meta = isCustom ? 'Custom' : 'Official';
-    const lastPlayed = d.lastPlayDateUTC ? formatDate(d.lastPlayDateUTC) : '';
-    const favClass = d.isFavourite ? 'active' : '';
-
-    return `
-      <div class="drill-card" data-id="${d.id}">
-        <div class="drill-card-info" data-id="${d.id}">
-          <div class="drill-card-title">${escapeHtml(d.name)}</div>
-          <div class="drill-card-meta">
-            <span>${meta}</span>
-            ${lastPlayed ? `<span>Played ${lastPlayed}</span>` : ''}
-          </div>
-        </div>
-        <button class="drill-card-fav ${favClass}" data-id="${d.id}" data-fav="${d.isFavourite}" aria-label="Favourite">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="${d.isFavourite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-        </button>
-      </div>`;
-  }).join('');
+  list.innerHTML = filtered.map(d => drillCardHtml(d)).join('');
 
   // Card click → open editor
-  list.querySelectorAll('.drill-card-info').forEach(el => {
-    el.addEventListener('click', () => {
+  list.querySelectorAll('.drill-card').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.card-action')) return;
       const drill = state.drills.find(d => d.id === parseInt(el.dataset.id));
       if (drill) openEditor(drill);
     });
   });
-
-  // Favourite toggle
-  list.querySelectorAll('.drill-card-fav').forEach(btn => {
+  list.querySelectorAll('.card-fav').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const id = parseInt(btn.dataset.id);
-      const newFav = btn.dataset.fav === '1' ? 0 : 1;
+      const drill = state.drills.find(d => d.id === id);
+      if (!drill) return;
+      const newFav = drill.isFavourite ? 0 : 1;
       try {
-        if (state.tab === 'basic') {
-          await api.setBasicFavourite(id, newFav);
-        } else {
-          await api.setAdvanceFavourite(id, newFav);
-        }
-        const drill = state.drills.find(d => d.id === id);
-        if (drill) drill.isFavourite = newFav;
+        await api.setBasicFavourite(id, newFav);
+        drill.isFavourite = newFav;
         renderDrillList();
-      } catch {
-        toast('Failed to update favourite');
-      }
+      } catch { toast('Failed to update favorite'); }
     });
   });
+  list.querySelectorAll('.card-more').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      openActionsSheet(state.drills.find(d => d.id === id));
+    });
+  });
+}
+
+function drillCardHtml(d) {
+  const isCustom = d.uid && d.uid !== 0;
+  const sourceLabel = isCustom ? 'Custom' : 'Official';
+  const last = d.lastPlayDateUTC ? `Played ${formatDate(d.lastPlayDateUTC)}`
+                                 : `Added ${formatDate(d.createDate)}`;
+  const landKind = d.landType === 2 ? 'random' : ((d.points?.length ?? 0) > 1 ? 'sequence' : 'single');
+  const modeLabel = landKind === 'random' ? 'Random' : landKind === 'sequence' ? 'Sequence' : 'Single';
+  return `
+    <div class="drill-card" data-id="${d.id}">
+      <div class="mini-court">${miniCourtCellsHtml(d)}</div>
+      <div class="drill-body">
+        <div class="drill-name-row">
+          <span class="drill-name-text">${escapeHtml(d.name)}</span>
+        </div>
+        <div class="drill-meta">
+          <span>${BALL_LABELS[d.ball] || ''}</span>
+          <span class="dot">·</span>
+          <span>${modeLabel}</span>
+          <span class="dot">·</span>
+          <span${isCustom ? ' class="meta-custom"' : ''}>${sourceLabel}</span>
+          <span class="dot">·</span>
+          <span>${last}</span>
+        </div>
+      </div>
+      <div class="drill-right card-action">
+        <button class="card-icon-btn card-fav ${d.isFavourite ? 'active' : ''}" data-id="${d.id}" aria-label="Favorite">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="${d.isFavourite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </button>
+        <button class="card-icon-btn card-more" data-id="${d.id}" aria-label="More actions">${ICONS.more}</button>
+      </div>
+    </div>`;
+}
+
+function miniCourtCellsHtml(d) {
+  // 15 cells, highlight placed points
+  const xs = new Set((d.points || []).map(p => p.x));
+  const cls = d.landType === 2 ? 'mc-cell on-seq' : 'mc-cell on';
+  let out = '';
+  for (let i = 1; i <= 15; i++) {
+    out += xs.has(i) ? `<span class="${cls}"></span>` : '<span class="mc-cell"></span>';
+  }
+  return out;
+}
+
+function renderAdvanceList() {
+  const list = $('#advance-drill-list');
+  const q = state.advanceSearchQuery.toLowerCase();
+  let filtered = state.advanceDrills.filter(d => !q || d.name.toLowerCase().includes(q));
+  filtered = filtered.slice().sort((a, b) => {
+    const ta = new Date(a.updateDate || a.createDate || 0).getTime();
+    const tb = new Date(b.updateDate || b.createDate || 0).getTime();
+    return tb - ta;
+  });
+  list.innerHTML = filtered.map(d => drillCardHtml(d)).join('');
+
+  // Card click → open editor (same path as basic)
+  list.querySelectorAll('.drill-card').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.card-action')) return;
+      const drill = state.advanceDrills.find(d => d.id === parseInt(el.dataset.id));
+      if (drill) openEditor(drill);
+    });
+  });
+  list.querySelectorAll('.card-fav').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const drill = state.advanceDrills.find(d => d.id === id);
+      if (!drill) return;
+      const newFav = drill.isFavourite ? 0 : 1;
+      try {
+        await api.setAdvanceFavourite(id, newFav);
+        drill.isFavourite = newFav;
+        renderAdvanceList();
+      } catch { toast('Failed to update favourite'); }
+    });
+  });
+  list.querySelectorAll('.card-more').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const drill = state.advanceDrills.find(d => d.id === id);
+      if (drill) openActionsSheet(drill);
+    });
+  });
+}
+
+function syncFilterChips() {
+  $$('#filter-chips .chip').forEach(chip => {
+    const g = chip.dataset.group, v = chip.dataset.value;
+    let active = false;
+    if (g === 'ball') active = state.filter.ball === parseInt(v);
+    else if (g === 'mode') active = state.filter.mode === v;
+    else if (g === 'source') {
+      if (v === 'favorite') active = state.filter.favorite;
+      else active = state.filter.patternType === (v === 'official' ? 0 : 1);
+    }
+    chip.classList.toggle('active', active);
+  });
+
+  // Update filter button badge / active state
+  let count = 0;
+  if (state.filter.ball !== -1) count++;
+  if (state.filter.mode) count++;
+  if (state.filter.patternType !== -1) count++;
+  if (state.filter.favorite) count++;
+  const btn = $('#btn-filter');
+  const badge = $('#filter-badge');
+  if (btn) btn.classList.toggle('has-active', count > 0);
+  if (badge) {
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count === 0);
+  }
+}
+
+// ── Drill actions sheet ──────────────────────────────────────
+let _actionsDrill = null;
+function openActionsSheet(drill) {
+  if (!drill) return;
+  _actionsDrill = drill;
+  const isOfficial = !drill.uid || drill.uid === 0;
+  const body = $('#actions-body');
+  body.innerHTML = `
+    <button class="sheet-action" data-act="edit">${ICONS.edit}<span>Edit</span></button>
+    <button class="sheet-action" data-act="duplicate">${ICONS.duplicate}<span>Duplicate</span></button>
+    ${isOfficial ? '' : `<button class="sheet-action" data-act="rename">${ICONS.rename}<span>Rename</span></button>`}
+    <button class="sheet-action" data-act="favorite">${ICONS.star}<span>${drill.isFavourite ? 'Unfavorite' : 'Favorite'}</span></button>
+    ${isOfficial ? '' : `<button class="sheet-action danger" data-act="delete">${ICONS.trash}<span>Delete</span></button>`}
+  `;
+  body.querySelectorAll('.sheet-action').forEach(b => {
+    b.addEventListener('click', () => handleAction(b.dataset.act));
+  });
+  openOverlay('actions-sheet');
+}
+
+async function handleAction(act) {
+  const drill = _actionsDrill;
+  closeOverlay('actions-sheet');
+  if (!drill) return;
+  if (act === 'edit') openEditor(drill);
+  else if (act === 'duplicate') duplicateDrill(drill);
+  else if (act === 'rename') openRename(drill);
+  else if (act === 'favorite') {
+    try {
+      const newFav = drill.isFavourite ? 0 : 1;
+      await api.setBasicFavourite(drill.id, newFav);
+      drill.isFavourite = newFav;
+      renderDrillList();
+    } catch { toast('Failed to update favorite'); }
+  } else if (act === 'delete') {
+    $('#delete-message').textContent = `"${drill.name}" will be permanently removed.`;
+    _pendingDelete = drill;
+    openOverlay('dialog-delete');
+  }
+}
+
+async function duplicateDrill(drill) {
+  const payload = {
+    id: 0,
+    name: `${drill.name} (Copy)`,
+    ball: drill.ball, spin: drill.spin, power: drill.power,
+    landType: drill.landType,
+    ballTime: drill.ballTime, numType: drill.numType ?? 1, times: drill.times,
+    adjustSpin: drill.adjustSpin ?? 0, adjustPosition: drill.adjustPosition ?? 0,
+    points: drill.points ? drill.points.map(p => ({ ...p })) : [],
+    isFavourite: 0,
+  };
+  try {
+    await api.saveBasicDrill(payload);
+    toast('Duplicated');
+    loadDrills();
+  } catch { toast('Failed to duplicate'); }
+}
+
+let _renameDrill = null;
+function openRename(drill) {
+  _renameDrill = drill;
+  $('#rename-input').value = drill.name;
+  openOverlay('dialog-rename');
+  setTimeout(() => $('#rename-input').select(), 50);
+}
+async function onRenameConfirm() {
+  const drill = _renameDrill;
+  const name = $('#rename-input').value.trim();
+  if (!drill || !name) return;
+  const payload = {
+    id: drill.id, name,
+    ball: drill.ball, spin: drill.spin, power: drill.power,
+    landType: drill.landType,
+    ballTime: drill.ballTime, numType: drill.numType ?? 1, times: drill.times,
+    adjustSpin: drill.adjustSpin ?? 0, adjustPosition: drill.adjustPosition ?? 0,
+    points: drill.points ? drill.points.map(p => ({ ...p })) : [],
+    isFavourite: drill.isFavourite || 0,
+  };
+  try {
+    await api.saveBasicDrill(payload);
+    drill.name = name;
+    closeOverlay('dialog-rename');
+    renderDrillList();
+  } catch { toast('Failed to rename'); }
+}
+
+let _pendingDelete = null;
+async function onDeleteConfirm() {
+  const drill = _pendingDelete;
+  if (!drill) return;
+  try {
+    await api.deleteBasicDrill(drill.id);
+    _pendingDelete = null;
+    closeOverlay('dialog-delete');
+    toast('Deleted');
+    loadDrills();
+  } catch { toast('Failed to delete'); }
 }
 
 // ── Editor ───────────────────────────────────────────────────
 function openEditor(drill) {
   if (drill) {
     state.currentDrill = { ...drill };
-    state.ball = drill.ball ?? 1;
-    state.spin = drill.spin ?? 0;
-    state.power = drill.power ?? 1;
+    state.ball  = drill.ball  ?? 1;
+    state.spin  = drill.spin  ?? 2;
+    state.power = drill.power ?? 2;
     state.points = (drill.points || []).map(p => ({ ...p }));
     state.ballTime = drill.ballTime ?? 9;
     state.ballCount = drill.times ?? 20;
-
-    // Determine mode from points
-    if (state.points.length <= 1) {
-      state.mode = 'single';
-    } else if (drill.landType === 2) {
-      state.mode = 'random';
-    } else {
-      state.mode = 'sequence';
-    }
+    if (drill.landType === 2) state.mode = 'random';
+    else if ((drill.points?.length ?? 0) > 1) state.mode = 'sequence';
+    else state.mode = 'single';
   } else {
-    // New drill
     state.currentDrill = { id: 0, name: 'New Drill', uid: 0 };
-    state.ball = 1;
-    state.spin = 0;
-    state.power = 1;
+    state.ball = 1; state.spin = 2; state.power = 2;
     state.points = [];
-    state.ballTime = 9;
-    state.ballCount = 20;
+    state.ballTime = 9; state.ballCount = 20;
     state.mode = 'single';
   }
-
   state.undoStack = [];
   state.dirty = false;
   syncEditorUI();
@@ -337,150 +708,136 @@ function openEditor(drill) {
 function syncEditorUI() {
   const d = state.currentDrill;
   $('#drill-name').textContent = d?.name || 'New Drill';
+  $('#drill-dirty').classList.toggle('hidden', !state.dirty);
 
-  // Ball / Spin / Power
-  $('#ball-value').textContent = BALL_LABELS[state.ball] || 'Normal';
-  $('#spin-value').textContent = SPIN_LABELS[state.spin] || 'No Spin';
-  $('#power-value').textContent = POWER_LABELS[state.power] || 'Medium';
+  $('#chip-ball-value').textContent  = BALL_LABELS[state.ball]  || 'Normal';
+  $('#chip-spin-value').textContent  = SPIN_LABELS[state.spin]  || 'No Spin';
+  $('#chip-power-value').textContent = POWER_LABELS[state.power] || 'Medium';
+  $('#chip-ball-glyph').innerHTML  = BALL_GLYPHS[state.ball]  || '';
+  $('#chip-spin-glyph').innerHTML  = SPIN_GLYPHS[state.spin]  || '';
+  $('#chip-power-glyph').innerHTML = POWER_GLYPHS[state.power] || '';
 
-  updateBallVisual();
-  updatePowerVisual();
+  $$('.seg-btn').forEach(b => {
+    const active = b.dataset.mode === state.mode;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-checked', active);
+  });
+  updateSegIndicator();
 
-  // Mode
-  $$('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
-
-  // Timing
   $('#timing-slider').value = 21 - state.ballTime;
   $('#timing-value').textContent = state.ballTime;
+  $('#ball-count-value').textContent = state.ballCount;
 
-  // Ball count
-  $('#ball-count-value').textContent = `${state.ballCount} Balls ›`;
+  $('#btn-undo').disabled = state.undoStack.length === 0;
 
-  renderGrid();
+  renderCourt();
 }
 
-function renderGrid() {
-  const cells = $$('.grid-cell');
-  cells.forEach((cell, idx) => {
-    const cellPoint = cellToPoint(idx);
-    const marker = cell.querySelector('.grid-cell-marker');
-    if (marker) marker.remove();
-
-    // Find if this cell has a selected point (match by x only;
-    // y is a robot depth parameter, not a visual row indicator)
-    let matchIndex = -1;
-    for (let i = 0; i < state.points.length; i++) {
-      if (state.points[i].x === cellPoint.x) {
-        matchIndex = i;
-        break;
-      }
-    }
-
-    const landAvailable = isLandareaAvailable(state.ball, state.spin, state.power, cellPoint.x);
-    cell.classList.toggle('impossible', !landAvailable);
-    cell.classList.toggle('active', matchIndex !== -1);
-
-    if (matchIndex !== -1) {
-      const m = document.createElement('div');
-      m.className = 'grid-cell-marker';
-      if (state.mode === 'random') {
-        m.textContent = 'R';
-      } else if (state.mode === 'sequence') {
-        m.textContent = matchIndex + 1;
-      } else {
-        m.textContent = '';
-        m.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>';
-      }
-      cell.appendChild(m);
-    }
-  });
-
-  // Show/hide grid actions
-  $('#grid-actions').style.display = state.points.length > 0 ? 'flex' : 'none';
-}
-
-function onCellClick(index) {
-  const point = cellToPoint(index);
-  if (!isLandareaAvailable(state.ball, state.spin, state.power, point.x)) return;
-
-  pushUndo('points');
-
-  if (state.mode === 'single') {
-    // Single mode: replace any existing point
-    state.points = [point];
-  } else {
-    // Sequence / Random: toggle cell
-    const existingIdx = state.points.findIndex(p => p.x === point.x);
-    if (existingIdx !== -1) {
-      state.points.splice(existingIdx, 1);
-    } else {
-      state.points.push(point);
-    }
-  }
-
+function markDirty() {
   state.dirty = true;
-  renderGrid();
+  $('#drill-dirty').classList.remove('hidden');
 }
 
-function resetEditor() {
-  if (state.currentDrill?.id) {
-    const original = state.drills.find(d => d.id === state.currentDrill.id);
-    if (original) {
-      openEditor(original);
-      return;
-    }
-  }
-  state.points = [];
-  state.ball = 1;
-  state.spin = 0;
-  state.power = 1;
-  state.ballTime = 9;
-  state.ballCount = 20;
-  state.mode = 'single';
+function doUndo() {
+  if (state.undoStack.length === 0) return;
+  const snap = state.undoStack.pop();
+  if (snap.points !== undefined) state.points = snap.points;
+  if (snap.ball   !== undefined) state.ball   = snap.ball;
+  if (snap.spin   !== undefined) state.spin   = snap.spin;
+  if (snap.power  !== undefined) state.power  = snap.power;
   syncEditorUI();
 }
 
-// ── Drill picker (list dialog from editor) ───────────────────
-function openDrillPicker() {
-  showView('list');
+// ── Picker (ball / spin / power) ─────────────────────────────
+let _pickerParam = null;
+let _pickerTemp = null;
+
+function openPicker(param) {
+  _pickerParam = param;
+  const titles = { ball: 'Ball type', spin: 'Spin', power: 'Power' };
+  $('#picker-title').textContent = titles[param];
+  _pickerTemp = state[param];
+
+  const opts = $('#picker-options');
+  opts.innerHTML = '';
+  const labels = param === 'ball' ? BALL_LABELS : param === 'spin' ? SPIN_LABELS : POWER_LABELS;
+  const glyphs = param === 'ball' ? BALL_GLYPHS : param === 'spin' ? SPIN_GLYPHS : POWER_GLYPHS;
+  const subs   = param === 'ball' ? BALL_SUBS   : param === 'power' ? POWER_SUBS : null;
+
+  labels.forEach((label, i) => {
+    const combo = {
+      ball:  param === 'ball'  ? i : state.ball,
+      spin:  param === 'spin'  ? i : state.spin,
+      power: param === 'power' ? i : state.power,
+    };
+    const available = isComboAvailable(combo.ball, combo.spin, combo.power);
+    const btn = document.createElement('button');
+    btn.className = 'picker-opt';
+    btn.dataset.value = i;
+    if (_pickerTemp === i) btn.classList.add('sel');
+    if (!available) btn.classList.add('imp');
+    btn.innerHTML = `
+      <span class="po-glyph">${glyphs[i] || ''}</span>
+      <span class="po-labels">
+        <span class="po-name">${label}</span>
+        <span class="po-sub">${available ? (subs ? subs[i] : '') : 'Unavailable with current combo'}</span>
+      </span>
+      <svg class="po-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    `;
+    btn.addEventListener('click', () => {
+      if (!available) return;
+      _pickerTemp = i;
+      opts.querySelectorAll('.picker-opt').forEach(o => o.classList.toggle('sel', parseInt(o.dataset.value) === i));
+    });
+    opts.appendChild(btn);
+  });
+  openOverlay('picker');
+}
+
+function onPickerConfirm() {
+  const param = _pickerParam;
+  const val = _pickerTemp;
+  closeOverlay('picker');
+  if (val == null || val === state[param]) return;
+
+  const newCombo = {
+    ball:  param === 'ball'  ? val : state.ball,
+    spin:  param === 'spin'  ? val : state.spin,
+    power: param === 'power' ? val : state.power,
+  };
+  applyWithConflictCheck(newCombo.ball, newCombo.spin, newCombo.power, () => {
+    state[param] = val;
+    markDirty();
+    syncEditorUI();
+  });
 }
 
 // ── Save ─────────────────────────────────────────────────────
 async function onSave() {
   const drill = state.currentDrill;
   const isNew = !drill.id || drill.id === 0;
-
-  if (isNew || drill.uid !== 0) {
-    // Custom drill → show name dialog
-    $('#save-name-input').value = drill.name || '';
-    openDialog('dialog-save');
-  } else {
-    // Official drill → save as new copy
-    $('#save-name-input').value = `${drill.name} (Copy)`;
-    openDialog('dialog-save');
-  }
+  const suggested = (isNew || (drill.uid && drill.uid !== 0)) ? (drill.name || '')
+                                                              : `${drill.name} (Copy)`;
+  $('#save-name-input').value = suggested;
+  openOverlay('dialog-save');
+  setTimeout(() => $('#save-name-input').select(), 50);
 }
 
 async function doSave(name) {
   const drill = state.currentDrill;
   const isCustom = drill.uid && drill.uid !== 0;
-
   const payload = {
     id: isCustom ? drill.id : 0,
     name,
-    ball: state.ball,
-    spin: state.spin,
-    power: state.power,
+    ball: state.ball, spin: state.spin, power: state.power,
     landType: state.mode === 'random' ? 2 : 0,
     ballTime: state.ballTime,
     numType: 1,
     times: state.ballCount,
-    adjustSpin: 0,
-    adjustPosition: 0,
+    adjustSpin: 0, adjustPosition: 0,
     points: state.points.length > 0 ? state.points : [{ x: 8, y: 2 }],
     isFavourite: drill.isFavourite || 0,
   };
-
   try {
     const res = await api.saveBasicDrill(payload);
     if (res?.data) {
@@ -489,83 +846,54 @@ async function doSave(name) {
       syncEditorUI();
       toast('Drill saved');
     }
-  } catch {
-    toast('Failed to save drill');
-  }
+  } catch { toast('Failed to save drill'); }
 }
 
-// ── Training state ───────────────────────────────────────────
+// ── Play / test / stop ───────────────────────────────────────
 function setTrainingActive(active) {
+  state.playing = active;
   $('#btn-play').classList.toggle('hidden', active);
   $('#btn-stop').classList.toggle('hidden', !active);
   $('#btn-test').disabled = active;
 }
 
-// ── Play / Test ──────────────────────────────────────────────
 async function onPlay(mode) {
-  if (state.points.length === 0) {
-    toast('Select at least one landing position');
-    return;
-  }
-
+  if (state.points.length === 0) { toast('Place at least one landing point'); return; }
   const drill = buildDrillPayload();
-
   if (robot.connected) {
     try {
       await robot.sendBasicDrill(drill);
-      if (mode === 'play') {
-        setTrainingActive(true);
-        toast('Playing...');
-      } else {
-        toast('Testing...');
-      }
-    } catch (err) {
-      toast('Failed to send to robot');
-      console.error(err);
-    }
+      if (mode === 'play') { setTrainingActive(true); toast('Playing'); }
+      else toast('Testing');
+    } catch (err) { toast('Failed to send to robot'); console.error(err); }
   } else {
     toast(`${mode === 'test' ? 'Test' : 'Play'}: Connect robot first`);
   }
-
-  // Log session
   try {
     const now = Math.floor(Date.now() / 1000);
     await api.logSession({
-      drillType: state.tab,
-      pid: state.currentDrill?.id || 0,
-      pname: state.currentDrill?.name || 'Unnamed',
-      ptype: 'pattern',
-      tmode: mode,
-      stime: now,
-      etime: now,
+      drillType: state.tab, pid: state.currentDrill?.id || 0,
+      pname: state.currentDrill?.name || 'Unnamed', ptype: 'pattern',
+      tmode: mode, stime: now, etime: now,
       startTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
     });
-  } catch { /* logging is best-effort */ }
+  } catch {}
 }
 
 async function onStop() {
   setTrainingActive(false);
   if (robot.connected) {
-    try {
-      await robot.stop();
-      toast('Training stopped');
-    } catch (err) {
-      toast('Failed to stop robot');
-      console.error(err);
-    }
+    try { await robot.stop(); toast('Stopped'); }
+    catch (err) { toast('Failed to stop robot'); console.error(err); }
   }
 }
 
 function buildDrillPayload() {
   return {
-    ball: state.ball,
-    spin: state.spin,
-    power: state.power,
+    ball: state.ball, spin: state.spin, power: state.power,
     landType: state.mode === 'random' ? 2 : 0,
-    ballTime: state.ballTime,
-    times: state.ballCount,
-    adjustSpin: 0,
-    adjustPosition: 0,
+    ballTime: state.ballTime, times: state.ballCount,
+    adjustSpin: 0, adjustPosition: 0,
     points: state.points,
   };
 }
@@ -573,25 +901,20 @@ function buildDrillPayload() {
 // ── Bluetooth UI ─────────────────────────────────────────────
 function setupBluetooth() {
   robot.onResponse = (parsed) => {
-    // 0x82 = training finished naturally, 0x83 = control-cmd ack (stop / cancel)
-    if (parsed?.cmd === 0x82 || parsed?.cmd === 0x83) {
-      setTrainingActive(false);
-    }
+    if (parsed?.cmd === 0x82 || parsed?.cmd === 0x83) setTrainingActive(false);
   };
-
   robot.onStatusChange = (status) => {
     const banner = $('#robot-banner');
     banner.classList.toggle('online', status === 'connected');
-    banner.classList.toggle('offline', status !== 'connected');
-
+    banner.classList.toggle('connecting', status === 'connecting');
     if (status === 'connected') {
       $('#robot-name').textContent = robot.deviceName || 'Robot';
-      $('#robot-status').textContent = 'Connected';
+      $('#robot-status').textContent = 'Connected · tap to disconnect';
     } else if (status === 'connecting') {
-      $('#robot-name').textContent = 'Connecting...';
+      $('#robot-name').textContent = 'Connecting…';
       $('#robot-status').textContent = 'Please wait';
     } else {
-      $('#robot-name').textContent = 'No Robot';
+      $('#robot-name').textContent = 'No robot';
       $('#robot-status').textContent = 'Tap to connect';
       setTrainingActive(false);
     }
@@ -600,287 +923,36 @@ function setupBluetooth() {
 
 async function onRobotBannerClick() {
   if (robot.connected) {
-    if (confirm('Disconnect from robot?')) {
-      await robot.disconnect();
-    }
+    if (confirm('Disconnect from robot?')) await robot.disconnect();
   } else {
-    try {
-      await robot.connect();
-      toast('Robot connected!');
-    } catch (err) {
-      if (err.name !== 'NotFoundError') { // user cancelled picker
-        toast(err.message || 'Connection failed');
-      }
+    try { await robot.connect(); toast('Robot connected'); }
+    catch (err) {
+      if (err.name !== 'NotFoundError') toast(err.message || 'Connection failed');
     }
   }
 }
 
-// ── Dialogs ──────────────────────────────────────────────────
-function openDialog(id) {
-  const overlay = $(`#${id}`);
-  overlay.classList.remove('hidden');
+// ── Overlays ─────────────────────────────────────────────────
+function openOverlay(id)  { const el = $(`#${id}`); if (!el) return; el.classList.remove('hidden'); el.setAttribute('aria-hidden','false'); }
+function closeOverlay(id) { const el = $(`#${id}`); if (!el) return; el.classList.add('hidden');    el.setAttribute('aria-hidden','true');  }
 
-  // Pre-select current values and mark impossible combinations
-  if (id === 'dialog-ball') {
-    overlay.querySelectorAll('.ball-type-label').forEach(l => {
-      const b = parseInt(l.dataset.ball);
-      l.classList.toggle('selected', b === state.ball);
-      l.classList.toggle('impossible', !isComboAvailable(b, state.spin, state.power));
-    });
-    updateBallTypeVisual(state.ball);
-  } else if (id === 'dialog-spin') {
-    overlay.querySelectorAll('.spin-label').forEach(l => {
-      const s = parseInt(l.dataset.spin);
-      l.classList.toggle('selected', s === state.spin);
-      l.classList.toggle('impossible', !isComboAvailable(state.ball, s, state.power));
-    });
-  } else if (id === 'dialog-power') {
-    overlay.querySelectorAll('.power-label').forEach(l => {
-      const p = parseInt(l.dataset.power);
-      l.classList.toggle('selected', p === state.power);
-      l.classList.toggle('impossible', !isComboAvailable(state.ball, state.spin, p));
-    });
-    updatePowerDialogVisual(state.power);
-  } else if (id === 'dialog-count') {
-    $('#count-input').value = state.ballCount;
-  }
-}
-
-function closeDialog(id) {
-  $(`#${id}`).classList.add('hidden');
-}
-
-function setupDialogs() {
-  // Close on overlay click
-  $$('.dialog-overlay').forEach(overlay => {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeDialog(overlay.id);
-    });
-  });
-
-  // Cancel buttons
-  $$('.dialog-btn.cancel').forEach(btn => {
-    btn.addEventListener('click', () => {
-      closeDialog(btn.closest('.dialog-overlay').id);
-    });
-  });
-
-  // ── Ball Type dialog ──
-  let tempBall = state.ball;
-  $('#dialog-ball').querySelectorAll('.ball-type-label').forEach(l => {
-    l.addEventListener('click', () => {
-      tempBall = parseInt(l.dataset.ball);
-      $('#dialog-ball').querySelectorAll('.ball-type-label').forEach(x =>
-        x.classList.toggle('selected', x === l));
-      updateBallTypeVisual(tempBall);
-    });
-  });
-  $('#dialog-ball .dialog-btn.confirm').addEventListener('click', () => {
-    closeDialog('dialog-ball');
-    applyWithConflictCheck(tempBall, state.spin, state.power, () => {
-      state.ball = tempBall;
-      updateBallVisual();
-      $('#ball-value').textContent = BALL_LABELS[state.ball];
-      renderGrid();
-    });
-  });
-
-  // ── Spin dialog ──
-  let tempSpin = state.spin;
-  $('#dialog-spin').querySelectorAll('.spin-label').forEach(l => {
-    l.addEventListener('click', () => {
-      tempSpin = parseInt(l.dataset.spin);
-      $('#dialog-spin').querySelectorAll('.spin-label').forEach(x =>
-        x.classList.toggle('selected', x === l));
-    });
-  });
-  $('#dialog-spin .dialog-btn.confirm').addEventListener('click', () => {
-    closeDialog('dialog-spin');
-    applyWithConflictCheck(state.ball, tempSpin, state.power, () => {
-      state.spin = tempSpin;
-      $('#spin-value').textContent = SPIN_LABELS[state.spin];
-      renderGrid();
-    });
-  });
-
-  // ── Power dialog ──
-  let tempPower = state.power;
-  $('#dialog-power').querySelectorAll('.power-option').forEach(row => {
-    row.addEventListener('click', () => {
-      const l = row.querySelector('.power-label');
-      tempPower = parseInt(l.dataset.power);
-      $('#dialog-power').querySelectorAll('.power-label').forEach(x =>
-        x.classList.toggle('selected', x === l));
-      updatePowerDialogVisual(tempPower);
-    });
-  });
-  $('#dialog-power .dialog-btn.confirm').addEventListener('click', () => {
-    closeDialog('dialog-power');
-    applyWithConflictCheck(state.ball, state.spin, tempPower, () => {
-      state.power = tempPower;
-      updatePowerVisual();
-      $('#power-value').textContent = POWER_LABELS[state.power];
-      renderGrid();
-    });
-  });
-
-  // ── Conflict dialog ──
-  $('#dialog-conflict .dialog-btn.confirm').addEventListener('click', () => {
-    closeDialog('dialog-conflict');
-    if (_pendingApply) { _pendingApply(); _pendingApply = null; }
-  });
-  $('#dialog-conflict .dialog-btn.cancel').addEventListener('click', () => {
-    _pendingApply = null;
-    closeDialog('dialog-conflict');
-  });
-
-  // ── Ball Count dialog ──
-  $('#dialog-count .dialog-btn.confirm').addEventListener('click', () => {
-    const val = parseInt($('#count-input').value) || 20;
-    state.ballCount = Math.max(1, Math.min(999, val));
-    $('#ball-count-value').textContent = `${state.ballCount} Balls ›`;
-    closeDialog('dialog-count');
-  });
-
-  // ── Filter Sheet ──
-  $('#filter-sheet').addEventListener('click', (e) => {
-    if (e.target === $('#filter-sheet')) {
-      closeFilterSheet();
-      loadDrills();
-      updateFilterBadge();
-    }
-  });
-  $('#filter-close').addEventListener('click', () => {
-    closeFilterSheet();
-    loadDrills();
-    updateFilterBadge();
-  });
-  $('#filter-reset').addEventListener('click', () => {
-    state.filter = { ball: -1, spin: -1, patternType: -1 };
-    syncFilterChips();
-  });
-  $$('#filter-sheet .filter-chip[data-ball]').forEach(c => {
-    c.addEventListener('click', () => {
-      const val = parseInt(c.dataset.ball);
-      state.filter.ball = state.filter.ball === val ? -1 : val;
-      syncFilterChips();
-    });
-  });
-  $$('#filter-sheet .filter-chip[data-spin]').forEach(c => {
-    c.addEventListener('click', () => {
-      const val = parseInt(c.dataset.spin);
-      state.filter.spin = state.filter.spin === val ? -1 : val;
-      syncFilterChips();
-    });
-  });
-  $$('#filter-sheet .filter-chip[data-pattern]').forEach(c => {
-    c.addEventListener('click', () => {
-      const val = parseInt(c.dataset.pattern);
-      state.filter.patternType = state.filter.patternType === val ? -1 : val;
-      syncFilterChips();
-    });
-  });
-  // ── Save dialog ──
-  $('#dialog-save .dialog-btn.confirm').addEventListener('click', () => {
-    const name = $('#save-name-input').value.trim();
-    if (!name) {
-      toast('Enter a drill name');
-      return;
-    }
-    closeDialog('dialog-save');
-    doSave(name);
-  });
-}
-
-// ── Filter Sheet helpers ──────────────────────────────────────
-function openFilterSheet() {
-  syncFilterChips();
-  $('#filter-sheet').classList.remove('hidden');
-}
-
-function closeFilterSheet() {
-  $('#filter-sheet').classList.add('hidden');
-}
-
-function syncFilterChips() {
-  $$('#filter-sheet .filter-chip[data-ball]').forEach(c =>
-    c.classList.toggle('active', parseInt(c.dataset.ball) === state.filter.ball));
-  $$('#filter-sheet .filter-chip[data-spin]').forEach(c =>
-    c.classList.toggle('active', parseInt(c.dataset.spin) === state.filter.spin));
-  $$('#filter-sheet .filter-chip[data-pattern]').forEach(c =>
-    c.classList.toggle('active', parseInt(c.dataset.pattern) === state.filter.patternType));
-}
-
-function updateFilterBadge() {
-  const active = state.filter.ball !== -1 || state.filter.spin !== -1 ||
-                 state.filter.patternType !== -1;
-  $('#btn-filter').classList.toggle('has-filter', active);
-}
-
-// ── Visual helpers ───────────────────────────────────────────
-function updateBallVisual() {
-  // Main settings bar arc
-  const arcs = {
-    0: 'M2,16 Q14,14 26,16',   // Serve (flat)
-    1: 'M2,16 Q14,4 26,16',    // Normal (medium arc)
-    2: 'M2,16 Q14,-4 26,16',   // Lob (high arc)
-  };
-  $('#ball-arc').setAttribute('d', arcs[state.ball] || arcs[1]);
-}
-
-function updateBallTypeVisual(ball) {
-  const arcs = {
-    0: 'M20,100 Q100,90 180,100',
-    1: 'M20,100 Q100,20 180,100',
-    2: 'M20,100 Q100,-20 180,100',
-  };
-  const dots = { 0: { cx: 100, cy: 95 }, 1: { cx: 20, cy: 100 }, 2: { cx: 20, cy: 100 } };
-  $('#ball-type-arc').setAttribute('d', arcs[ball] || arcs[1]);
-  const dot = dots[ball] || dots[1];
-  $('#ball-type-dot').setAttribute('cx', dot.cx);
-  $('#ball-type-dot').setAttribute('cy', dot.cy);
-}
-
-function updatePowerVisual() {
-  // Settings bar power indicator (0=Extreme, 1=Strong, 2=Medium, 3=Light)
-  const p = state.power;
-  $('#power-line1').setAttribute('opacity', p <= 0 ? '1' : '0.3');
-  $('#power-line2').setAttribute('opacity', p <= 1 ? '1' : '0.3');
-  $('#power-line3').setAttribute('opacity', '1');
-}
-
-function updatePowerDialogVisual(power) {
-  for (let i = 1; i <= 4; i++) {
-    $(`#power-bar${i}`).classList.toggle('active', i - 1 >= power);
-  }
-}
-
-// ── Utilities ────────────────────────────────────────────────
+// ── Utils ────────────────────────────────────────────────────
 function formatDate(dateStr) {
   try {
     const d = new Date(dateStr);
+    if (isNaN(d)) return '';
     const now = new Date();
     const diffDays = Math.floor((now - d) / 86400000);
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 30) return `${diffDays} days ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
-  } catch {
-    return '';
-  }
+    if (diffDays <= 0) return 'today';
+    if (diffDays === 1) return 'yesterday';
+    if (diffDays < 30) return `${diffDays}d ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+    return `${Math.floor(diffDays / 365)}y ago`;
+  } catch { return ''; }
 }
-
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
+function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
 function toast(msg) {
-  const el = $('#toast');
-  el.textContent = msg;
-  el.classList.remove('hidden');
+  const el = $('#toast'); el.textContent = msg; el.classList.remove('hidden');
   clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.add('hidden'), 2500);
+  el._timer = setTimeout(() => el.classList.add('hidden'), 2400);
 }
