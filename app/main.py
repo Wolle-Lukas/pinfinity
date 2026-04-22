@@ -52,6 +52,7 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 if FRONTEND_DIR.is_dir():
     app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
     app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
+    app.mount("/fonts", StaticFiles(directory=FRONTEND_DIR / "fonts"), name="fonts")
 
     @app.get("/")
     async def frontend_index():
