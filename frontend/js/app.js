@@ -73,11 +73,25 @@ async function init() {
   const storedTheme = localStorage.getItem('pinfinity.theme') || 'dark';
   document.body.dataset.theme = storedTheme;
 
+  // Restore tab before building UI so the correct tab is active from the start
+  const savedTab = localStorage.getItem('pinfinity.lastTab');
+  if (savedTab && savedTab !== state.tab) setTab(savedTab);
+
+  // If we'll restore an editor session, pre-switch views immediately (before any
+  // async work) so the list never flashes on screen.
+  const willRestoreEditor = localStorage.getItem('pinfinity.lastView') === 'editor'
+    && localStorage.getItem('pinfinity.lastDrillId');
+  if (willRestoreEditor) {
+    $('#view-list').classList.remove('active');
+    $('#view-editor').classList.add('active');
+  }
+
   buildCourt();
   bindEvents();
   setupBluetooth();
   await loadBaseConf();
-  loadDrills();
+  await loadDrills();
+  restoreLastSession();
 }
 
 async function loadBaseConf() {
@@ -198,13 +212,7 @@ function bindEvents() {
 
   // Tabs
   $$('.tab').forEach(t => t.addEventListener('click', () => {
-    state.tab = t.dataset.tab;
-    $$('.tab').forEach(x => x.classList.toggle('active', x === t));
-    const isBasic = state.tab === 'basic';
-    $('#basic-toolbar').classList.toggle('hidden', !isBasic);
-    $('#drill-list').classList.toggle('hidden', !isBasic);
-    $('#advance-toolbar').classList.toggle('hidden', isBasic);
-    $('#advance-drill-list').classList.toggle('hidden', isBasic);
+    setTab(t.dataset.tab);
     loadDrills();
   }));
 
@@ -383,7 +391,38 @@ function showView(view) {
   state.view = view;
   $('#view-list').classList.toggle('active', view === 'list');
   $('#view-editor').classList.toggle('active', view === 'editor');
-  if (view === 'list') loadDrills();
+  if (view === 'list') {
+    localStorage.removeItem('pinfinity.lastView');
+    localStorage.removeItem('pinfinity.lastDrillId');
+    loadDrills();
+  }
+}
+
+function setTab(tab) {
+  state.tab = tab;
+  localStorage.setItem('pinfinity.lastTab', tab);
+  $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const isBasic = tab === 'basic';
+  $('#basic-toolbar').classList.toggle('hidden', !isBasic);
+  $('#drill-list').classList.toggle('hidden', !isBasic);
+  $('#advance-toolbar').classList.toggle('hidden', isBasic);
+  $('#advance-drill-list').classList.toggle('hidden', isBasic);
+}
+
+function restoreLastSession() {
+  const lastView = localStorage.getItem('pinfinity.lastView');
+  const lastDrillId = parseInt(localStorage.getItem('pinfinity.lastDrillId'));
+  if (lastView !== 'editor' || !lastDrillId) return;
+  const drills = state.tab === 'basic' ? state.drills : state.advanceDrills;
+  const drill = drills.find(d => d.id === lastDrillId);
+  if (drill) {
+    openEditor(drill);
+  } else {
+    // Drill no longer exists — clear saved state and show list
+    localStorage.removeItem('pinfinity.lastView');
+    localStorage.removeItem('pinfinity.lastDrillId');
+    showView('list');
+  }
 }
 
 // ── Drill list ───────────────────────────────────────────────
@@ -702,6 +741,11 @@ function openEditor(drill) {
   state.undoStack = [];
   state.dirty = false;
   syncEditorUI();
+  if (drill?.id) {
+    localStorage.setItem('pinfinity.lastView', 'editor');
+    localStorage.setItem('pinfinity.lastDrillId', String(drill.id));
+    localStorage.setItem('pinfinity.lastTab', state.tab);
+  }
   showView('editor');
 }
 
@@ -931,6 +975,7 @@ async function onRobotBannerClick() {
     }
   }
 }
+
 
 // ── Overlays ─────────────────────────────────────────────────
 function openOverlay(id)  { const el = $(`#${id}`); if (!el) return; el.classList.remove('hidden'); el.setAttribute('aria-hidden','false'); }
