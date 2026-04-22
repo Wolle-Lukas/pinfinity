@@ -37,14 +37,15 @@ Use the **original Joola Android app** alongside the pinfinity Docker container.
 
 ---
 
-### Option B — Web Frontend + Docker
+### Option B — Web Frontend + Docker (Only Android or Windows)
 
-Use the **custom web frontend** (built into pinfinity) instead of the Joola app. Works in any modern browser that supports the Web Bluetooth API (Chrome/Chromium on Android).
+Use the **custom web frontend** (built into pinfinity) instead of the Joola app. Works in any modern browser that supports the Web Bluetooth API (Chrome/Chromium on Android). iOS devices are not supported ad Safari does not support Web Bluetooth.
 
 **Requires:**
 - A self-signed TLS certificate (so HTTPS is served — required for Web Bluetooth)
 - Installing the CA certificate on your Android device
-- A host running Docker Compose
+- A DNS redirect pointing `api-v6.admin.joola.com` to your server
+- A host running Docker Compose (a Raspberry Pi is sufficient)
 - No APK patching needed
 
 → [Full setup guide](docs/deployment.md) (skip the APK patching steps)
