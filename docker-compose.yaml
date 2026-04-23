@@ -12,7 +12,7 @@ services:
       PINFINITY_DEVICE_ID: "XXX"
       PINFINITY_DEVICE_NAME: "XXX"
       PINFINITY_SERIAL_NUMBER: "XXX"
-      LOG_LEVEL: "DEBUG"
+      LOG_LEVEL: "WARNING"
     restart: always
     networks:
       - web
