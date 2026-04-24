@@ -652,6 +652,7 @@ class RobotSimulator:
         self._char = self._server.get_characteristic(CHAR_UUID)
 
         await self._server.start()
+        await asyncio.sleep(2)  # give BlueZ time to fully register the GATT service
         self.log.info("Advertising as '%s'", self.device_name)
         self.log.info("Service : %s", SERVICE_UUID)
         self.log.info("Char    : %s", CHAR_UUID)

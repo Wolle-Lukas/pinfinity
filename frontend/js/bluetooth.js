@@ -153,56 +153,77 @@ export class RobotConnection {
       });
       console.log(`[BT] Device selected: "${this.device.name}" (id=${this.device.id})`);
 
+      // Only set disconnected when not in the middle of a (re)connect attempt
       this.device.addEventListener('gattserverdisconnected', () => {
         console.warn('[BT] GATT server disconnected unexpectedly');
-        this._setStatus('disconnected');
+        if (this._status !== 'connecting') {
+          this._setStatus('disconnected');
+        }
       });
 
-      console.log('[BT] Connecting to GATT server…');
-      this.server = await this.device.gatt.connect();
-      console.log('[BT] GATT server connected');
-
-      // Try primary service first, then alternative
+      // BlueZ on Raspberry Pi sometimes drops the link during initial service
+      // discovery; retry a few times before giving up.
+      const MAX_ATTEMPTS = 3;
       let service, char;
-      try {
-        console.debug(`[BT] Trying primary service ${SERVICE_UUID}…`);
-        service = await this.server.getPrimaryService(SERVICE_UUID);
-        console.debug(`[BT] Primary service found, getting characteristic ${CHAR_UUID}…`);
-        char = await service.getCharacteristic(CHAR_UUID);
-        console.log('[BT] Using primary service + characteristic');
-      } catch (primaryErr) {
-        console.warn(`[BT] Primary service unavailable (${primaryErr.message}), falling back to alt service ${ALT_SERVICE_UUID}`);
-        service = await this.server.getPrimaryService(ALT_SERVICE_UUID);
-        console.debug(`[BT] Alt service found, getting write characteristic ${ALT_CHAR_WRITE}…`);
-        char = await service.getCharacteristic(ALT_CHAR_WRITE);
-        console.log('[BT] Using alt service + write characteristic');
-        // Also set up notifications on the alt notify characteristic
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        if (attempt > 1) {
+          console.log(`[BT] Retrying GATT connection (attempt ${attempt}/${MAX_ATTEMPTS})…`);
+          await new Promise((r) => setTimeout(r, 500));
+        }
         try {
-          console.debug(`[BT] Setting up notifications on alt notify characteristic ${ALT_CHAR_NOTIFY}…`);
-          const notifyChar = await service.getCharacteristic(ALT_CHAR_NOTIFY);
-          await notifyChar.startNotifications();
-          notifyChar.addEventListener('characteristicvaluechanged', (e) => {
-            this._onNotification(e.target.value);
-          });
-          console.debug('[BT] Alt notify characteristic subscribed');
-        } catch (notifyErr) {
-          console.warn(`[BT] Alt notifications not available: ${notifyErr.message}`);
+          console.log('[BT] Connecting to GATT server…');
+          this.server = await this.device.gatt.connect();
+          console.log('[BT] GATT server connected');
+
+          // Try primary service first, then alternative
+          try {
+            console.debug(`[BT] Trying primary service ${SERVICE_UUID}…`);
+            service = await this.server.getPrimaryService(SERVICE_UUID);
+            console.debug(`[BT] Primary service found, getting characteristic ${CHAR_UUID}…`);
+            char = await service.getCharacteristic(CHAR_UUID);
+            console.log('[BT] Using primary service + characteristic');
+          } catch (primaryErr) {
+            if (!this.server.connected) throw primaryErr;
+            console.warn(`[BT] Primary service unavailable (${primaryErr.message}), falling back to alt service ${ALT_SERVICE_UUID}`);
+            service = await this.server.getPrimaryService(ALT_SERVICE_UUID);
+            console.debug(`[BT] Alt service found, getting write characteristic ${ALT_CHAR_WRITE}…`);
+            char = await service.getCharacteristic(ALT_CHAR_WRITE);
+            console.log('[BT] Using alt service + write characteristic');
+            // Also set up notifications on the alt notify characteristic
+            try {
+              console.debug(`[BT] Setting up notifications on alt notify characteristic ${ALT_CHAR_NOTIFY}…`);
+              const notifyChar = await service.getCharacteristic(ALT_CHAR_NOTIFY);
+              await notifyChar.startNotifications();
+              notifyChar.addEventListener('characteristicvaluechanged', (e) => {
+                this._onNotification(e.target.value);
+              });
+              console.debug('[BT] Alt notify characteristic subscribed');
+            } catch (notifyErr) {
+              console.warn(`[BT] Alt notifications not available: ${notifyErr.message}`);
+            }
+          }
+
+          // Enable notifications if supported
+          if (char.properties.notify) {
+            console.debug('[BT] Enabling notifications on write characteristic…');
+            await char.startNotifications();
+            char.addEventListener('characteristicvaluechanged', (e) => {
+              this._onNotification(e.target.value);
+            });
+            console.debug('[BT] Notifications enabled');
+          } else {
+            console.debug('[BT] Characteristic does not support notifications');
+          }
+
+          break; // success
+        } catch (err) {
+          const disconnected = err.message && err.message.includes('GATT Server is disconnected');
+          if (!disconnected || attempt === MAX_ATTEMPTS) throw err;
+          console.warn(`[BT] GATT dropped during setup (attempt ${attempt}), retrying…`);
         }
       }
 
       this.characteristic = char;
-
-      // Enable notifications if supported
-      if (char.properties.notify) {
-        console.debug('[BT] Enabling notifications on write characteristic…');
-        await char.startNotifications();
-        char.addEventListener('characteristicvaluechanged', (e) => {
-          this._onNotification(e.target.value);
-        });
-        console.debug('[BT] Notifications enabled');
-      } else {
-        console.debug('[BT] Characteristic does not support notifications');
-      }
 
       // Extract device ID from name (J-XXXXXXXXXXXXXXXX → full 16 hex chars, decoded to 8 bytes)
       const name = this.device.name || '';
