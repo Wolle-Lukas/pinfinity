@@ -8,25 +8,6 @@ const SPIN_LABELS  = ['Max Topspin', 'Topspin', 'No Spin', 'Backspin', 'Max Back
 const POWER_LABELS = ['Extreme', 'Strong', 'Medium', 'Light'];
 const POWER_SUBS   = ['Fastest setting', 'Firm pace', 'Typical rally speed', 'Gentle, great for warm-up'];
 
-// Inline SVG glyphs for summary chips + picker options
-const BALL_GLYPHS = {
-  0: '<svg width="28" height="14" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 10 L26 10"/></svg>',
-  1: '<svg width="28" height="14" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12 Q14 2 26 12"/></svg>',
-  2: '<svg width="28" height="14" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 13 Q14 -3 26 13"/></svg>',
-};
-const SPIN_GLYPHS = {
-  0: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 3 A8 8 0 0 1 20 11"/><polyline points="17 9 20 11 22 8"/></svg>',
-  1: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 3 A8 8 0 0 1 18 7"/><polyline points="16 5 18 7 20 5"/></svg>',
-  2: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/></svg>',
-  3: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 19 A8 8 0 0 1 6 15"/><polyline points="8 17 6 15 4 17"/></svg>',
-  4: '<svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="8"/><path d="M12 19 A8 8 0 0 1 4 11"/><polyline points="7 13 4 11 2 14"/></svg>',
-};
-const POWER_GLYPHS = {
-  0: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor"/><rect x="2" y="14" width="22" height="3" rx="1" fill="currentColor"/></svg>',
-  1: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor"/><rect x="2" y="14" width="22" height="3" rx="1" fill="currentColor"/></svg>',
-  2: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="14" width="22" height="3" rx="1" fill="currentColor"/></svg>',
-  3: '<svg width="26" height="20" viewBox="0 0 26 20"><rect x="2" y="2" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="8" width="22" height="3" rx="1" fill="currentColor" opacity=".3"/><rect x="2" y="14" width="8" height="3" rx="1" fill="currentColor"/></svg>',
-};
 
 const ICONS = {
   edit:      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
@@ -757,9 +738,6 @@ function syncEditorUI() {
   $('#chip-ball-value').textContent  = BALL_LABELS[state.ball]  || 'Normal';
   $('#chip-spin-value').textContent  = SPIN_LABELS[state.spin]  || 'No Spin';
   $('#chip-power-value').textContent = POWER_LABELS[state.power] || 'Medium';
-  $('#chip-ball-glyph').innerHTML  = BALL_GLYPHS[state.ball]  || '';
-  $('#chip-spin-glyph').innerHTML  = SPIN_GLYPHS[state.spin]  || '';
-  $('#chip-power-glyph').innerHTML = POWER_GLYPHS[state.power] || '';
 
   $$('.seg-btn').forEach(b => {
     const active = b.dataset.mode === state.mode;
@@ -821,7 +799,6 @@ function openPicker(param) {
     if (_pickerTemp === i) btn.classList.add('sel');
     if (!available) btn.classList.add('imp');
     btn.innerHTML = `
-      <span class="po-glyph">${glyphs[i] || ''}</span>
       <span class="po-labels">
         <span class="po-name">${label}</span>
         <span class="po-sub">${available ? (subs ? subs[i] : '') : 'Unavailable with current combo'}</span>
