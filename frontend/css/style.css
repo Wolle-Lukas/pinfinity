@@ -228,8 +228,8 @@ body[data-theme="light"] .icon-btn .icon-moon { display: none; }
 
 /* ── Drill card ───────────────────────────────────────────── */
 .drill-card {
-  display: grid;
-  grid-template-columns: 64px 1fr auto;
+  display: flex;
+  flex-direction: row;
   gap: 12px;
   align-items: center;
   background: var(--bg-1);
@@ -242,19 +242,8 @@ body[data-theme="light"] .icon-btn .icon-moon { display: none; }
 .drill-card:hover { background: var(--bg-2); border-color: var(--border); }
 .drill-card:active { transform: scale(0.995); }
 
-.mini-court {
-  width: 64px; height: 44px; border-radius: 8px;
-  background: var(--court-fill);
-  border: 1px solid var(--court-line);
-  display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(3, 1fr);
-  gap: 2px; padding: 3px;
-  flex: 0 0 64px;
-}
-.mc-cell { background: transparent; border-radius: 2px; }
-.mc-cell.on { background: var(--accent); }
-.mc-cell.on-seq { background: var(--accent); opacity: .85; }
 
-.drill-body { min-width: 0; }
+.drill-body { min-width: 0; flex: 1; }
 .drill-name-row {
   display: flex; align-items: center; gap: 6px;
   font-weight: 600; font-size: 15px;

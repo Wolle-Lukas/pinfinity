@@ -492,7 +492,6 @@ function drillCardHtml(d) {
   const modeLabel = landKind === 'random' ? 'Random' : landKind === 'sequence' ? 'Sequence' : 'Single';
   return `
     <div class="drill-card" data-id="${d.id}">
-      <div class="mini-court">${miniCourtCellsHtml(d)}</div>
       <div class="drill-body">
         <div class="drill-name-row">
           <span class="drill-name-text">${escapeHtml(d.name)}</span>
@@ -516,17 +515,6 @@ function drillCardHtml(d) {
         <button class="card-icon-btn card-more" data-id="${d.id}" aria-label="More actions">${ICONS.more}</button>
       </div>
     </div>`;
-}
-
-function miniCourtCellsHtml(d) {
-  // 15 cells, highlight placed points
-  const xs = new Set((d.points || []).map(p => p.x));
-  const cls = d.landType === 2 ? 'mc-cell on-seq' : 'mc-cell on';
-  let out = '';
-  for (let i = 1; i <= 15; i++) {
-    out += xs.has(i) ? `<span class="${cls}"></span>` : '<span class="mc-cell"></span>';
-  }
-  return out;
 }
 
 function renderAdvanceList() {
