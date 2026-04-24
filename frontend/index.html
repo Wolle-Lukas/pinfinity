@@ -16,21 +16,20 @@
   <div id="app">
     <main id="view-list" class="view active">
       <header class="list-head">
-        <div id="robot-banner" class="robot-banner" role="button" tabindex="0">
-          <span class="robot-dot"></span>
-          <div class="robot-info">
-            <span id="robot-name">No robot</span>
-            <span id="robot-status">Tap to connect</span>
-          </div>
-          <svg class="robot-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
+
         <div class="list-head-inner">
           <div class="list-head-top">
             <h1 class="list-title">Drills</h1>
-            <button id="btn-theme" class="icon-btn" aria-label="Toggle theme">
-              <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-              <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
+            <div class="list-head-top-right">
+              <button id="btn-robot-list" class="robot-pill" aria-label="Robot connection">
+                <span class="robot-pill-dot"></span>
+                <span id="robot-pill-label">Connect robot</span>
+              </button>
+              <button id="btn-theme" class="icon-btn" aria-label="Toggle theme">
+                <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </button>
+            </div>
           </div>
           <nav id="tabs" class="tabs" role="tablist">
             <button class="tab active" data-tab="basic" role="tab">Basic</button>
@@ -81,6 +80,12 @@
           <span id="drill-dirty" class="dirty-dot hidden"></span>
         </div>
         <div class="editor-head-actions">
+          <div class="robot-btn-wrap">
+            <button id="btn-robot-editor" class="icon-btn" aria-label="Robot connection">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></svg>
+            </button>
+            <span id="robot-editor-dot" class="robot-editor-dot"></span>
+          </div>
           <button id="btn-undo" class="icon-btn" aria-label="Undo" disabled>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
           </button>

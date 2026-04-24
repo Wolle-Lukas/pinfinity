@@ -71,26 +71,60 @@ body[data-theme="light"] {
 
 #app { max-width: 520px; margin: 0 auto; min-height: 100vh; position: relative; }
 
-/* ── Robot connection bar ─────────────────────────────────── */
-.robot-banner {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 16px;
-  background: var(--bg-1);
-  border-bottom: 1px solid var(--border-soft);
+/* ── Robot connection — list pill ────────────────────────── */
+.list-head-top-right {
+  display: flex; align-items: center; gap: 4px;
+}
+.robot-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 10px; border-radius: 20px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  color: var(--fg-3);
+  font: inherit; font-size: 12px; font-weight: 500;
   cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+  white-space: nowrap;
 }
-.robot-dot {
-  width: 8px; height: 8px; border-radius: 50%;
+.robot-pill:hover { background: var(--bg-3); color: var(--fg-2); }
+.robot-pill.online {
+  background: var(--good-soft, rgba(34,195,138,.12));
+  border-color: rgba(34,195,138,.25);
+  color: var(--good);
+}
+.robot-pill-dot {
+  width: 6px; height: 6px; border-radius: 50%;
   background: var(--fg-3);
-  box-shadow: 0 0 0 4px rgba(255,255,255,0);
+  flex-shrink: 0;
+  transition: background .2s, box-shadow .2s;
 }
-.robot-banner.online .robot-dot { background: var(--good); box-shadow: 0 0 0 4px rgba(34,195,138,.15); }
-.robot-banner.connecting .robot-dot { background: #f5a623; animation: pulse 1.2s infinite; }
+.robot-pill.online .robot-pill-dot {
+  background: var(--good);
+  box-shadow: 0 0 0 3px rgba(34,195,138,.15);
+}
+
+/* ── Robot connection — editor header dot badge ───────────── */
+.robot-btn-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.robot-editor-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--fg-3);
+  border: 1.5px solid var(--bg);
+  pointer-events: none;
+  transition: background .2s, box-shadow .2s;
+}
+.robot-editor-dot.online {
+  background: var(--good);
+  box-shadow: 0 0 0 3px rgba(34,195,138,.15);
+}
+.robot-editor-dot.connecting {
+  background: var(--warn, #f5a623);
+  animation: pulse 1.2s infinite;
+}
 @keyframes pulse { 50% { opacity: .35; } }
-.robot-info { flex: 1; display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
-#robot-name { font-weight: 600; font-size: 13px; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#robot-status { font-size: 11px; color: var(--fg-3); }
-.robot-caret { color: var(--fg-3); }
 
 /* ── Views ────────────────────────────────────────────────── */
 .view { display: none; min-height: 100vh; flex-direction: column; }

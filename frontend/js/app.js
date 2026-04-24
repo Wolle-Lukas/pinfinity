@@ -316,8 +316,9 @@ function bindEvents() {
   $('#btn-play').addEventListener('click', () => onPlay('play'));
   $('#btn-stop').addEventListener('click', onStop);
 
-  // Robot banner
-  $('#robot-banner').addEventListener('click', onRobotBannerClick);
+  // Robot connection buttons (list pill + editor icon)
+  $('#btn-robot-list').addEventListener('click', onRobotBannerClick);
+  $('#btn-robot-editor').addEventListener('click', onRobotBannerClick);
 
   // Picker
   $('#picker-confirm').addEventListener('click', onPickerConfirm);
@@ -925,20 +926,25 @@ function setupBluetooth() {
     if (parsed?.cmd === 0x82 || parsed?.cmd === 0x83) setTrainingActive(false);
   };
   robot.onStatusChange = (status) => {
-    const banner = $('#robot-banner');
-    banner.classList.toggle('online', status === 'connected');
-    banner.classList.toggle('connecting', status === 'connecting');
-    if (status === 'connected') {
-      $('#robot-name').textContent = robot.deviceName || 'Robot';
-      $('#robot-status').textContent = 'Connected · tap to disconnect';
-    } else if (status === 'connecting') {
-      $('#robot-name').textContent = 'Connecting…';
-      $('#robot-status').textContent = 'Please wait';
-    } else {
-      $('#robot-name').textContent = 'No robot';
-      $('#robot-status').textContent = 'Tap to connect';
-      setTrainingActive(false);
+    const isConnected  = status === 'connected';
+    const isConnecting = status === 'connecting';
+
+    // List pill
+    const pill      = $('#btn-robot-list');
+    const pillLabel = $('#robot-pill-label');
+    if (pill)      pill.classList.toggle('online', isConnected);
+    if (pillLabel) pillLabel.textContent = isConnecting ? 'Connecting…' : isConnected ? 'Connected' : 'Connect robot';
+
+    // Editor header bluetooth button
+    const editorBtn = $('#btn-robot-editor');
+    const editorDot = $('#robot-editor-dot');
+    if (editorBtn) editorBtn.style.color = isConnected ? 'var(--good)' : isConnecting ? 'var(--warn)' : '';
+    if (editorDot) {
+      editorDot.classList.toggle('online',     isConnected);
+      editorDot.classList.toggle('connecting', isConnecting);
     }
+
+    if (!isConnected) setTrainingActive(false);
   };
 }
 
