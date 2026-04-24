@@ -19,7 +19,7 @@ const ICONS = {
 };
 
 // ── State ────────────────────────────────────────────────────
-const state = {
+export const state = {
   view: 'list',
   tab: 'basic',
   drills: [],
@@ -867,7 +867,7 @@ function setTrainingActive(active) {
   $('#btn-test').disabled = active;
 }
 
-async function onPlay(mode) {
+export async function onPlay(mode) {
   if (state.points.length === 0) { toast('Place at least one landing point'); return; }
   const drill = buildDrillPayload();
   if (robot.connected) {
@@ -876,18 +876,18 @@ async function onPlay(mode) {
       if (mode === 'play') { setTrainingActive(true); toast('Playing'); }
       else toast('Testing');
     } catch (err) { toast('Failed to send to robot'); console.error(err); }
+    try {
+      const now = Math.floor(Date.now() / 1000);
+      await api.logSession({
+        drillType: state.tab, pid: state.currentDrill?.id || 0,
+        pname: state.currentDrill?.name || 'Unnamed', ptype: 'pattern',
+        tmode: mode, stime: now, etime: now,
+        startTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+      });
+    } catch {}
   } else {
     toast(`${mode === 'test' ? 'Test' : 'Play'}: Connect robot first`);
   }
-  try {
-    const now = Math.floor(Date.now() / 1000);
-    await api.logSession({
-      drillType: state.tab, pid: state.currentDrill?.id || 0,
-      pname: state.currentDrill?.name || 'Unnamed', ptype: 'pattern',
-      tmode: mode, stime: now, etime: now,
-      startTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
-    });
-  } catch {}
 }
 
 async function onStop() {

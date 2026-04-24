@@ -5,6 +5,7 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "jsdom": "^29.0.2",
     "vitest": "^3.2.0"
   }
 }
