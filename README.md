@@ -7,7 +7,8 @@
 As Joola decided to no longer support their Infinity table tennis robots, pinfinity is a self-hosted replacement for the Joola cloud backend. It reimplements the API the Joola app talks to and includes a custom web frontend that controls the robot directly via Bluetooth.
 
 **What works:**
-- Training sessions (basic and advanced) — create, modify, and delete
+- Basic training sessions are supported via App and Web Frontend
+- Advanced training sessions are only supported via App
 - The app ships with all default trainings pre-loaded
 
 **What does not work:**
