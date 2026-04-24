@@ -4,6 +4,7 @@ pinfinity/
 .ruff_cache/
 .claude/
 /app/data/
+node_modules/
 
 
 # Byte-compiled / optimized / DLL files
