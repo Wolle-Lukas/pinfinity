@@ -298,24 +298,46 @@ describe('RobotConnection._encodeBasicPattern', () => {
     expect(buf[11]).toBe(1);    // isRandom flag
   });
 
-  it('encodes sequential trailer: byte 0 = numType', () => {
-    const buf = conn._encodeBasicPattern(drill({ numType: 1 }));
+  it('single-point sequential: byte 6 = times, trailer byte 0 = 1', () => {
+    const buf = conn._encodeBasicPattern(drill({ times: 5, landType: 0 }));
     const off = 12; // 1 point * 12 bytes
-    expect(buf[off + 0]).toBe(1);
+    expect(buf[6]).toBe(5);          // all repetitions encoded per-point
+    expect(buf[off + 0]).toBe(1);    // trailer cycle count = 1
     expect(buf[off + 1]).toBe(0);
     expect(buf[off + 2]).toBe(0);
     expect(buf[off + 3]).toBe(0);
+  });
+
+  it('multi-point sequential (2 pts, times=20): byte 6 = 1, trailer byte 0 = 10', () => {
+    const buf = conn._encodeBasicPattern(drill({
+      times: 20, landType: 0,
+      points: [{ x: 1, y: 2 }, { x: 5, y: 2 }],
+    }));
+    expect(buf[6]).toBe(1);           // per-point times = 1
+    expect(buf[6 + 12]).toBe(1);      // same for second point
+    const off = 24; // 2 points * 12 bytes
+    expect(buf[off + 0]).toBe(10);    // trailer = 20 / 2 = 10
+  });
+
+  it('multi-point sequential (3 pts, times=30): byte 6 = 1, trailer byte 0 = 10', () => {
+    const conf = [
+      ...BASE_CONF,
+      { ball: 1, spin: 0, power: 1, landarea: 3, m1speed: 90, m2speed: 95, xaxis: 45, yaxis: 55, zaxis: 65 },
+    ];
+    conn.baseConf = conf;
+    const buf = conn._encodeBasicPattern(drill({
+      times: 30, landType: 0,
+      points: [{ x: 1, y: 2 }, { x: 5, y: 2 }, { x: 3, y: 2 }],
+    }));
+    expect(buf[6]).toBe(1);           // per-point times = 1
+    const off = 36; // 3 points * 12 bytes
+    expect(buf[off + 0]).toBe(10);    // trailer = 30 / 3 = 10
   });
 
   it('encodes random trailer: byte 0 = times', () => {
     const buf = conn._encodeBasicPattern(drill({ landType: 2, times: 7 }));
     const off = 12;
     expect(buf[off + 0]).toBe(7);
-  });
-
-  it('encodes times in byte 6 for sequential mode', () => {
-    const buf = conn._encodeBasicPattern(drill({ times: 5, landType: 0 }));
-    expect(buf[6]).toBe(5);
   });
 });
 

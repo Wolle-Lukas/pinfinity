@@ -295,6 +295,7 @@ export class RobotConnection {
     // Layout confirmed against Android app logcat (20260406_App_logs.txt).
     const points = drill.points || [];
     const isRandom = (drill.landType ?? 0) === 2;
+    const singlePoint = points.length === 1;
     const buf = new Uint8Array((points.length * 12) + 4);
 
     for (let i = 0; i < points.length; i++) {
@@ -312,15 +313,18 @@ export class RobotConnection {
       // Byte 5: always 0x00 (high byte of 16-bit field)
       buf[off + 5] = 0x00;
 
-      // Byte 6: sequential=times (ball count), random=0x01
-      buf[off + 6] = isRandom ? 0x01 : ((drill.times ?? 0) & 0xFF);
+      // Byte 6: low byte of big-endian 16-bit "times per point" field.
+      // single-point sequential: drill.times (robot shoots all balls at this one point)
+      // multi-point sequential:  1           (robot shoots 1 ball per point per cycle;
+      //                                       cycle count goes into the trailer instead)
+      // random:                  0x01
+      buf[off + 6] = isRandom ? 0x01 : (singlePoint ? (drill.times ?? 0) : 1) & 0xFF;
 
       // Byte 7: ball timing wire value.
       // single-point: (int)((19 - ballTime) * 3.5), clamped to 0 for ballTime>=20
       // multi-point:  0 (ball_time byte carries the value instead)
       // random:       0x80 (mode flag)
       const ballTime = drill.ballTime ?? 9;
-      const singlePoint = points.length === 1;
       buf[off + 7] = isRandom ? 0x80 : (singlePoint ? (Math.max(0, 19 - ballTime) * 3.5 | 0) : 0);
 
       // Byte 8: raw app ballTime (1-20).
@@ -345,8 +349,14 @@ export class RobotConnection {
 
     // 4 trailing bytes
     const trailerOff = points.length * 12;
-    // Byte 0: sequential=numType (1=ball-count mode), random=times (total ball count)
-    buf[trailerOff + 0] = isRandom ? ((drill.times ?? 0) & 0xFF) : (drill.numType ?? 1);
+    // Byte 0: cycle count sent to the robot.
+    // random:                  drill.times (total ball count, robot picks random points)
+    // single-point sequential: 1           (all repetitions already encoded in byte 6)
+    // multi-point sequential:  drill.times / numPoints (integer division)
+    //                          e.g. 30 balls ÷ 3 points = 10 cycles
+    buf[trailerOff + 0] = isRandom
+      ? ((drill.times ?? 0) & 0xFF)
+      : (singlePoint ? 1 : Math.trunc((drill.times ?? 0) / points.length));
     buf[trailerOff + 1] = 0;  // confirmed 0x00 (was wrongly 0x01)
     buf[trailerOff + 2] = 0;
     buf[trailerOff + 3] = 0;

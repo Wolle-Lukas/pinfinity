@@ -1,7 +1,7 @@
 # Pinfinity – Joola Infinity Robot Bluetooth Protocol
 
 > **Status:** Protocol fully validated and working (connect, pattern send, and stop all confirmed via live robot ACKs).
-> **Last updated:** 2026-04-17
+> **Last updated:** 2026-04-26
 > **Source:** Reverse-engineered via protocol analysis (HCI snoop logs + Android app logcat).
 
 ---
@@ -174,8 +174,10 @@ Byte  Name            Source / Notes
  3    yaxis           base-conf lookup  (NOT raw landarea value)
  4    zaxis           base-conf lookup
  5    (zero)          0x00 always
- 6    times/flag      sequential: drill.times (ball count, 1 byte)
-                      random:     0x01
+ 6    times/flag      single-point sequential: drill.times  (all repetitions at this point)
+                      multi-point sequential:  1            (one ball per point per cycle;
+                                               total cycle count is in trailer byte 0)
+                      random:                  0x01
  7    ball_timing     single-point: (int)((19 − ballTime) × 3.5), range 0–63
                       multi-point:  0x00 (ball_time byte carries the value)
                       random:       0x80 (mode flag)
@@ -196,11 +198,14 @@ Byte  Name            Source / Notes
 Appended after all point data:
 
 ```
-Byte  Value                       Notes
-────  ────────────────────────    ──────────────────────────────────────────
- 0    sequential: drill.numType   1 = ball-count mode (most trainings)
-      random:     drill.times     total ball count to play before stopping
- 1    0x00                        (was incorrectly documented as 0x01)
+Byte  Value                              Notes
+────  ─────────────────────────────────  ──────────────────────────────────────
+ 0    single-point sequential: 1         all repetitions already in byte 6
+      multi-point sequential:            cycle count = drill.times / numPoints
+        Math.trunc(drill.times /         e.g. 30 balls ÷ 3 points = 10 cycles
+                   numPoints)
+      random: drill.times                total ball count (robot picks random points)
+ 1    0x00
  2    0x00
  3    0x00
 ```
@@ -366,12 +371,14 @@ Incoming frames are CRC-checked using the same CRC-CCITT algorithm. A mismatch i
 
 ## 10. Known Unknowns
 
-### ballTime=0 for single-point sequential trainings
+### ~~ballTime=0 for single-point sequential trainings~~ *(resolved)*
 
 The original app sends `byte 8 = 0x00` for single-point sequential trainings even when the JSON
-`ballTime` field is non-zero (confirmed: a training with JSON `ballTime=18` shows `0x00` in the
-log). Our implementation sends the actual JSON value. The robot likely ignores byte 8 in single-point
-sequential mode. No issue expected, but to confirm: record a sequential multi-point training.
+`ballTime` field is non-zero. This is **confirmed correct behavior**: for single-point sequential
+patterns, timing is carried entirely by byte 7 (`ball_timing` = `(19 − ballTime) × 3.5`); byte 8
+is always `0x00`. Multi-point and random patterns carry timing in byte 8 instead.
+Verified with B1. Beginner Forehand Drive (1 pt) vs B13. Beginner Push and Loop Drill (2 pts),
+2026-04-26.
 
 ### Byte 6 for random mode = 0x01
 
@@ -451,6 +458,18 @@ All fixes are implemented in [frontend/js/bluetooth.js](../frontend/js/bluetooth
 | # | Bug | Was | Fixed To |
 |---|---|---|---|
 | 10 | Wrong stop command | cmd `0x05` + empty payload (actually `CMD_GET_INFO` — triggers firmware-version reply, drill keeps running) | cmd `0x03` + payload `{ 0x00 }` (`CMD_CONTROL` stop sub-action) |
+
+### Multi-point times/trailer fix (2026-04-26)
+
+| # | Bug | Was | Fixed To |
+|---|---|---|---|
+| 13 | Wrong per-point `times` for multi-point drills | Always `drill.times` (e.g. 30) | Single-point: `drill.times`; multi-point: `1` |
+| 14 | Wrong trailer cycle count for multi-point drills | Always `1` (`drill.numType`) | Single-point: `1`; multi-point: `drill.times / numPoints` (integer); random: `drill.times` |
+
+Root cause: frontend used the single-point encoding formula for all exercises regardless of point
+count. A 3-point drill with `times=30` was sending 30 balls per point (90 total) instead of
+1 ball per point × 10 cycles (30 total). Verified via App vs. Web Frontend simulator logs for
+I4. Intermediate Falkenberg (3 pts) and B13. Beginner Push and Loop Drill (2 pts).
 
 ### Simulator drill-lifecycle fix (2026-04-18)
 
