@@ -142,19 +142,28 @@ function renderCourt() {
   cells.forEach((cell, idx) => {
     const point = cellToPoint(idx);
     const avail = isLandareaAvailable(state.ball, state.spin, state.power, point.x);
-    const match = state.points.findIndex(p => p.x === point.x);
+    const matchIndices = state.points.reduce((acc, p, i) => {
+      if (p.x === point.x) acc.push(i);
+      return acc;
+    }, []);
 
     cell.classList.toggle('imp', !avail);
-    cell.classList.toggle('on', match !== -1);
+    cell.classList.toggle('on', matchIndices.length > 0);
     cell.disabled = !avail;
     cell.innerHTML = '';
 
-    if (match !== -1) {
+    if (matchIndices.length > 0) {
       const lbl = document.createElement('span');
       lbl.className = 'dot-label';
-      if (state.mode === 'sequence') lbl.textContent = match + 1;
-      else if (state.mode === 'random') lbl.textContent = 'R';
-      else lbl.textContent = '●';
+      if (state.mode === 'sequence') {
+        const nums = matchIndices.map(i => i + 1);
+        lbl.textContent = nums.join(',');
+        if (nums.length > 2) lbl.style.fontSize = '11px';
+      } else if (state.mode === 'random') {
+        lbl.textContent = 'R';
+      } else {
+        lbl.textContent = '●';
+      }
       cell.appendChild(lbl);
     }
   });
@@ -162,7 +171,7 @@ function renderCourt() {
   $('#btn-clear').disabled = state.points.length === 0;
   const hint = $('#mode-hint');
   if (state.mode === 'single')   hint.textContent = 'Tap one zone. Each shot lands in the same spot.';
-  if (state.mode === 'sequence') hint.textContent = 'Tap zones in order. The robot cycles through them.';
+  if (state.mode === 'sequence') hint.textContent = 'Tap zones in order. Tap the same zone again to add it multiple times. Use Undo or Clear to remove.';
   if (state.mode === 'random')   hint.textContent = 'Tap any zones. The robot picks one at random per shot.';
 }
 
@@ -173,9 +182,15 @@ function onCellClick(index) {
   pushUndo('points');
   if (state.mode === 'single') {
     state.points = [point];
+  } else if (state.mode === 'sequence') {
+    // Multiple balls can land in the same zone (max 2, matching real drill data).
+    // Use undo or Clear to remove.
+    const countInCell = state.points.filter(p => p.x === point.x).length;
+    if (countInCell < 3) state.points.push(point);
   } else {
-    const idx = state.points.findIndex(p => p.x === point.x);
-    if (idx !== -1) state.points.splice(idx, 1);
+    // Random mode: toggle the entire zone on/off
+    const hasAny = state.points.some(p => p.x === point.x);
+    if (hasAny) state.points = state.points.filter(p => p.x !== point.x);
     else state.points.push(point);
   }
   markDirty();
@@ -454,12 +469,9 @@ function renderDrillList() {
       return ls === state.filter.mode;
     });
   }
-  // Sort: newest first by updateDate/createDate
-  filtered = filtered.slice().sort((a, b) => {
-    const ta = new Date(a.updateDate || a.createDate || 0).getTime();
-    const tb = new Date(b.updateDate || b.createDate || 0).getTime();
-    return tb - ta;
-  });
+  filtered = filtered.slice().sort((a, b) =>
+    new Date(b.lastPlayDateUTC).getTime() - new Date(a.lastPlayDateUTC).getTime()
+  );
 
   $('#drill-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'drill' : 'drills'}`;
   $('#drill-empty').classList.toggle('hidden', filtered.length > 0);
@@ -535,11 +547,9 @@ function renderAdvanceList() {
   const list = $('#advance-drill-list');
   const q = state.advanceSearchQuery.toLowerCase();
   let filtered = state.advanceDrills.filter(d => !q || d.name.toLowerCase().includes(q));
-  filtered = filtered.slice().sort((a, b) => {
-    const ta = new Date(a.updateDate || a.createDate || 0).getTime();
-    const tb = new Date(b.updateDate || b.createDate || 0).getTime();
-    return tb - ta;
-  });
+  filtered = filtered.slice().sort((a, b) =>
+    new Date(b.lastPlayDateUTC).getTime() - new Date(a.lastPlayDateUTC).getTime()
+  );
   list.innerHTML = filtered.map(d => drillCardHtml(d)).join('');
 
   // Card click → open editor (same path as basic)
