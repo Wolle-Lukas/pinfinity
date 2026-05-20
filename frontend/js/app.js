@@ -1,12 +1,13 @@
 import * as api from './api.js';
 import { RobotConnection, cellToPoint, pointToCell } from './bluetooth.js';
+import { init as i18nInit, t, applyToDOM } from './i18n.js';
 
 // ── Constants ────────────────────────────────────────────────
-const BALL_LABELS  = ['Serve', 'Normal', 'Lob'];
-const BALL_SUBS    = ['Flat trajectory, robot behind baseline', 'Everyday rally ball', 'High arcing ball'];
-const SPIN_LABELS  = ['Max Topspin', 'Topspin', 'No Spin', 'Backspin', 'Max Backspin'];
-const POWER_LABELS = ['Extreme', 'Strong', 'Medium', 'Light'];
-const POWER_SUBS   = ['Fastest setting', 'Firm pace', 'Typical rally speed', 'Gentle, great for warm-up'];
+const BALL_KEYS      = ['ball_serve', 'ball_normal', 'ball_lob'];
+const BALL_SUB_KEYS  = ['ball_serve_sub', 'ball_normal_sub', 'ball_lob_sub'];
+const SPIN_KEYS      = ['spin_max_topspin', 'spin_topspin', 'spin_no_spin', 'spin_backspin', 'spin_max_backspin'];
+const POWER_KEYS     = ['power_extreme', 'power_strong', 'power_medium', 'power_light'];
+const POWER_SUB_KEYS = ['power_extreme_sub', 'power_strong_sub', 'power_medium_sub', 'power_light_sub'];
 
 
 const ICONS = {
@@ -51,6 +52,8 @@ const $$ = (s) => document.querySelectorAll(s);
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
+  i18nInit();
+
   // Theme: read from localStorage, default dark
   const storedTheme = localStorage.getItem('pinfinity.theme') || 'dark';
   document.body.dataset.theme = storedTheme;
@@ -69,6 +72,7 @@ async function init() {
   }
 
   buildCourt();
+  applyToDOM();
   bindEvents();
   setupBluetooth();
   await loadBaseConf();
@@ -114,9 +118,9 @@ function applyWithConflictCheck(newBall, newSpin, newPower, applyFn) {
     pushUndo('settings'); applyFn(); return;
   }
   const n = conflicts.length;
-  $('#conflict-message').textContent =
-    `${n} placed ball${n > 1 ? 's are' : ' is'} in ${n > 1 ? 'areas' : 'an area'} ` +
-    `that won't be reachable with the new setting and will be removed.`;
+  $('#conflict-message').textContent = n === 1
+    ? t('conflict_message_one')
+    : t('conflict_message_many', { n });
   _pendingApply = () => {
     pushUndo('all');
     state.points = state.points.filter(p => isLandareaAvailable(newBall, newSpin, newPower, p.x));
@@ -132,7 +136,7 @@ function buildCourt() {
     const cell = document.createElement('button');
     cell.className = 'cell';
     cell.dataset.index = i;
-    cell.setAttribute('aria-label', `Cell ${i + 1}`);
+    cell.setAttribute('aria-label', t('court_cell', { n: i + 1 }));
     cell.addEventListener('click', () => onCellClick(i));
     grid.appendChild(cell);
   }
@@ -171,9 +175,9 @@ function renderCourt() {
 
   $('#btn-clear').disabled = state.points.length === 0;
   const hint = $('#mode-hint');
-  if (state.mode === 'single')   hint.textContent = 'Tap one zone. Each shot lands in the same spot.';
-  if (state.mode === 'sequence') hint.textContent = 'Tap zones in order. Tap the same zone again to add it multiple times. Use Undo or Clear to remove.';
-  if (state.mode === 'random')   hint.textContent = 'Tap any zones. The robot picks one at random per shot.';
+  if (state.mode === 'single')   hint.textContent = t('mode_hint_single');
+  if (state.mode === 'sequence') hint.textContent = t('mode_hint_sequence');
+  if (state.mode === 'random')   hint.textContent = t('mode_hint_random');
 }
 
 function onCellClick(index) {
@@ -272,10 +276,10 @@ function bindEvents() {
     if (!file) return;
     try {
       const result = await api.uploadLists(file);
-      toast(`Imported: ${result.imported.join(', ')}`);
+      toast(t('toast_imported', { list: result.imported.join(', ') }));
       loadDrills();
     } catch (err) {
-      toast(`Import failed: ${err.message}`);
+      toast(t('toast_import_failed', { message: err.message }));
     }
   });
 
@@ -394,7 +398,7 @@ function bindEvents() {
   // Save dialog
   $('#save-confirm').addEventListener('click', () => {
     const name = $('#save-name-input').value.trim();
-    if (!name) { toast('Enter a drill name'); return; }
+    if (!name) { toast(t('toast_enter_name')); return; }
     closeOverlay('dialog-save');
     doSave(name);
   });
@@ -492,7 +496,7 @@ async function loadDrills() {
       renderAdvanceList();
     }
   } catch (err) {
-    toast('Failed to load drills');
+    toast(t('toast_load_failed'));
     console.error(err);
   }
 }
@@ -512,7 +516,9 @@ function renderDrillList() {
     new Date(b.lastPlayDateUTC).getTime() - new Date(a.lastPlayDateUTC).getTime()
   );
 
-  $('#drill-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'drill' : 'drills'}`;
+  $('#drill-count').textContent = filtered.length === 1
+    ? t('drill_count_one')
+    : t('drill_count_many', { n: filtered.length });
   $('#drill-empty').classList.toggle('hidden', filtered.length > 0);
 
   list.innerHTML = filtered.map(d => drillCardHtml(d)).join('');
@@ -536,7 +542,7 @@ function renderDrillList() {
         await api.setBasicFavourite(id, newFav);
         drill.isFavourite = newFav;
         renderDrillList();
-      } catch { toast('Failed to update favorite'); }
+      } catch { toast(t('toast_fav_failed')); }
     });
   });
   list.querySelectorAll('.card-more').forEach(btn => {
@@ -550,11 +556,11 @@ function renderDrillList() {
 
 function drillCardHtml(d) {
   const isCustom = d.uid && d.uid !== 0;
-  const sourceLabel = isCustom ? 'Custom' : 'Official';
-  const last = d.lastPlayDateUTC ? `Played ${formatDate(d.lastPlayDateUTC)}`
-                                 : `Added ${formatDate(d.createDate)}`;
+  const sourceLabel = isCustom ? t('drill_source_custom') : t('drill_source_official');
+  const last = d.lastPlayDateUTC ? t('drill_played', { date: formatDate(d.lastPlayDateUTC) })
+                                 : t('drill_added',  { date: formatDate(d.createDate) });
   const landKind = d.landType === 2 ? 'random' : ((d.points?.length ?? 0) > 1 ? 'sequence' : 'single');
-  const modeLabel = landKind === 'random' ? 'Random' : landKind === 'sequence' ? 'Sequence' : 'Single';
+  const modeLabel = landKind === 'random' ? t('mode_random') : landKind === 'sequence' ? t('mode_sequence') : t('mode_single');
   return `
     <div class="drill-card" data-id="${d.id}">
       <div class="drill-body">
@@ -562,7 +568,7 @@ function drillCardHtml(d) {
           <span class="drill-name-text">${escapeHtml(d.name)}</span>
         </div>
         <div class="drill-meta">
-          <span>${BALL_LABELS[d.ball] || ''}</span>
+          <span>${t(BALL_KEYS[d.ball]) || ''}</span>
           <span class="dot">·</span>
           <span>${modeLabel}</span>
           <span class="dot">·</span>
@@ -610,7 +616,7 @@ function renderAdvanceList() {
         await api.setAdvanceFavourite(id, newFav);
         drill.isFavourite = newFav;
         renderAdvanceList();
-      } catch { toast('Failed to update favourite'); }
+      } catch { toast(t('toast_fav_failed')); }
     });
   });
   list.querySelectorAll('.card-more').forEach(btn => {
@@ -659,11 +665,11 @@ function openActionsSheet(drill) {
   const isOfficial = !drill.uid || drill.uid === 0;
   const body = $('#actions-body');
   body.innerHTML = `
-    <button class="sheet-action" data-act="edit">${ICONS.edit}<span>Edit</span></button>
-    <button class="sheet-action" data-act="duplicate">${ICONS.duplicate}<span>Duplicate</span></button>
-    ${isOfficial ? '' : `<button class="sheet-action" data-act="rename">${ICONS.rename}<span>Rename</span></button>`}
-    <button class="sheet-action" data-act="favorite">${ICONS.star}<span>${drill.isFavourite ? 'Unfavorite' : 'Favorite'}</span></button>
-    ${isOfficial ? '' : `<button class="sheet-action danger" data-act="delete">${ICONS.trash}<span>Delete</span></button>`}
+    <button class="sheet-action" data-act="edit">${ICONS.edit}<span>${t('action_edit')}</span></button>
+    <button class="sheet-action" data-act="duplicate">${ICONS.duplicate}<span>${t('action_duplicate')}</span></button>
+    ${isOfficial ? '' : `<button class="sheet-action" data-act="rename">${ICONS.rename}<span>${t('action_rename')}</span></button>`}
+    <button class="sheet-action" data-act="favorite">${ICONS.star}<span>${drill.isFavourite ? t('action_unfavorite') : t('action_favorite')}</span></button>
+    ${isOfficial ? '' : `<button class="sheet-action danger" data-act="delete">${ICONS.trash}<span>${t('action_delete')}</span></button>`}
   `;
   body.querySelectorAll('.sheet-action').forEach(b => {
     b.addEventListener('click', () => handleAction(b.dataset.act));
@@ -684,9 +690,9 @@ async function handleAction(act) {
       await api.setBasicFavourite(drill.id, newFav);
       drill.isFavourite = newFav;
       renderDrillList();
-    } catch { toast('Failed to update favorite'); }
+    } catch { toast(t('toast_fav_failed')); }
   } else if (act === 'delete') {
-    $('#delete-message').textContent = `"${drill.name}" will be permanently removed.`;
+    $('#delete-message').textContent = t('delete_message', { name: drill.name });
     _pendingDelete = drill;
     openOverlay('dialog-delete');
   }
@@ -695,7 +701,7 @@ async function handleAction(act) {
 async function duplicateDrill(drill) {
   const payload = {
     id: 0,
-    name: `${drill.name} (Copy)`,
+    name: `${drill.name} ${t('drill_copy_suffix')}`,
     ball: drill.ball, spin: drill.spin, power: drill.power,
     landType: drill.landType,
     ballTime: drill.ballTime, numType: drill.numType ?? 1, times: drill.times,
@@ -705,9 +711,9 @@ async function duplicateDrill(drill) {
   };
   try {
     await api.saveBasicDrill(payload);
-    toast('Duplicated');
+    toast(t('toast_duplicated'));
     loadDrills();
-  } catch { toast('Failed to duplicate'); }
+  } catch { toast(t('toast_duplicate_failed')); }
 }
 
 let _renameDrill = null;
@@ -735,7 +741,7 @@ async function onRenameConfirm() {
     drill.name = name;
     closeOverlay('dialog-rename');
     renderDrillList();
-  } catch { toast('Failed to rename'); }
+  } catch { toast(t('toast_rename_failed')); }
 }
 
 let _pendingDelete = null;
@@ -746,9 +752,9 @@ async function onDeleteConfirm() {
     await api.deleteBasicDrill(drill.id);
     _pendingDelete = null;
     closeOverlay('dialog-delete');
-    toast('Deleted');
+    toast(t('toast_deleted'));
     loadDrills();
-  } catch { toast('Failed to delete'); }
+  } catch { toast(t('toast_delete_failed')); }
 }
 
 // ── Editor ───────────────────────────────────────────────────
@@ -766,7 +772,7 @@ function openEditor(drill) {
     else if ((drill.points?.length ?? 0) > 1) state.mode = 'sequence';
     else state.mode = 'single';
   } else {
-    state.currentDrill = { id: 0, name: 'New Drill', uid: 0 };
+    state.currentDrill = { id: 0, name: t('editor_new_drill'), uid: 0 };
     state.ball = 1; state.spin = 2; state.power = 2;
     state.points = [];
     state.ballTime = 9; state.ballCount = 20; state.numType = 1;
@@ -785,12 +791,12 @@ function openEditor(drill) {
 
 function syncEditorUI() {
   const d = state.currentDrill;
-  $('#drill-name').textContent = d?.name || 'New Drill';
+  $('#drill-name').textContent = d?.name || t('editor_new_drill');
   $('#drill-dirty').classList.toggle('hidden', !state.dirty);
 
-  $('#chip-ball-value').textContent  = BALL_LABELS[state.ball]  || 'Normal';
-  $('#chip-spin-value').textContent  = SPIN_LABELS[state.spin]  || 'No Spin';
-  $('#chip-power-value').textContent = POWER_LABELS[state.power] || 'Medium';
+  $('#chip-ball-value').textContent  = t(BALL_KEYS[state.ball]);
+  $('#chip-spin-value').textContent  = t(SPIN_KEYS[state.spin]);
+  $('#chip-power-value').textContent = t(POWER_KEYS[state.power]);
 
   $$('.segmented .seg-btn').forEach(b => {
     const active = b.dataset.mode === state.mode;
@@ -810,13 +816,13 @@ function syncEditorUI() {
 
 function syncCountField() {
   if (state.numType === 0) {
-    $('#count-field-label').textContent = 'Duration';
+    $('#count-field-label').textContent = t('duration');
     $('#ball-count-value').textContent = formatDrillTime(state.ballCount);
     $('#ball-count-unit').textContent = '';
   } else {
-    $('#count-field-label').textContent = 'Ball count';
+    $('#count-field-label').textContent = t('ball_count');
     $('#ball-count-value').textContent = state.ballCount;
-    $('#ball-count-unit').textContent = 'balls';
+    $('#ball-count-unit').textContent = t('unit_balls');
   }
 }
 
@@ -848,15 +854,16 @@ let _pickerTemp = null;
 
 function openPicker(param) {
   _pickerParam = param;
-  const titles = { ball: 'Ball type', spin: 'Spin', power: 'Power' };
+  const titles = { ball: t('picker_title_ball'), spin: t('picker_title_spin'), power: t('picker_title_power') };
   $('#picker-title').textContent = titles[param];
   _pickerTemp = state[param];
 
   const opts = $('#picker-options');
   opts.innerHTML = '';
-  const labels = param === 'ball' ? BALL_LABELS : param === 'spin' ? SPIN_LABELS : POWER_LABELS;
-  const glyphs = param === 'ball' ? BALL_GLYPHS : param === 'spin' ? SPIN_GLYPHS : POWER_GLYPHS;
-  const subs   = param === 'ball' ? BALL_SUBS   : param === 'power' ? POWER_SUBS : null;
+  const keys    = param === 'ball' ? BALL_KEYS  : param === 'spin' ? SPIN_KEYS  : POWER_KEYS;
+  const subKeys  = param === 'ball' ? BALL_SUB_KEYS : param === 'power' ? POWER_SUB_KEYS : null;
+  const labels  = keys.map(k => t(k));
+  const subs    = subKeys ? subKeys.map(k => t(k)) : null;
 
   labels.forEach((label, i) => {
     const combo = {
@@ -873,7 +880,7 @@ function openPicker(param) {
     btn.innerHTML = `
       <span class="po-labels">
         <span class="po-name">${label}</span>
-        <span class="po-sub">${available ? (subs ? subs[i] : '') : 'Unavailable with current combo'}</span>
+        <span class="po-sub">${available ? (subs ? subs[i] : '') : t('picker_unavailable')}</span>
       </span>
       <svg class="po-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
     `;
@@ -937,9 +944,9 @@ async function doSave(name) {
       state.currentDrill = res.data;
       state.dirty = false;
       syncEditorUI();
-      toast('Drill saved');
+      toast(t('toast_saved'));
     }
-  } catch { toast('Failed to save drill'); }
+  } catch { toast(t('toast_save_failed')); }
 }
 
 // ── Play / test / stop ───────────────────────────────────────
@@ -951,14 +958,14 @@ function setTrainingActive(active) {
 }
 
 export async function onPlay(mode) {
-  if (state.points.length === 0) { toast('Place at least one landing point'); return; }
+  if (state.points.length === 0) { toast(t('toast_place_point')); return; }
   const drill = buildDrillPayload();
   if (robot.connected) {
     try {
       await robot.sendBasicDrill(drill);
-      if (mode === 'play') { setTrainingActive(true); toast('Playing'); }
-      else toast('Testing');
-    } catch (err) { toast('Failed to send to robot'); console.error(err); }
+      if (mode === 'play') { setTrainingActive(true); toast(t('toast_playing')); }
+      else toast(t('toast_testing'));
+    } catch (err) { toast(t('toast_send_failed')); console.error(err); }
     try {
       const now = Math.floor(Date.now() / 1000);
       await api.logSession({
@@ -969,15 +976,15 @@ export async function onPlay(mode) {
       });
     } catch {}
   } else {
-    toast(`${mode === 'test' ? 'Test' : 'Play'}: Connect robot first`);
+    toast(t('toast_connect_first', { mode: mode === 'test' ? t('btn_test') : t('btn_play') }));
   }
 }
 
 async function onStop() {
   setTrainingActive(false);
   if (robot.connected) {
-    try { await robot.stop(); toast('Stopped'); }
-    catch (err) { toast('Failed to stop robot'); console.error(err); }
+    try { await robot.stop(); toast(t('toast_stopped')); }
+    catch (err) { toast(t('toast_stop_failed')); console.error(err); }
   }
 }
 
@@ -1004,7 +1011,7 @@ function setupBluetooth() {
     const pill      = $('#btn-robot-list');
     const pillLabel = $('#robot-pill-label');
     if (pill)      pill.classList.toggle('online', isConnected);
-    if (pillLabel) pillLabel.textContent = isConnecting ? 'Connecting…' : isConnected ? 'Connected' : 'Connect robot';
+    if (pillLabel) pillLabel.textContent = isConnecting ? t('robot_connecting') : isConnected ? t('robot_connected') : t('robot_connect');
 
     // Editor header bluetooth button
     const editorBtn = $('#btn-robot-editor');
@@ -1021,11 +1028,11 @@ function setupBluetooth() {
 
 async function onRobotBannerClick() {
   if (robot.connected) {
-    if (confirm('Disconnect from robot?')) await robot.disconnect();
+    if (confirm(t('robot_disconnect_confirm'))) await robot.disconnect();
   } else {
-    try { await robot.connect(); toast('Robot connected'); }
+    try { await robot.connect(); toast(t('toast_robot_connected')); }
     catch (err) {
-      if (err.name !== 'NotFoundError') toast(err.message || 'Connection failed');
+      if (err.name !== 'NotFoundError') toast(err.message || t('toast_connection_failed'));
     }
   }
 }
@@ -1042,11 +1049,11 @@ function formatDate(dateStr) {
     if (isNaN(d)) return '';
     const now = new Date();
     const diffDays = Math.floor((now - d) / 86400000);
-    if (diffDays <= 0) return 'today';
-    if (diffDays === 1) return 'yesterday';
-    if (diffDays < 30) return `${diffDays}d ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
-    return `${Math.floor(diffDays / 365)}y ago`;
+    if (diffDays <= 0) return t('date_today');
+    if (diffDays === 1) return t('date_yesterday');
+    if (diffDays < 30) return t('date_days_ago',   { n: diffDays });
+    if (diffDays < 365) return t('date_months_ago', { n: Math.floor(diffDays / 30) });
+    return t('date_years_ago', { n: Math.floor(diffDays / 365) });
   } catch { return ''; }
 }
 function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
