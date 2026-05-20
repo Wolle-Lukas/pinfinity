@@ -1,0 +1,1064 @@
+import * as api from './api.js';
+import { RobotConnection, cellToPoint, pointToCell } from './bluetooth.js';
+import { init as i18nInit, t, applyToDOM } from './i18n.js';
+
+// ── Constants ────────────────────────────────────────────────
+const BALL_KEYS      = ['ball_serve', 'ball_normal', 'ball_lob'];
+const BALL_SUB_KEYS  = ['ball_serve_sub', 'ball_normal_sub', 'ball_lob_sub'];
+const SPIN_KEYS      = ['spin_max_topspin', 'spin_topspin', 'spin_no_spin', 'spin_backspin', 'spin_max_backspin'];
+const POWER_KEYS     = ['power_extreme', 'power_strong', 'power_medium', 'power_light'];
+const POWER_SUB_KEYS = ['power_extreme_sub', 'power_strong_sub', 'power_medium_sub', 'power_light_sub'];
+
+
+const ICONS = {
+  edit:      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  duplicate: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  rename:    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
+  trash:     '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  star:      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  more:      '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+};
+
+// ── State ────────────────────────────────────────────────────
+export const state = {
+  view: 'list',
+  tab: 'basic',
+  drills: [],
+  advanceDrills: [],
+  searchQuery: '',
+  advanceSearchQuery: '',
+  filter: { ball: -1, spin: -1, patternType: -1, mode: null, favorite: false },
+  // Editor state
+  currentDrill: null,
+  ball: 1, spin: 2, power: 2,
+  mode: 'single',
+  points: [],
+  undoStack: [],
+  ballTime: 9,
+  ballCount: 20,
+  numType: 1,
+  dirty: false,
+  playing: false,
+};
+
+const robot = new RobotConnection();
+let baseConf = [];
+
+// ── DOM helpers ──────────────────────────────────────────────
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+// ── Init ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', init);
+
+async function init() {
+  i18nInit();
+
+  // Theme: read from localStorage, default dark
+  const storedTheme = localStorage.getItem('pinfinity.theme') || 'dark';
+  document.body.dataset.theme = storedTheme;
+
+  // Restore tab before building UI so the correct tab is active from the start
+  const savedTab = localStorage.getItem('pinfinity.lastTab');
+  if (savedTab && savedTab !== state.tab) setTab(savedTab);
+
+  // If we'll restore an editor session, pre-switch views immediately (before any
+  // async work) so the list never flashes on screen.
+  const willRestoreEditor = localStorage.getItem('pinfinity.lastView') === 'editor'
+    && localStorage.getItem('pinfinity.lastDrillId');
+  if (willRestoreEditor) {
+    $('#view-list').classList.remove('active');
+    $('#view-editor').classList.add('active');
+  }
+
+  buildCourt();
+  applyToDOM();
+  bindEvents();
+  setupBluetooth();
+  await loadBaseConf();
+  await loadDrills();
+  restoreLastSession();
+}
+
+async function loadBaseConf() {
+  try {
+    const res = await api.getBaseConf();
+    baseConf = res.data || [];
+    robot.baseConf = baseConf;
+    console.log(`[app] Loaded ${baseConf.length} base-conf entries`);
+  } catch (e) {
+    console.error('[app] Failed to load base-conf:', e);
+  }
+}
+
+function isComboAvailable(ball, spin, power) {
+  return baseConf.some(e => e.ball === ball && e.spin === spin && e.power === power);
+}
+function isLandareaAvailable(ball, spin, power, landarea) {
+  return baseConf.some(e => e.ball === ball && e.spin === spin && e.power === power && e.landarea === landarea);
+}
+
+function pushUndo(what) {
+  const snap = {};
+  if (what === 'points' || what === 'all') snap.points = state.points.map(p => ({ ...p }));
+  if (what === 'settings' || what === 'all') {
+    snap.ball = state.ball; snap.spin = state.spin; snap.power = state.power;
+  }
+  state.undoStack.push(snap);
+  $('#btn-undo').disabled = state.undoStack.length === 0;
+}
+
+let _pendingApply = null;
+function getConflictingPoints(ball, spin, power) {
+  return state.points.filter(p => !isLandareaAvailable(ball, spin, power, p.x));
+}
+function applyWithConflictCheck(newBall, newSpin, newPower, applyFn) {
+  const conflicts = getConflictingPoints(newBall, newSpin, newPower);
+  if (conflicts.length === 0) {
+    pushUndo('settings'); applyFn(); return;
+  }
+  const n = conflicts.length;
+  $('#conflict-message').textContent = n === 1
+    ? t('conflict_message_one')
+    : t('conflict_message_many', { n });
+  _pendingApply = () => {
+    pushUndo('all');
+    state.points = state.points.filter(p => isLandareaAvailable(newBall, newSpin, newPower, p.x));
+    applyFn();
+  };
+  openOverlay('dialog-conflict');
+}
+
+// ── Court ────────────────────────────────────────────────────
+function buildCourt() {
+  const grid = $('#court');
+  for (let i = 0; i < 15; i++) {
+    const cell = document.createElement('button');
+    cell.className = 'cell';
+    cell.dataset.index = i;
+    cell.setAttribute('aria-label', t('court_cell', { n: i + 1 }));
+    cell.addEventListener('click', () => onCellClick(i));
+    grid.appendChild(cell);
+  }
+}
+
+function renderCourt() {
+  const cells = $$('#court .cell');
+  cells.forEach((cell, idx) => {
+    const point = cellToPoint(idx);
+    const avail = isLandareaAvailable(state.ball, state.spin, state.power, point.x);
+    const matchIndices = state.points.reduce((acc, p, i) => {
+      if (p.x === point.x) acc.push(i);
+      return acc;
+    }, []);
+
+    cell.classList.toggle('imp', !avail);
+    cell.classList.toggle('on', matchIndices.length > 0);
+    cell.disabled = !avail;
+    cell.innerHTML = '';
+
+    if (matchIndices.length > 0) {
+      const lbl = document.createElement('span');
+      lbl.className = 'dot-label';
+      if (state.mode === 'sequence') {
+        const nums = matchIndices.map(i => i + 1);
+        lbl.textContent = nums.join(',');
+        if (nums.length > 2) lbl.style.fontSize = '11px';
+      } else if (state.mode === 'random') {
+        lbl.textContent = 'R';
+      } else {
+        lbl.textContent = '●';
+      }
+      cell.appendChild(lbl);
+    }
+  });
+
+  $('#btn-clear').disabled = state.points.length === 0;
+  const hint = $('#mode-hint');
+  if (state.mode === 'single')   hint.textContent = t('mode_hint_single');
+  if (state.mode === 'sequence') hint.textContent = t('mode_hint_sequence');
+  if (state.mode === 'random')   hint.textContent = t('mode_hint_random');
+}
+
+function onCellClick(index) {
+  const point = cellToPoint(index);
+  if (!isLandareaAvailable(state.ball, state.spin, state.power, point.x)) return;
+
+  pushUndo('points');
+  if (state.mode === 'single') {
+    state.points = [point];
+  } else if (state.mode === 'sequence') {
+    // Multiple balls can land in the same zone (max 2, matching real drill data).
+    // Use undo or Clear to remove.
+    const countInCell = state.points.filter(p => p.x === point.x).length;
+    if (countInCell < 3) state.points.push(point);
+  } else {
+    // Random mode: toggle the entire zone on/off
+    const hasAny = state.points.some(p => p.x === point.x);
+    if (hasAny) state.points = state.points.filter(p => p.x !== point.x);
+    else state.points.push(point);
+  }
+  markDirty();
+  renderCourt();
+}
+
+// ── Event bindings ───────────────────────────────────────────
+function bindEvents() {
+  // Theme toggle
+  $('#btn-theme').addEventListener('click', () => {
+    const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.body.dataset.theme = next;
+    localStorage.setItem('pinfinity.theme', next);
+  });
+
+  // Tabs
+  $$('.tab').forEach(t => t.addEventListener('click', () => {
+    setTab(t.dataset.tab);
+    loadDrills();
+  }));
+
+  // Search
+  $('#search-input').addEventListener('input', (e) => {
+    state.searchQuery = e.target.value;
+    $('#search-clear').classList.toggle('hidden', !e.target.value);
+    renderDrillList();
+  });
+  $('#search-clear').addEventListener('click', () => {
+    $('#search-input').value = '';
+    state.searchQuery = '';
+    $('#search-clear').classList.add('hidden');
+    renderDrillList();
+  });
+  $('#advance-search-input').addEventListener('input', (e) => {
+    state.advanceSearchQuery = e.target.value;
+    renderAdvanceList();
+  });
+
+  // Filter chips
+  $('#filter-chips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const g = chip.dataset.group, v = chip.dataset.value;
+    if (g === 'ball') {
+      const val = parseInt(v);
+      state.filter.ball = state.filter.ball === val ? -1 : val;
+    } else if (g === 'mode') {
+      state.filter.mode = state.filter.mode === v ? null : v;
+    } else if (g === 'source') {
+      if (v === 'favorite') state.filter.favorite = !state.filter.favorite;
+      else {
+        const patternValue = v === 'official' ? 0 : 1;
+        state.filter.patternType = state.filter.patternType === patternValue ? -1 : patternValue;
+      }
+    }
+    syncFilterChips();
+    loadDrills();
+  });
+
+  // Filter button → open sheet
+  $('#btn-filter').addEventListener('click', () => {
+    syncFilterChips();
+    $('#filter-sheet').classList.remove('hidden');
+  });
+  $('#filter-reset').addEventListener('click', () => {
+    state.filter = { ball: -1, spin: -1, patternType: -1, mode: null, favorite: false };
+    syncFilterChips();
+    loadDrills();
+  });
+
+  // New drill / import backup
+  $('#btn-new-drill').addEventListener('click', () => openOverlay('fab-sheet'));
+  $('#fab-new-drill').addEventListener('click', () => { closeOverlay('fab-sheet'); openEditor(null); });
+  $('#fab-import-backup').addEventListener('click', () => { closeOverlay('fab-sheet'); $('#import-file-input').click(); });
+  $('#import-file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const result = await api.uploadLists(file);
+      toast(t('toast_imported', { list: result.imported.join(', ') }));
+      loadDrills();
+    } catch (err) {
+      toast(t('toast_import_failed', { message: err.message }));
+    }
+  });
+
+  // Back / editor actions
+  $('#btn-back').addEventListener('click', () => showView('list'));
+  $('#btn-save').addEventListener('click', onSave);
+  $('#btn-undo').addEventListener('click', doUndo);
+
+  // Summary chips → picker
+  $('#chip-ball').addEventListener('click',  () => openPicker('ball'));
+  $('#chip-spin').addEventListener('click',  () => openPicker('spin'));
+  $('#chip-power').addEventListener('click', () => openPicker('power'));
+
+  // Segmented mode
+  $$('.segmented .seg-btn').forEach(b => b.addEventListener('click', () => {
+    if (state.mode === b.dataset.mode) return;
+    pushUndo('points');
+    state.mode = b.dataset.mode;
+    state.points = [];
+    $$('.segmented .seg-btn').forEach((x, i) => {
+      x.classList.toggle('active', x === b);
+      x.setAttribute('aria-checked', x === b);
+    });
+    updateSegIndicator();
+    markDirty();
+    renderCourt();
+  }));
+
+  // Clear court
+  $('#btn-clear').addEventListener('click', () => {
+    if (state.points.length === 0) return;
+    pushUndo('points');
+    state.points = [];
+    markDirty();
+    renderCourt();
+  });
+
+  // Timing slider
+  $('#timing-slider').addEventListener('input', (e) => {
+    state.ballTime = 21 - parseInt(e.target.value);
+    $('#timing-value').textContent = state.ballTime;
+    markDirty();
+  });
+
+  // Ball count / duration
+  let _countTimeValue = 1;
+
+  function _setCountMode(isTime) {
+    $('#count-mode-balls').classList.toggle('active', !isTime);
+    $('#count-mode-time').classList.toggle('active', isTime);
+    $('#count-balls-body').classList.toggle('hidden', isTime);
+    $('#count-balls-unit').classList.toggle('hidden', isTime);
+    $('#count-time-body').classList.toggle('hidden', !isTime);
+    $('#count-time-unit').classList.toggle('hidden', !isTime);
+  }
+
+  $('#row-ball-count').addEventListener('click', () => {
+    const isTime = state.numType === 0;
+    _setCountMode(isTime);
+    if (isTime) {
+      _countTimeValue = state.ballCount;
+      $('#time-display').textContent = formatDrillTime(_countTimeValue);
+    } else {
+      $('#count-input').value = state.ballCount;
+    }
+    openOverlay('dialog-count');
+  });
+  $('#count-mode-balls').addEventListener('click', () => _setCountMode(false));
+  $('#count-mode-time').addEventListener('click', () => {
+    _countTimeValue = state.numType === 0 ? state.ballCount : 1;
+    $('#time-display').textContent = formatDrillTime(_countTimeValue);
+    _setCountMode(true);
+  });
+  $('#count-minus').addEventListener('click', () => {
+    const v = Math.max(1, (parseInt($('#count-input').value) || 1) - 1);
+    $('#count-input').value = v;
+  });
+  $('#count-plus').addEventListener('click', () => {
+    const v = Math.min(999, (parseInt($('#count-input').value) || 0) + 1);
+    $('#count-input').value = v;
+  });
+  $('#time-minus').addEventListener('click', () => {
+    _countTimeValue = Math.max(1, _countTimeValue - 1);
+    $('#time-display').textContent = formatDrillTime(_countTimeValue);
+  });
+  $('#time-plus').addEventListener('click', () => {
+    _countTimeValue = Math.min(10, _countTimeValue + 1);
+    $('#time-display').textContent = formatDrillTime(_countTimeValue);
+  });
+  $('#count-confirm').addEventListener('click', () => {
+    const isTime = $('#count-mode-time').classList.contains('active');
+    if (isTime) {
+      state.numType = 0;
+      state.ballCount = _countTimeValue;
+    } else {
+      state.numType = 1;
+      state.ballCount = Math.max(1, Math.min(999, parseInt($('#count-input').value) || 20));
+    }
+    syncCountField();
+    markDirty();
+    closeOverlay('dialog-count');
+  });
+
+  // Play / test / stop
+  $('#btn-test').addEventListener('click', () => onPlay('test'));
+  $('#btn-play').addEventListener('click', () => onPlay('play'));
+  $('#btn-stop').addEventListener('click', onStop);
+
+  // Robot connection buttons (list pill + editor icon)
+  $('#btn-robot-list').addEventListener('click', onRobotBannerClick);
+  $('#btn-robot-editor').addEventListener('click', onRobotBannerClick);
+
+  // Picker
+  $('#picker-confirm').addEventListener('click', onPickerConfirm);
+
+  // Save dialog
+  $('#save-confirm').addEventListener('click', () => {
+    const name = $('#save-name-input').value.trim();
+    if (!name) { toast(t('toast_enter_name')); return; }
+    closeOverlay('dialog-save');
+    doSave(name);
+  });
+
+  // Rename dialog
+  $('#rename-confirm').addEventListener('click', onRenameConfirm);
+
+  // Delete dialog
+  $('#delete-confirm').addEventListener('click', onDeleteConfirm);
+
+  // Conflict dialog
+  $('#conflict-confirm').addEventListener('click', () => {
+    closeOverlay('dialog-conflict');
+    if (_pendingApply) { _pendingApply(); _pendingApply = null; }
+  });
+
+  // Generic close handlers (data-close="<id>")
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-close]');
+    if (btn) { closeOverlay(btn.dataset.close); return; }
+    // click overlay background
+    const overlay = e.target.closest('.sheet-overlay, .dialog-overlay');
+    if (overlay && e.target === overlay) closeOverlay(overlay.id);
+  });
+
+  // Escape key closes top overlay
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const open = [...$$('.sheet-overlay, .dialog-overlay')].reverse().find(o => !o.classList.contains('hidden'));
+      if (open) closeOverlay(open.id);
+    }
+  });
+}
+
+function updateSegIndicator() {
+  const map = { single: 0, sequence: 1, random: 2 };
+  const i = map[state.mode] ?? 0;
+  const ind = $('.seg-indicator');
+  if (ind) ind.style.transform = `translateX(${i * 100}%)`;
+}
+
+// ── Views ────────────────────────────────────────────────────
+function showView(view) {
+  state.view = view;
+  $('#view-list').classList.toggle('active', view === 'list');
+  $('#view-editor').classList.toggle('active', view === 'editor');
+  if (view === 'list') {
+    localStorage.removeItem('pinfinity.lastView');
+    localStorage.removeItem('pinfinity.lastDrillId');
+    loadDrills();
+  }
+}
+
+function setTab(tab) {
+  state.tab = tab;
+  localStorage.setItem('pinfinity.lastTab', tab);
+  $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const isBasic = tab === 'basic';
+  $('#basic-toolbar').classList.toggle('hidden', !isBasic);
+  $('#drill-list').classList.toggle('hidden', !isBasic);
+  $('#advance-toolbar').classList.toggle('hidden', isBasic);
+  $('#advance-drill-list').classList.toggle('hidden', isBasic);
+}
+
+function restoreLastSession() {
+  const lastView = localStorage.getItem('pinfinity.lastView');
+  const lastDrillId = parseInt(localStorage.getItem('pinfinity.lastDrillId'));
+  if (lastView !== 'editor' || !lastDrillId) return;
+  const drills = state.tab === 'basic' ? state.drills : state.advanceDrills;
+  const drill = drills.find(d => d.id === lastDrillId);
+  if (drill) {
+    openEditor(drill);
+  } else {
+    // Drill no longer exists — clear saved state and show list
+    localStorage.removeItem('pinfinity.lastView');
+    localStorage.removeItem('pinfinity.lastDrillId');
+    showView('list');
+  }
+}
+
+// ── Drill list ───────────────────────────────────────────────
+async function loadDrills() {
+  try {
+    if (state.tab === 'basic') {
+      const res = await api.getBasicList({
+        ball: state.filter.ball,
+        spin: state.filter.spin,
+        patternType: state.filter.patternType,
+      });
+      state.drills = res?.data?.records || [];
+      renderDrillList();
+    } else {
+      const res = await api.getAdvanceList();
+      state.advanceDrills = res?.data?.records || [];
+      renderAdvanceList();
+    }
+  } catch (err) {
+    toast(t('toast_load_failed'));
+    console.error(err);
+  }
+}
+
+function renderDrillList() {
+  const list = $('#drill-list');
+  const q = state.searchQuery.toLowerCase();
+  let filtered = state.drills.filter(d => !q || d.name.toLowerCase().includes(q));
+  if (state.filter.favorite) filtered = filtered.filter(d => d.isFavourite);
+  if (state.filter.mode) {
+    filtered = filtered.filter(d => {
+      const ls = d.landType === 2 ? 'random' : ((d.points?.length ?? 0) > 1 ? 'sequence' : 'single');
+      return ls === state.filter.mode;
+    });
+  }
+  filtered = filtered.slice().sort((a, b) =>
+    new Date(b.lastPlayDateUTC).getTime() - new Date(a.lastPlayDateUTC).getTime()
+  );
+
+  $('#drill-count').textContent = filtered.length === 1
+    ? t('drill_count_one')
+    : t('drill_count_many', { n: filtered.length });
+  $('#drill-empty').classList.toggle('hidden', filtered.length > 0);
+
+  list.innerHTML = filtered.map(d => drillCardHtml(d)).join('');
+
+  // Card click → open editor
+  list.querySelectorAll('.drill-card').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.card-action')) return;
+      const drill = state.drills.find(d => d.id === parseInt(el.dataset.id));
+      if (drill) openEditor(drill);
+    });
+  });
+  list.querySelectorAll('.card-fav').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const drill = state.drills.find(d => d.id === id);
+      if (!drill) return;
+      const newFav = drill.isFavourite ? 0 : 1;
+      try {
+        await api.setBasicFavourite(id, newFav);
+        drill.isFavourite = newFav;
+        renderDrillList();
+      } catch { toast(t('toast_fav_failed')); }
+    });
+  });
+  list.querySelectorAll('.card-more').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      openActionsSheet(state.drills.find(d => d.id === id));
+    });
+  });
+}
+
+function drillCardHtml(d) {
+  const isCustom = d.uid && d.uid !== 0;
+  const sourceLabel = isCustom ? t('drill_source_custom') : t('drill_source_official');
+  const last = d.lastPlayDateUTC ? t('drill_played', { date: formatDate(d.lastPlayDateUTC) })
+                                 : t('drill_added',  { date: formatDate(d.createDate) });
+  const landKind = d.landType === 2 ? 'random' : ((d.points?.length ?? 0) > 1 ? 'sequence' : 'single');
+  const modeLabel = landKind === 'random' ? t('mode_random') : landKind === 'sequence' ? t('mode_sequence') : t('mode_single');
+  return `
+    <div class="drill-card" data-id="${d.id}">
+      <div class="drill-body">
+        <div class="drill-name-row">
+          <span class="drill-name-text">${escapeHtml(d.name)}</span>
+        </div>
+        <div class="drill-meta">
+          <span>${t(BALL_KEYS[d.ball]) || ''}</span>
+          <span class="dot">·</span>
+          <span>${modeLabel}</span>
+          <span class="dot">·</span>
+          <span${isCustom ? ' class="meta-custom"' : ''}>${sourceLabel}</span>
+          <span class="dot">·</span>
+          <span>${last}</span>
+        </div>
+      </div>
+      <div class="drill-right card-action">
+        <button class="card-icon-btn card-fav ${d.isFavourite ? 'active' : ''}" data-id="${d.id}" aria-label="Favorite">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="${d.isFavourite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </button>
+        <button class="card-icon-btn card-more" data-id="${d.id}" aria-label="More actions">${ICONS.more}</button>
+      </div>
+    </div>`;
+}
+
+function renderAdvanceList() {
+  const list = $('#advance-drill-list');
+  const q = state.advanceSearchQuery.toLowerCase();
+  let filtered = state.advanceDrills.filter(d => !q || d.name.toLowerCase().includes(q));
+  filtered = filtered.slice().sort((a, b) =>
+    new Date(b.lastPlayDateUTC).getTime() - new Date(a.lastPlayDateUTC).getTime()
+  );
+  list.innerHTML = filtered.map(d => drillCardHtml(d)).join('');
+
+  // Card click → open editor (same path as basic)
+  list.querySelectorAll('.drill-card').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.card-action')) return;
+      const drill = state.advanceDrills.find(d => d.id === parseInt(el.dataset.id));
+      if (drill) openEditor(drill);
+    });
+  });
+  list.querySelectorAll('.card-fav').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const drill = state.advanceDrills.find(d => d.id === id);
+      if (!drill) return;
+      const newFav = drill.isFavourite ? 0 : 1;
+      try {
+        await api.setAdvanceFavourite(id, newFav);
+        drill.isFavourite = newFav;
+        renderAdvanceList();
+      } catch { toast(t('toast_fav_failed')); }
+    });
+  });
+  list.querySelectorAll('.card-more').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const drill = state.advanceDrills.find(d => d.id === id);
+      if (drill) openActionsSheet(drill);
+    });
+  });
+}
+
+function syncFilterChips() {
+  $$('#filter-chips .chip').forEach(chip => {
+    const g = chip.dataset.group, v = chip.dataset.value;
+    let active = false;
+    if (g === 'ball') active = state.filter.ball === parseInt(v);
+    else if (g === 'mode') active = state.filter.mode === v;
+    else if (g === 'source') {
+      if (v === 'favorite') active = state.filter.favorite;
+      else active = state.filter.patternType === (v === 'official' ? 0 : 1);
+    }
+    chip.classList.toggle('active', active);
+  });
+
+  // Update filter button badge / active state
+  let count = 0;
+  if (state.filter.ball !== -1) count++;
+  if (state.filter.mode) count++;
+  if (state.filter.patternType !== -1) count++;
+  if (state.filter.favorite) count++;
+  const btn = $('#btn-filter');
+  const badge = $('#filter-badge');
+  if (btn) btn.classList.toggle('has-active', count > 0);
+  if (badge) {
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count === 0);
+  }
+}
+
+// ── Drill actions sheet ──────────────────────────────────────
+let _actionsDrill = null;
+function openActionsSheet(drill) {
+  if (!drill) return;
+  _actionsDrill = drill;
+  const isOfficial = !drill.uid || drill.uid === 0;
+  const body = $('#actions-body');
+  body.innerHTML = `
+    <button class="sheet-action" data-act="edit">${ICONS.edit}<span>${t('action_edit')}</span></button>
+    <button class="sheet-action" data-act="duplicate">${ICONS.duplicate}<span>${t('action_duplicate')}</span></button>
+    ${isOfficial ? '' : `<button class="sheet-action" data-act="rename">${ICONS.rename}<span>${t('action_rename')}</span></button>`}
+    <button class="sheet-action" data-act="favorite">${ICONS.star}<span>${drill.isFavourite ? t('action_unfavorite') : t('action_favorite')}</span></button>
+    ${isOfficial ? '' : `<button class="sheet-action danger" data-act="delete">${ICONS.trash}<span>${t('action_delete')}</span></button>`}
+  `;
+  body.querySelectorAll('.sheet-action').forEach(b => {
+    b.addEventListener('click', () => handleAction(b.dataset.act));
+  });
+  openOverlay('actions-sheet');
+}
+
+async function handleAction(act) {
+  const drill = _actionsDrill;
+  closeOverlay('actions-sheet');
+  if (!drill) return;
+  if (act === 'edit') openEditor(drill);
+  else if (act === 'duplicate') duplicateDrill(drill);
+  else if (act === 'rename') openRename(drill);
+  else if (act === 'favorite') {
+    try {
+      const newFav = drill.isFavourite ? 0 : 1;
+      await api.setBasicFavourite(drill.id, newFav);
+      drill.isFavourite = newFav;
+      renderDrillList();
+    } catch { toast(t('toast_fav_failed')); }
+  } else if (act === 'delete') {
+    $('#delete-message').textContent = t('delete_message', { name: drill.name });
+    _pendingDelete = drill;
+    openOverlay('dialog-delete');
+  }
+}
+
+async function duplicateDrill(drill) {
+  const payload = {
+    id: 0,
+    name: `${drill.name} ${t('drill_copy_suffix')}`,
+    ball: drill.ball, spin: drill.spin, power: drill.power,
+    landType: drill.landType,
+    ballTime: drill.ballTime, numType: drill.numType ?? 1, times: drill.times,
+    adjustSpin: drill.adjustSpin ?? 0, adjustPosition: drill.adjustPosition ?? 0,
+    points: drill.points ? drill.points.map(p => ({ ...p })) : [],
+    isFavourite: 0,
+  };
+  try {
+    await api.saveBasicDrill(payload);
+    toast(t('toast_duplicated'));
+    loadDrills();
+  } catch { toast(t('toast_duplicate_failed')); }
+}
+
+let _renameDrill = null;
+function openRename(drill) {
+  _renameDrill = drill;
+  $('#rename-input').value = drill.name;
+  openOverlay('dialog-rename');
+  setTimeout(() => $('#rename-input').select(), 50);
+}
+async function onRenameConfirm() {
+  const drill = _renameDrill;
+  const name = $('#rename-input').value.trim();
+  if (!drill || !name) return;
+  const payload = {
+    id: drill.id, name,
+    ball: drill.ball, spin: drill.spin, power: drill.power,
+    landType: drill.landType,
+    ballTime: drill.ballTime, numType: drill.numType ?? 1, times: drill.times,
+    adjustSpin: drill.adjustSpin ?? 0, adjustPosition: drill.adjustPosition ?? 0,
+    points: drill.points ? drill.points.map(p => ({ ...p })) : [],
+    isFavourite: drill.isFavourite || 0,
+  };
+  try {
+    await api.saveBasicDrill(payload);
+    drill.name = name;
+    closeOverlay('dialog-rename');
+    renderDrillList();
+  } catch { toast(t('toast_rename_failed')); }
+}
+
+let _pendingDelete = null;
+async function onDeleteConfirm() {
+  const drill = _pendingDelete;
+  if (!drill) return;
+  try {
+    await api.deleteBasicDrill(drill.id);
+    _pendingDelete = null;
+    closeOverlay('dialog-delete');
+    toast(t('toast_deleted'));
+    loadDrills();
+  } catch { toast(t('toast_delete_failed')); }
+}
+
+// ── Editor ───────────────────────────────────────────────────
+function openEditor(drill) {
+  if (drill) {
+    state.currentDrill = { ...drill };
+    state.ball  = drill.ball  ?? 1;
+    state.spin  = drill.spin  ?? 2;
+    state.power = drill.power ?? 2;
+    state.points = (drill.points || []).map(p => ({ ...p }));
+    state.ballTime = drill.ballTime ?? 9;
+    state.numType = drill.numType ?? 1;
+    state.ballCount = state.numType === 0 ? (drill.times ?? 1) : (drill.times ?? 20);
+    if (drill.landType === 2) state.mode = 'random';
+    else if ((drill.points?.length ?? 0) > 1) state.mode = 'sequence';
+    else state.mode = 'single';
+  } else {
+    state.currentDrill = { id: 0, name: t('editor_new_drill'), uid: 0 };
+    state.ball = 1; state.spin = 2; state.power = 2;
+    state.points = [];
+    state.ballTime = 9; state.ballCount = 20; state.numType = 1;
+    state.mode = 'single';
+  }
+  state.undoStack = [];
+  state.dirty = false;
+  syncEditorUI();
+  if (drill?.id) {
+    localStorage.setItem('pinfinity.lastView', 'editor');
+    localStorage.setItem('pinfinity.lastDrillId', String(drill.id));
+    localStorage.setItem('pinfinity.lastTab', state.tab);
+  }
+  showView('editor');
+}
+
+function syncEditorUI() {
+  const d = state.currentDrill;
+  $('#drill-name').textContent = d?.name || t('editor_new_drill');
+  $('#drill-dirty').classList.toggle('hidden', !state.dirty);
+
+  $('#chip-ball-value').textContent  = t(BALL_KEYS[state.ball]);
+  $('#chip-spin-value').textContent  = t(SPIN_KEYS[state.spin]);
+  $('#chip-power-value').textContent = t(POWER_KEYS[state.power]);
+
+  $$('.segmented .seg-btn').forEach(b => {
+    const active = b.dataset.mode === state.mode;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-checked', active);
+  });
+  updateSegIndicator();
+
+  $('#timing-slider').value = 21 - state.ballTime;
+  $('#timing-value').textContent = state.ballTime;
+  syncCountField();
+
+  $('#btn-undo').disabled = state.undoStack.length === 0;
+
+  renderCourt();
+}
+
+function syncCountField() {
+  if (state.numType === 0) {
+    $('#count-field-label').textContent = t('duration');
+    $('#ball-count-value').textContent = formatDrillTime(state.ballCount);
+    $('#ball-count-unit').textContent = '';
+  } else {
+    $('#count-field-label').textContent = t('ball_count');
+    $('#ball-count-value').textContent = state.ballCount;
+    $('#ball-count-unit').textContent = t('unit_balls');
+  }
+}
+
+function markDirty() {
+  state.dirty = true;
+  $('#drill-dirty').classList.remove('hidden');
+}
+
+function formatDrillTime(times) {
+  const totalSecs = times * 30;
+  const m = Math.floor(totalSecs / 60);
+  const s = totalSecs % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function doUndo() {
+  if (state.undoStack.length === 0) return;
+  const snap = state.undoStack.pop();
+  if (snap.points !== undefined) state.points = snap.points;
+  if (snap.ball   !== undefined) state.ball   = snap.ball;
+  if (snap.spin   !== undefined) state.spin   = snap.spin;
+  if (snap.power  !== undefined) state.power  = snap.power;
+  syncEditorUI();
+}
+
+// ── Picker (ball / spin / power) ─────────────────────────────
+let _pickerParam = null;
+let _pickerTemp = null;
+
+function openPicker(param) {
+  _pickerParam = param;
+  const titles = { ball: t('picker_title_ball'), spin: t('picker_title_spin'), power: t('picker_title_power') };
+  $('#picker-title').textContent = titles[param];
+  _pickerTemp = state[param];
+
+  const opts = $('#picker-options');
+  opts.innerHTML = '';
+  const keys    = param === 'ball' ? BALL_KEYS  : param === 'spin' ? SPIN_KEYS  : POWER_KEYS;
+  const subKeys  = param === 'ball' ? BALL_SUB_KEYS : param === 'power' ? POWER_SUB_KEYS : null;
+  const labels  = keys.map(k => t(k));
+  const subs    = subKeys ? subKeys.map(k => t(k)) : null;
+
+  labels.forEach((label, i) => {
+    const combo = {
+      ball:  param === 'ball'  ? i : state.ball,
+      spin:  param === 'spin'  ? i : state.spin,
+      power: param === 'power' ? i : state.power,
+    };
+    const available = isComboAvailable(combo.ball, combo.spin, combo.power);
+    const btn = document.createElement('button');
+    btn.className = 'picker-opt';
+    btn.dataset.value = i;
+    if (_pickerTemp === i) btn.classList.add('sel');
+    if (!available) btn.classList.add('imp');
+    btn.innerHTML = `
+      <span class="po-labels">
+        <span class="po-name">${label}</span>
+        <span class="po-sub">${available ? (subs ? subs[i] : '') : t('picker_unavailable')}</span>
+      </span>
+      <svg class="po-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    `;
+    btn.addEventListener('click', () => {
+      if (!available) return;
+      _pickerTemp = i;
+      opts.querySelectorAll('.picker-opt').forEach(o => o.classList.toggle('sel', parseInt(o.dataset.value) === i));
+    });
+    opts.appendChild(btn);
+  });
+  openOverlay('picker');
+}
+
+function onPickerConfirm() {
+  const param = _pickerParam;
+  const val = _pickerTemp;
+  closeOverlay('picker');
+  if (val == null || val === state[param]) return;
+
+  const newCombo = {
+    ball:  param === 'ball'  ? val : state.ball,
+    spin:  param === 'spin'  ? val : state.spin,
+    power: param === 'power' ? val : state.power,
+  };
+  applyWithConflictCheck(newCombo.ball, newCombo.spin, newCombo.power, () => {
+    state[param] = val;
+    markDirty();
+    syncEditorUI();
+  });
+}
+
+// ── Save ─────────────────────────────────────────────────────
+async function onSave() {
+  const drill = state.currentDrill;
+  const isNew = !drill.id || drill.id === 0;
+  const suggested = (isNew || (drill.uid && drill.uid !== 0)) ? (drill.name || '')
+                                                              : `${drill.name} (Copy)`;
+  $('#save-name-input').value = suggested;
+  openOverlay('dialog-save');
+  setTimeout(() => $('#save-name-input').select(), 50);
+}
+
+async function doSave(name) {
+  const drill = state.currentDrill;
+  const isCustom = drill.uid && drill.uid !== 0;
+  const payload = {
+    id: isCustom ? drill.id : 0,
+    name,
+    ball: state.ball, spin: state.spin, power: state.power,
+    landType: state.mode === 'random' ? 2 : 0,
+    ballTime: state.ballTime,
+    numType: state.numType,
+    times: state.ballCount,
+    adjustSpin: 0, adjustPosition: 0,
+    points: state.points.length > 0 ? state.points : [{ x: 8, y: 2 }],
+    isFavourite: drill.isFavourite || 0,
+  };
+  try {
+    const res = await api.saveBasicDrill(payload);
+    if (res?.data) {
+      state.currentDrill = res.data;
+      state.dirty = false;
+      syncEditorUI();
+      toast(t('toast_saved'));
+    }
+  } catch { toast(t('toast_save_failed')); }
+}
+
+// ── Play / test / stop ───────────────────────────────────────
+function setTrainingActive(active) {
+  state.playing = active;
+  $('#btn-play').classList.toggle('hidden', active);
+  $('#btn-stop').classList.toggle('hidden', !active);
+  $('#btn-test').disabled = active;
+}
+
+export async function onPlay(mode) {
+  if (state.points.length === 0) { toast(t('toast_place_point')); return; }
+  const drill = buildDrillPayload();
+  if (robot.connected) {
+    try {
+      await robot.sendBasicDrill(drill);
+      if (mode === 'play') { setTrainingActive(true); toast(t('toast_playing')); }
+      else toast(t('toast_testing'));
+    } catch (err) { toast(t('toast_send_failed')); console.error(err); }
+    try {
+      const now = Math.floor(Date.now() / 1000);
+      await api.logSession({
+        drillType: state.tab, pid: state.currentDrill?.id || 0,
+        pname: state.currentDrill?.name || 'Unnamed', ptype: 'pattern',
+        tmode: mode, stime: now, etime: now,
+        startTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+      });
+    } catch {}
+  } else {
+    toast(t('toast_connect_first', { mode: mode === 'test' ? t('btn_test') : t('btn_play') }));
+  }
+}
+
+async function onStop() {
+  setTrainingActive(false);
+  if (robot.connected) {
+    try { await robot.stop(); toast(t('toast_stopped')); }
+    catch (err) { toast(t('toast_stop_failed')); console.error(err); }
+  }
+}
+
+function buildDrillPayload() {
+  return {
+    ball: state.ball, spin: state.spin, power: state.power,
+    landType: state.mode === 'random' ? 2 : 0,
+    ballTime: state.ballTime, numType: state.numType, times: state.ballCount,
+    adjustSpin: 0, adjustPosition: 0,
+    points: state.points,
+  };
+}
+
+// ── Bluetooth UI ─────────────────────────────────────────────
+function setupBluetooth() {
+  robot.onResponse = (parsed) => {
+    if (parsed?.cmd === 0x82 || parsed?.cmd === 0x83) setTrainingActive(false);
+  };
+  robot.onStatusChange = (status) => {
+    const isConnected  = status === 'connected';
+    const isConnecting = status === 'connecting';
+
+    // List pill
+    const pill      = $('#btn-robot-list');
+    const pillLabel = $('#robot-pill-label');
+    if (pill)      pill.classList.toggle('online', isConnected);
+    if (pillLabel) pillLabel.textContent = isConnecting ? t('robot_connecting') : isConnected ? t('robot_connected') : t('robot_connect');
+
+    // Editor header bluetooth button
+    const editorBtn = $('#btn-robot-editor');
+    const editorDot = $('#robot-editor-dot');
+    if (editorBtn) editorBtn.style.color = isConnected ? 'var(--good)' : isConnecting ? 'var(--warn)' : '';
+    if (editorDot) {
+      editorDot.classList.toggle('online',     isConnected);
+      editorDot.classList.toggle('connecting', isConnecting);
+    }
+
+    if (!isConnected) setTrainingActive(false);
+  };
+}
+
+async function onRobotBannerClick() {
+  if (robot.connected) {
+    if (confirm(t('robot_disconnect_confirm'))) await robot.disconnect();
+  } else {
+    try { await robot.connect(); toast(t('toast_robot_connected')); }
+    catch (err) {
+      if (err.name !== 'NotFoundError') toast(err.message || t('toast_connection_failed'));
+    }
+  }
+}
+
+
+// ── Overlays ─────────────────────────────────────────────────
+function openOverlay(id)  { const el = $(`#${id}`); if (!el) return; el.classList.remove('hidden'); el.setAttribute('aria-hidden','false'); }
+function closeOverlay(id) { const el = $(`#${id}`); if (!el) return; el.classList.add('hidden');    el.setAttribute('aria-hidden','true');  }
+
+// ── Utils ────────────────────────────────────────────────────
+function formatDate(dateStr) {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    const now = new Date();
+    const diffDays = Math.floor((now - d) / 86400000);
+    if (diffDays <= 0) return t('date_today');
+    if (diffDays === 1) return t('date_yesterday');
+    if (diffDays < 30) return t('date_days_ago',   { n: diffDays });
+    if (diffDays < 365) return t('date_months_ago', { n: Math.floor(diffDays / 30) });
+    return t('date_years_ago', { n: Math.floor(diffDays / 365) });
+  } catch { return ''; }
+}
+function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
+function toast(msg) {
+  const el = $('#toast'); el.textContent = msg; el.classList.remove('hidden');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.add('hidden'), 2400);
+}

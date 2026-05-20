@@ -29,7 +29,7 @@ async def read_list(
     patternType: int = Query(-1, alias="patternType"),
     name: str = Query("", alias="name"),
     pageNum: int = Query(1, alias="pageNum"),
-    pageSize: int = Query(100, alias="pageSize"),
+    pageSize: int = Query(100, alias="pageSize", ge=1, le=500),
 ):
     data_path = os.path.join(
         os.path.dirname(__file__), "..", "data", "advance-list.json"

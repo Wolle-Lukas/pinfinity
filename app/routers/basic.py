@@ -37,7 +37,7 @@ async def read_list(
     ball: int = Query(-1, alias="ball"),
     spin: int = Query(-1, alias="spin"),
     pageNum: int = Query(1, alias="pageNum"),
-    pageSize: int = Query(100, alias="pageSize"),
+    pageSize: int = Query(100, alias="pageSize", ge=1, le=500),
 ):
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "basic-list.json")
     metadata_path = os.path.join(
@@ -60,7 +60,6 @@ async def read_list(
         filters.append(lambda q: q.where("ball").eq(ball))
     if spin != -1:
         filters.append(lambda q: q.where("spin").eq(spin))
-
     logger.debug(
         "GET /basic/list: patternType=%d name=%r ball=%d spin=%d page=%d size=%d",
         patternType,

@@ -6,7 +6,7 @@ router = APIRouter()
 
 
 @router.post("/config/country", tags=["config"])
-async def read_skillevel():
+async def read_country():
     data_path = os.path.join(
         os.path.dirname(__file__), "..", "data", "config-country.json"
     )
