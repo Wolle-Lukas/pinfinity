@@ -145,8 +145,8 @@
         </div>
 
         <button id="row-ball-count" class="field-card field-row">
-          <span class="field-label">Ball count</span>
-          <span class="field-value"><span id="ball-count-value">20</span><span class="field-unit">balls</span>
+          <span class="field-label" id="count-field-label">Ball count</span>
+          <span class="field-value"><span id="ball-count-value">20</span><span id="ball-count-unit" class="field-unit">balls</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
           </span>
         </button>
@@ -193,13 +193,23 @@
 
     <div id="dialog-count" class="dialog-overlay hidden">
       <div class="dialog">
-        <h2 class="dialog-title">Ball count</h2>
-        <div class="dialog-body count-body">
+        <h2 class="dialog-title">Training length</h2>
+        <div class="count-mode-seg">
+          <button id="count-mode-balls" class="seg-btn active">Balls</button>
+          <button id="count-mode-time" class="seg-btn">Time</button>
+        </div>
+        <div id="count-balls-body" class="dialog-body count-body">
           <button id="count-minus" class="stepper-btn">−</button>
           <input id="count-input" type="number" min="1" max="999" value="20" class="count-input">
           <button id="count-plus" class="stepper-btn">+</button>
         </div>
-        <div class="count-unit-label">balls</div>
+        <div id="count-balls-unit" class="count-unit-label">balls</div>
+        <div id="count-time-body" class="dialog-body count-body hidden">
+          <button id="time-minus" class="stepper-btn">−</button>
+          <span id="time-display" class="count-display">0:30</span>
+          <button id="time-plus" class="stepper-btn">+</button>
+        </div>
+        <div id="count-time-unit" class="count-unit-label hidden">min : sec</div>
         <div class="dialog-actions">
           <button class="btn btn-ghost" data-close="dialog-count">Cancel</button>
           <button id="count-confirm" class="btn btn-primary">Done</button>

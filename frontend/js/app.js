@@ -35,6 +35,7 @@ export const state = {
   undoStack: [],
   ballTime: 9,
   ballCount: 20,
+  numType: 1,
   dirty: false,
   playing: false,
 };
@@ -289,12 +290,12 @@ function bindEvents() {
   $('#chip-power').addEventListener('click', () => openPicker('power'));
 
   // Segmented mode
-  $$('.seg-btn').forEach(b => b.addEventListener('click', () => {
+  $$('.segmented .seg-btn').forEach(b => b.addEventListener('click', () => {
     if (state.mode === b.dataset.mode) return;
     pushUndo('points');
     state.mode = b.dataset.mode;
     state.points = [];
-    $$('.seg-btn').forEach((x, i) => {
+    $$('.segmented .seg-btn').forEach((x, i) => {
       x.classList.toggle('active', x === b);
       x.setAttribute('aria-checked', x === b);
     });
@@ -319,10 +320,34 @@ function bindEvents() {
     markDirty();
   });
 
-  // Ball count
+  // Ball count / duration
+  let _countTimeValue = 1;
+
+  function _setCountMode(isTime) {
+    $('#count-mode-balls').classList.toggle('active', !isTime);
+    $('#count-mode-time').classList.toggle('active', isTime);
+    $('#count-balls-body').classList.toggle('hidden', isTime);
+    $('#count-balls-unit').classList.toggle('hidden', isTime);
+    $('#count-time-body').classList.toggle('hidden', !isTime);
+    $('#count-time-unit').classList.toggle('hidden', !isTime);
+  }
+
   $('#row-ball-count').addEventListener('click', () => {
-    $('#count-input').value = state.ballCount;
+    const isTime = state.numType === 0;
+    _setCountMode(isTime);
+    if (isTime) {
+      _countTimeValue = state.ballCount;
+      $('#time-display').textContent = formatDrillTime(_countTimeValue);
+    } else {
+      $('#count-input').value = state.ballCount;
+    }
     openOverlay('dialog-count');
+  });
+  $('#count-mode-balls').addEventListener('click', () => _setCountMode(false));
+  $('#count-mode-time').addEventListener('click', () => {
+    _countTimeValue = state.numType === 0 ? state.ballCount : 1;
+    $('#time-display').textContent = formatDrillTime(_countTimeValue);
+    _setCountMode(true);
   });
   $('#count-minus').addEventListener('click', () => {
     const v = Math.max(1, (parseInt($('#count-input').value) || 1) - 1);
@@ -332,10 +357,24 @@ function bindEvents() {
     const v = Math.min(999, (parseInt($('#count-input').value) || 0) + 1);
     $('#count-input').value = v;
   });
+  $('#time-minus').addEventListener('click', () => {
+    _countTimeValue = Math.max(1, _countTimeValue - 1);
+    $('#time-display').textContent = formatDrillTime(_countTimeValue);
+  });
+  $('#time-plus').addEventListener('click', () => {
+    _countTimeValue = Math.min(10, _countTimeValue + 1);
+    $('#time-display').textContent = formatDrillTime(_countTimeValue);
+  });
   $('#count-confirm').addEventListener('click', () => {
-    const v = Math.max(1, Math.min(999, parseInt($('#count-input').value) || 20));
-    state.ballCount = v;
-    $('#ball-count-value').textContent = v;
+    const isTime = $('#count-mode-time').classList.contains('active');
+    if (isTime) {
+      state.numType = 0;
+      state.ballCount = _countTimeValue;
+    } else {
+      state.numType = 1;
+      state.ballCount = Math.max(1, Math.min(999, parseInt($('#count-input').value) || 20));
+    }
+    syncCountField();
     markDirty();
     closeOverlay('dialog-count');
   });
@@ -721,7 +760,8 @@ function openEditor(drill) {
     state.power = drill.power ?? 2;
     state.points = (drill.points || []).map(p => ({ ...p }));
     state.ballTime = drill.ballTime ?? 9;
-    state.ballCount = drill.times ?? 20;
+    state.numType = drill.numType ?? 1;
+    state.ballCount = state.numType === 0 ? (drill.times ?? 1) : (drill.times ?? 20);
     if (drill.landType === 2) state.mode = 'random';
     else if ((drill.points?.length ?? 0) > 1) state.mode = 'sequence';
     else state.mode = 'single';
@@ -729,7 +769,7 @@ function openEditor(drill) {
     state.currentDrill = { id: 0, name: 'New Drill', uid: 0 };
     state.ball = 1; state.spin = 2; state.power = 2;
     state.points = [];
-    state.ballTime = 9; state.ballCount = 20;
+    state.ballTime = 9; state.ballCount = 20; state.numType = 1;
     state.mode = 'single';
   }
   state.undoStack = [];
@@ -752,7 +792,7 @@ function syncEditorUI() {
   $('#chip-spin-value').textContent  = SPIN_LABELS[state.spin]  || 'No Spin';
   $('#chip-power-value').textContent = POWER_LABELS[state.power] || 'Medium';
 
-  $$('.seg-btn').forEach(b => {
+  $$('.segmented .seg-btn').forEach(b => {
     const active = b.dataset.mode === state.mode;
     b.classList.toggle('active', active);
     b.setAttribute('aria-checked', active);
@@ -761,16 +801,35 @@ function syncEditorUI() {
 
   $('#timing-slider').value = 21 - state.ballTime;
   $('#timing-value').textContent = state.ballTime;
-  $('#ball-count-value').textContent = state.ballCount;
+  syncCountField();
 
   $('#btn-undo').disabled = state.undoStack.length === 0;
 
   renderCourt();
 }
 
+function syncCountField() {
+  if (state.numType === 0) {
+    $('#count-field-label').textContent = 'Duration';
+    $('#ball-count-value').textContent = formatDrillTime(state.ballCount);
+    $('#ball-count-unit').textContent = '';
+  } else {
+    $('#count-field-label').textContent = 'Ball count';
+    $('#ball-count-value').textContent = state.ballCount;
+    $('#ball-count-unit').textContent = 'balls';
+  }
+}
+
 function markDirty() {
   state.dirty = true;
   $('#drill-dirty').classList.remove('hidden');
+}
+
+function formatDrillTime(times) {
+  const totalSecs = times * 30;
+  const m = Math.floor(totalSecs / 60);
+  const s = totalSecs % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 function doUndo() {
@@ -866,7 +925,7 @@ async function doSave(name) {
     ball: state.ball, spin: state.spin, power: state.power,
     landType: state.mode === 'random' ? 2 : 0,
     ballTime: state.ballTime,
-    numType: 1,
+    numType: state.numType,
     times: state.ballCount,
     adjustSpin: 0, adjustPosition: 0,
     points: state.points.length > 0 ? state.points : [{ x: 8, y: 2 }],
@@ -926,7 +985,7 @@ function buildDrillPayload() {
   return {
     ball: state.ball, spin: state.spin, power: state.power,
     landType: state.mode === 'random' ? 2 : 0,
-    ballTime: state.ballTime, times: state.ballCount,
+    ballTime: state.ballTime, numType: state.numType, times: state.ballCount,
     adjustSpin: 0, adjustPosition: 0,
     points: state.points,
   };
