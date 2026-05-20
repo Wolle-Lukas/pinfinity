@@ -3,7 +3,7 @@ import {
   getBasicList, getBasicInfo, getBasicSkillLevels,
   saveBasicDrill, deleteBasicDrill, setBasicFavourite,
   getAdvanceList, saveAdvanceDrill, deleteAdvanceDrill, setAdvanceFavourite,
-  getBaseConf, getUserInfo, logSession,
+  getBaseConf, getUserInfo, logSession, uploadLists,
 } from '../api.js';
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -269,5 +269,61 @@ describe('logSession', () => {
     expect(lastOptions().method).toBe('POST');
     expect(lastUrl()).toBe('/api/log');
     expect(JSON.parse(lastOptions().body)).toEqual(data);
+  });
+});
+
+// ── uploadLists ──────────────────────────────────────────────
+
+describe('uploadLists', () => {
+  it('calls POST /api/upload/lists', async () => {
+    mockFetch({ body: { imported: [] } });
+    await uploadLists(new Blob(['data']));
+    expect(lastOptions().method).toBe('POST');
+    expect(lastUrl()).toBe('/api/upload/lists');
+  });
+
+  it('sends a FormData body with the file appended under the "file" key', async () => {
+    mockFetch({ body: { imported: [] } });
+    const file = new Blob(['data']);
+    await uploadLists(file);
+    const body = lastOptions().body;
+    expect(body).toBeInstanceOf(FormData);
+    // Node's FormData wraps Blob entries as File internally; check by type and size
+    const entry = body.get('file');
+    expect(entry).toBeInstanceOf(Blob);
+    expect(entry.size).toBe(file.size);
+  });
+
+  it('does not set Content-Type manually (lets fetch set the multipart boundary)', async () => {
+    mockFetch({ body: { imported: [] } });
+    await uploadLists(new Blob(['data']));
+    expect(lastOptions().headers).toBeUndefined();
+  });
+
+  it('returns parsed JSON on success', async () => {
+    const payload = { imported: ['basic', 'advance'] };
+    mockFetch({ body: payload });
+    const result = await uploadLists(new Blob(['data']));
+    expect(result).toEqual(payload);
+  });
+
+  it('throws with err.detail when the error response has a JSON body', async () => {
+    mockFetch({ ok: false, status: 422, body: { detail: 'Invalid file format' } });
+    await expect(uploadLists(new Blob(['data']))).rejects.toThrow('Invalid file format');
+  });
+
+  it('throws with statusText when the error response body is not JSON', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      json: vi.fn().mockRejectedValue(new SyntaxError('not json')),
+    });
+    await expect(uploadLists(new Blob(['data']))).rejects.toThrow('Internal Server Error');
+  });
+
+  it('propagates fetch network errors', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
+    await expect(uploadLists(new Blob(['data']))).rejects.toThrow('Failed to fetch');
   });
 });

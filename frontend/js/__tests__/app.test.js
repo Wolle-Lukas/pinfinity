@@ -48,4 +48,11 @@ describe('onPlay', () => {
     await onPlay('play');
     expect(document.querySelector('#toast').textContent).toBe('Play: Connect robot first');
   });
+
+  it('shows a toast and returns early when no landing points are set', async () => {
+    state.points = [];
+    await onPlay('play');
+    expect(document.querySelector('#toast').textContent).toBe('Place at least one landing point');
+    expect(apiModule.logSession).not.toHaveBeenCalled();
+  });
 });
