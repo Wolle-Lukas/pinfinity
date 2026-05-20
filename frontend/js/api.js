@@ -73,3 +73,16 @@ export async function getUserInfo() {
 export async function logSession(data) {
   return request('POST', '/log', data);
 }
+
+// ── Backup ───────────────────────────────────────────────────
+
+export async function uploadLists(file) {
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch(`${BASE}/upload/lists`, { method: 'POST', body: form });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || res.statusText);
+  }
+  return res.json();
+}

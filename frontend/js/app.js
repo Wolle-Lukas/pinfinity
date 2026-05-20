@@ -246,8 +246,22 @@ function bindEvents() {
     loadDrills();
   });
 
-  // New drill
-  $('#btn-new-drill').addEventListener('click', () => openEditor(null));
+  // New drill / import backup
+  $('#btn-new-drill').addEventListener('click', () => openOverlay('fab-sheet'));
+  $('#fab-new-drill').addEventListener('click', () => { closeOverlay('fab-sheet'); openEditor(null); });
+  $('#fab-import-backup').addEventListener('click', () => { closeOverlay('fab-sheet'); $('#import-file-input').click(); });
+  $('#import-file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const result = await api.uploadLists(file);
+      toast(`Imported: ${result.imported.join(', ')}`);
+      loadDrills();
+    } catch (err) {
+      toast(`Import failed: ${err.message}`);
+    }
+  });
 
   // Back / editor actions
   $('#btn-back').addEventListener('click', () => showView('list'));
