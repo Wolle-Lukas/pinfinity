@@ -636,9 +636,9 @@ traitlets==5.14.3 \
     # via
     #   ipython
     #   matplotlib-inline
-typer==0.24.1 \
-    --hash=sha256:112c1f0ce578bfb4cab9ffdabc68f031416ebcc216536611ba21f04e9aa84c9e \
-    --hash=sha256:e39b4732d65fbdcde189ae76cf7cd48aeae72919dea1fdfc16593be016256b45
+typer==0.26.3 \
+    --hash=sha256:3e2b9352f535e5303ef27806dadc2c8647687bdca5c902f03fec3fb88f46a46a \
+    --hash=sha256:e70549ec5a403ca8a0bf0802ddd9f3c6ff7a14ccbb859b01b697baa943636f33
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
