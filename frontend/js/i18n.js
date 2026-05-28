@@ -1,6 +1,7 @@
 import en from '../locales/en.js';
+import de from '../locales/de.js';
 
-const locales = { en };
+const locales = { en, de };
 let strings = en;
 
 export function init() {

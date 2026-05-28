@@ -204,11 +204,47 @@ function onCellClick(index) {
 
 // ── Event bindings ───────────────────────────────────────────
 function bindEvents() {
-  // Theme toggle
-  $('#btn-theme').addEventListener('click', () => {
-    const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.body.dataset.theme = next;
-    localStorage.setItem('pinfinity.theme', next);
+  // Settings button
+  $('#btn-settings').addEventListener('click', () => {
+    syncSettingsUI();
+    openOverlay('settings-sheet');
+  });
+
+  // Settings: dark mode toggle
+  $('#toggle-theme').addEventListener('change', (e) => {
+    const theme = e.target.checked ? 'dark' : 'light';
+    document.body.dataset.theme = theme;
+    localStorage.setItem('pinfinity.theme', theme);
+  });
+
+  // Settings: language buttons
+  $$('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      localStorage.setItem('pinfinity.lang', btn.dataset.lang);
+      i18nInit();
+      applyToDOM();
+      renderDrillList();
+      renderAdvanceList();
+      if (state.view === 'editor') syncEditorUI();
+      syncSettingsUI();
+    });
+  });
+
+  // Settings: export lists
+  $('#settings-export').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = '/api/download/lists';
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast(t('toast_exported'));
+  });
+
+  // Settings: import lists
+  $('#settings-import').addEventListener('click', () => {
+    closeOverlay('settings-sheet');
+    $('#import-file-input').click();
   });
 
   // Tabs
@@ -266,10 +302,8 @@ function bindEvents() {
     loadDrills();
   });
 
-  // New drill / import backup
-  $('#btn-new-drill').addEventListener('click', () => openOverlay('fab-sheet'));
-  $('#fab-new-drill').addEventListener('click', () => { closeOverlay('fab-sheet'); openEditor(null); });
-  $('#fab-import-backup').addEventListener('click', () => { closeOverlay('fab-sheet'); $('#import-file-input').click(); });
+  // New drill
+  $('#btn-new-drill').addEventListener('click', () => openEditor(null));
   $('#import-file-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     e.target.value = '';
@@ -655,6 +689,12 @@ function syncFilterChips() {
     badge.textContent = count;
     badge.classList.toggle('hidden', count === 0);
   }
+}
+
+function syncSettingsUI() {
+  $('#toggle-theme').checked = document.body.dataset.theme === 'dark';
+  const lang = (localStorage.getItem('pinfinity.lang') || navigator.language || 'en').toLowerCase().split('-')[0];
+  $$('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
 }
 
 // ── Drill actions sheet ──────────────────────────────────────

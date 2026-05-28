@@ -5,6 +5,7 @@ pinfinity/
 .claude/
 /app/data/
 node_modules/
+logs/
 
 
 # Byte-compiled / optimized / DLL files
