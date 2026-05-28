@@ -167,6 +167,16 @@ export default {
   fab_new_drill:     'New drill',
   fab_import_backup: 'Import backup',
 
+  // Settings
+  settings_title:          'Settings',
+  settings_appearance:     'Appearance',
+  settings_dark_mode:      'Dark Mode',
+  settings_language_label: 'Language',
+  settings_data:           'Data',
+  settings_export:         'Export drills',
+  settings_import:         'Import drills',
+  toast_exported:          'Export started',
+
   // Toast messages
   toast_enter_name:      'Enter a drill name',
   toast_load_failed:     'Failed to load drills',

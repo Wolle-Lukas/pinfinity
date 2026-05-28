@@ -148,9 +148,6 @@ body[data-theme="light"] {
 .icon-btn:hover:not(:disabled) { background: var(--bg-2); color: var(--fg); }
 .icon-btn:disabled { opacity: .35; cursor: default; }
 .icon-btn-primary { color: var(--accent); }
-.icon-btn .icon-sun { display: none; }
-body[data-theme="light"] .icon-btn .icon-sun { display: inline; }
-body[data-theme="light"] .icon-btn .icon-moon { display: none; }
 
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border-soft); margin-top: 4px; }
 .tab {
@@ -616,6 +613,69 @@ body[data-theme="light"] .dialog-overlay { background: rgba(20, 25, 45, .35); }
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 96px; height: 44px;
   font-size: 20px; font-weight: 600; color: var(--fg);
+}
+
+/* ── Settings sheet ───────────────────────────────────────── */
+.settings-body { padding: 4px 12px calc(16px + env(safe-area-inset-bottom)); }
+.settings-section-label {
+  font-size: 11px; font-weight: 600; color: var(--fg-3);
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 16px 4px 8px;
+}
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-radius: 12px;
+  background: var(--bg-2);
+  margin-bottom: 8px;
+}
+.settings-row-left {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; color: var(--fg);
+}
+.settings-row-left svg { color: var(--fg-3); flex: 0 0 18px; }
+.settings-lang-row {
+  background: transparent;
+  padding: 0;
+  gap: 8px;
+}
+.lang-btn {
+  flex: 1;
+  background: var(--bg-1); border: 1px solid var(--border-soft);
+  color: var(--fg-2); font: inherit; font-size: 14px; font-weight: 500;
+  padding: 10px 0; border-radius: 10px;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.lang-btn:hover { background: var(--bg-2); color: var(--fg); }
+.lang-btn.active {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--accent);
+}
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative; display: inline-block;
+  width: 44px; height: 26px; cursor: pointer; flex: 0 0 44px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: 13px;
+  transition: background .2s, border-color .2s;
+}
+.toggle-track::before {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px; left: 2px; top: 2px;
+  background: var(--fg-2); border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  transition: transform .2s, background .2s;
+}
+.toggle-switch input:checked + .toggle-track {
+  background: var(--accent); border-color: var(--accent);
+}
+.toggle-switch input:checked + .toggle-track::before {
+  background: #fff; transform: translateX(18px);
 }
 
 /* ── Toast ────────────────────────────────────────────────── */
