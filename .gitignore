@@ -6,6 +6,8 @@ pinfinity/
 /app/data/
 node_modules/
 logs/
+BT/
+/app/data/
 
 
 # Byte-compiled / optimized / DLL files

@@ -57,11 +57,10 @@ class TestAdvanceSave:
         assert "createDate" in data["data"]
         assert "updateDate" in data["data"]
 
-    def test_create_serializes_ball_list(self, client, restore_advance_list):
+    def test_create_stores_ball_list(self, client, restore_advance_list):
         r = client.post("/api/advance/save", json=SAMPLE_TRAINING)
         assert r.status_code == 200
-        # ballList is stored as stringified JSON in the "json" field
-        assert "json" in r.json()["data"]
+        assert r.json()["data"]["ballList"] == SAMPLE_TRAINING["ballList"]
 
     def test_create_assigns_new_id(self, client, restore_advance_list):
         r1 = client.post("/api/advance/save", json=SAMPLE_TRAINING)

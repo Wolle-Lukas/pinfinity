@@ -122,7 +122,6 @@ async def save_advance(request: Request):
             body.get("name"),
             new_id,
         )
-        # Add json field with stringified ballList
         doc.update(
             {
                 "id": new_id,
@@ -130,7 +129,7 @@ async def save_advance(request: Request):
                 "isFavourite": body.get("isFavourite", 0),
                 "createDate": now_str,
                 "updateDate": now_str,
-                "json": json.dumps(body.get("ballList", [])),
+                "ballList": body.get("ballList", []),
                 "subTime": 0,
                 "collectFlag": 0,
                 "lastPlayDate": time_index,
@@ -144,7 +143,7 @@ async def save_advance(request: Request):
             {
                 "updateDate": now_str,
                 "uid": uid,
-                "json": json.dumps(body.get("ballList", [])),
+                "ballList": body.get("ballList", []),
             }
         )
         advance_list.where("id").eq(body["id"]).update(doc)

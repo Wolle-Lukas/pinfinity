@@ -1,10 +1,9 @@
 """Edge-case tests for advance training endpoints.
 
 Mirrors test_basic_edge_cases.py and adds advance-specific cases:
-ballList serialisation into the "json" field, update of that field.
+ballList storage and update of that field.
 """
 
-import json
 import time
 
 SAMPLE = {
@@ -125,18 +124,16 @@ class TestAdvanceSaveResponseStructure:
         assert r.json()["data"]["collectFlag"] == 0
 
 
-# ── Save: ballList serialisation ─────────────────────────────
+# ── Save: ballList storage ───────────────────────────────────
 
 
 class TestAdvanceBallListSerialisation:
-    def test_json_field_is_stringified_ball_list(self, client, restore_advance_list):
+    def test_ball_list_field_matches_input(self, client, restore_advance_list):
         r = client.post("/api/advance/save", json=SAMPLE)
         data = r.json()["data"]
-        assert "json" in data
-        parsed = json.loads(data["json"])
-        assert parsed == SAMPLE["ballList"]
+        assert data["ballList"] == SAMPLE["ballList"]
 
-    def test_update_refreshes_json_field(self, client, restore_advance_list):
+    def test_update_refreshes_ball_list_field(self, client, restore_advance_list):
         r = client.post("/api/advance/save", json=SAMPLE)
         new_id = r.json()["data"]["id"]
 
@@ -145,15 +142,13 @@ class TestAdvanceBallListSerialisation:
             "/api/advance/save",
             json={**SAMPLE, "id": new_id, "ballList": new_ball_list},
         )
-        parsed = json.loads(r.json()["data"]["json"])
-        assert parsed[0]["ball"] == 0
+        assert r.json()["data"]["ballList"][0]["ball"] == 0
 
     def test_empty_ball_list_is_stored_as_empty_array(
         self, client, restore_advance_list
     ):
         r = client.post("/api/advance/save", json={**SAMPLE, "ballList": []})
-        parsed = json.loads(r.json()["data"]["json"])
-        assert parsed == []
+        assert r.json()["data"]["ballList"] == []
 
 
 # ── Save: timestamp semantics ────────────────────────────────
