@@ -287,9 +287,9 @@ jinja2==3.1.6 \
     # via
     #   fastapi
     #   pyvis
-jsonpickle==4.1.1 \
-    --hash=sha256:bb141da6057898aa2438ff268362b126826c812a1721e31cf08a6e142910dc91 \
-    --hash=sha256:f86e18f13e2b96c1c1eede0b7b90095bbb61d99fedc14813c44dc2f361dbbae1
+jsonpickle==4.1.2 \
+    --hash=sha256:7ffe34426bc797684dbf1dc84185558bd864cd25b1ff5fb01b7405e392d0a937 \
+    --hash=sha256:8afed18aa189fd81e2e833b426bb4af485594921f0b1d36c2001fc5637a2f210
     # via pyvis
 markdown-it-py==4.0.0 \
     --hash=sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147 \
